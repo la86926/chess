@@ -215,7 +215,8 @@ function tutor(texto,tono){
   if(limpio&&dichos[0]!==limpio){dichos.unshift(limpio);if(dichos.length>12)dichos.length=12;}
   var full=el('ref-full');if(full)full.innerHTML=dichos.map(function(d){return '<p>'+esc(d)+'</p>';}).join('');
 }
-function botonContinuar(texto,visible){var b=el('aa-continuar');b.firstChild.nodeValue=texto||'Continuar';b.hidden=visible===false;}
+/* secundario=true: el botón queda discreto (p. ej. «Saltar ejercicio») para que lo principal sea mover en el tablero */
+function botonContinuar(texto,visible,secundario){var b=el('aa-continuar');b.firstChild.nodeValue=texto||'Continuar';b.hidden=visible===false;b.classList.toggle('principal',!secundario);}
 
 /* =====================================================================
    4. Lecciones
@@ -541,8 +542,8 @@ function iniciarTarea(etapa,t,opc){
     if(t.fen){mostrarPosicion(t.fen,{orient:t.orient||ladoDe(t.fen),sinAnimar:true});}
     fijarCapa(t.flechas||[],t.marcas||[],true);
     ejercicioActual=comoEjercicio({fen:state.game.fen(),orient:state.orient},A.id);
-    tutor((etapa==='comprueba'?'Reforzar: ':'')+t.texto);
-    pintarOpciones(t);botonContinuar('Saltar',true);
+    tutor('**Elige la respuesta correcta.** '+t.texto);
+    pintarOpciones(t);botonContinuar('Saltar ejercicio',true,true);
     return;
   }
   if(A.tarea.tipo==='casilla'){
@@ -550,7 +551,7 @@ function iniciarTarea(etapa,t,opc){
     mostrarPosicion(t.fen,{orient:t.orient||ladoDe(t.fen),sinAnimar:true});
     limpiarCapa();
     ejercicioActual=comoEjercicio({fen:t.fen,orient:t.orient},A.id);
-    tutor(t.di);botonContinuar('Saltar',true);
+    tutor((/^toca/i.test(t.di||'')?'':'**Toca en el tablero.** ')+t.di);botonContinuar('Saltar ejercicio',true,true);
     return;
   }
   modoControles('tarea');
@@ -568,9 +569,10 @@ function iniciarTarea(etapa,t,opc){
     renderBoard();renderMoves();
   }
   var intro=t.di||('Te toca: juegan las '+ladoTexto(state.orient)+'.');
-  var pre=etapa==='practica'?'Resolvemos juntos. ':etapa==='hazlo'?'Práctica, sin ayuda al principio. ':'Reforzar: ';
+  /* frase directa: hay que mover en el tablero (no basta con pulsar un botón) */
+  var pre=etapa==='practica'?'**Mueve en el tablero.** ':etapa==='hazlo'?'**Mueve en el tablero**, ahora sin ayuda. ':'**Mueve en el tablero** para terminar. ';
   tutor(pre+intro);
-  botonContinuar('Saltar',true);
+  botonContinuar('Saltar ejercicio',true,true);
   renderHead();
 }
 function registrarIntento(){
@@ -686,7 +688,7 @@ setStatus=function(kind,msg){
   try{
     if(!A.tarea||A.tarea.tipo!=='jugada'||A.resuelta)return r;
     if(kind==='ok'&&/rival responde/i.test(msg||''))tutor('¡Correcto! Tu rival responde…','bien');
-    else if(kind==='idle'&&/Sigue la línea/i.test(msg||''))tutor('Bien. Sigue: te toca otra vez.','bien');
+    else if(kind==='idle'&&/Sigue la línea/i.test(msg||''))tutor('Bien. Vuelve a mover en el tablero.','bien');
     else if(kind==='done'&&/Línea completa/i.test(msg||'')){tutor('Esa era la solución. Ahora inténtalo tú para que cuente.','');el('aa-reintentar').hidden=false;}
   }catch(e){}
   return r;
@@ -839,8 +841,8 @@ function cargarDescubre(it,reinicio){
   ejercicioActual=comoEjercicio(it.tarea,'descubre');
   limpiarCapa();A.bloqueado=false;el('aa-reintentar').hidden=true;load(ejercicioActual);
   el('aa-etapas').hidden=true;
-  tutor('Juegan las '+ladoTexto(state.orient)+'. Encuentra la mejor jugada. Si te atascas, pide una pista: primero te doy una idea, luego la pieza y, al final, la jugada.');
-  botonContinuar('Rendirme y ver la táctica');
+  tutor('**Mueve en el tablero.** Juegan las '+ladoTexto(state.orient)+': encuentra la mejor jugada. Si te atascas, toca la bombilla para recibir una pista.');
+  botonContinuar('Ver la solución',true,true);
   renderHead();renderRef();pintarRuta();guardarUltimo();
 }
 function pistaDescubre(otraVez){
@@ -1359,8 +1361,8 @@ window.addEventListener('storage',function(e){
    ===================================================================== */
 var TOUR=[
   {t:'Tu lección',x:'Así se ve una lección. Te muestro en un momento qué tocar.',sel:null},
-  {t:'Las cinco etapas',x:'Teoría, Resolver, Práctica, Reforzar y Repaso. Toca cualquiera para ir a ella, aunque no hayas hecho las anteriores.',sel:'#aa-etapas'},
-  {t:'Juega sobre el tablero',x:'En los ejercicios, arrastra la pieza o toca la pieza y luego la casilla.',sel:'#board',arrastre:true},
+  {t:'Las cinco etapas',x:'A la derecha del tablero: Teoría, Resolver, Práctica, Reforzar y Repaso. Toca cualquiera para ir a ella, aunque no hayas hecho las anteriores.',sel:'#aa-etapas'},
+  {t:'Mueve en el tablero',x:'Cuando tu tutor diga «Mueve en el tablero», arrastra la pieza o tócala y luego toca la casilla. El botón «Saltar ejercicio» solo es por si quieres pasarlo.',sel:'#board',arrastre:true},
   {t:'Tu tutor',x:'La mascota te explica cada paso. Si algo no queda claro, toca «Explícame otra vez» y te lo cuenta de otra forma, más despacio.',sel:'#aa-tutor'},
   {t:'Tus botones',x:'La bombilla te da pistas poco a poco, «Solución» te muestra la jugada y el reloj abre tu historial.',sel:'#pc-fila-controles'},
   {t:'Otras lecciones',x:'Con estos botones pasas a la lección anterior o a la siguiente.',sel:'#b-next-top'},

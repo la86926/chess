@@ -69,10 +69,9 @@ with sync_playwright() as p:
         pg.evaluate("id=>AAApp.abrirLeccion(id,{etapa:'descubre'})",lid); time.sleep(0.3)
         continuar(pg)                                            # Descubre -> Observa
         ok(pg.evaluate("AAApp.estado.etapa")=='observa',lid+': Continuar no llevó a Observa')
-        for _ in range(len(L['observa'])+1):
-            if pg.evaluate("document.getElementById('aa-paso-sig').disabled"): break
-            pg.click('#aa-paso-sig'); time.sleep(0.1)
-        continuar(pg)                                            # Observa -> Comprende
+        for _ in range(len(L['observa'])+2):                   # «Siguiente paso» hasta terminar la demostración
+            if pg.evaluate("AAApp.estado.etapa")!='observa': break
+            continuar(pg)
         ok(pg.evaluate("AAApp.estado.etapa")=='comprende',lid+': no llegó a Comprende')
         q=L['comprende'].get('pregunta')
         if q:
