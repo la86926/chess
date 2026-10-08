@@ -145,6 +145,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 }
 .drawer-backdrop.open .app-choice{opacity:1;transform:none}
 .drawer-backdrop.open .app-choice[data-app="2"]{transition-delay:.11s}
+.drawer-backdrop.open .app-choice[data-app="3"]{transition-delay:.17s}
 .app-choice > span{display:block;min-width:0;font-family:var(--serif);font-size:1.16rem;font-weight:600;letter-spacing:-.01em;line-height:1.15}
 .app-choice br{display:none}
 .app-choice small{
@@ -236,21 +237,24 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   <aside class="drawer" role="dialog" aria-modal="true" aria-label="Elegir aplicación">
     <div class="drawer-brand">
       <img src="torre.png" alt="Ajedrez">
-      <div><strong>Método PC1 y PC2</strong><small>Dos métodos en una aplicación</small></div>
+      <div><strong>Método PC1 y PC2</strong><small>Aprende Ajedrez y dos métodos</small></div>
     </div>
     <div class="tema" id="tema" role="group" aria-label="Apariencia">
       <button type="button" data-modo="claro" aria-pressed="false" title="Claro" aria-label="Apariencia: Claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v2.1M12 18.7v2.1M3.2 12h2.1M18.7 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5"/></svg><span class="sr">Claro</span></button>
       <button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg><span class="sr">Oscuro</span></button>
       <button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg><span class="sr">Sistema</span></button>
     </div>
-    <button class="app-choice active" data-app="1" type="button"><span>Método PC1<br><small>Ejercicios tácticos</small></span></button>
-    <button class="app-choice" data-app="2" type="button"><span>Método PC2<br><small>Ejercicios posicionales</small></span></button>
+    <button class="app-choice" data-app="3" type="button"><span>Aprende Ajedrez<br><small>Seis niveles progresivos</small></span></button>
+    <button class="app-choice active" data-app="1" type="button"><span>Método PC1 (Avanzado)<br><small>Ejercicios tácticos</small></span></button>
+    <button class="app-choice" data-app="2" type="button"><span>Método PC2 (Muy avanzado)<br><small>Ejercicios posicionales</small></span></button>
     <button class="drawer-tuto" id="drawer-tuto" type="button">Ver tutorial</button>
-    <p class="drawer-note">El progreso de cada método se conserva de forma independiente.</p>
+    <p class="drawer-note">El progreso de cada sección se conserva de forma independiente.</p>
   </aside>
 </div>
-<iframe class="app-frame active" id="app-frame-1" src="index1.html?v=20261008-nombres" title="Método PC1" allow="autoplay"></iframe>
-<iframe class="app-frame" id="app-frame-2" src="index2.html?v=20261008-nombres" title="Método PC2" allow="autoplay"></iframe>
+<iframe class="app-frame active" id="app-frame-1" src="index1.html?v=20261008-nombres" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-2" src="index2.html?v=20261008-nombres" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
+<!-- Aprende Ajedrez se carga la primera vez que se abre (así PC1 y PC2 no tardan más en abrir). -->
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=20261008-aa2" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -275,6 +279,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     var frames=document.querySelectorAll('.app-frame');
     for(var i=0;i<frames.length;i++) frames[i].classList.remove('active');
     var frame=document.getElementById('app-frame-'+activeApp);
+    if(frame&&!frame.getAttribute('src')&&frame.dataset.src) frame.setAttribute('src',frame.dataset.src);
     if(frame) frame.classList.add('active');
     var choices=document.querySelectorAll('.app-choice');
     for(var j=0;j<choices.length;j++) choices[j].classList.toggle('active',choices[j].getAttribute('data-app')===activeApp);
@@ -289,7 +294,21 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   var guardado=null;
   try{guardado=localStorage.getItem('pc_l3_active_app');}catch(e){}
   if(!guardado) guardado=galleta('pc_l3_active_app');
-  if(guardado==='2') selectApp('2');
+  /* Sección al abrir:
+     - Si hay una sección guardada (también la que llega de la nube con el código), se abre esa.
+     - Si no hay ninguna guardada pero la persona ya tiene avance o un código de progreso,
+       se mantiene lo de siempre: Método PC1.
+     - Solo quien es nuevo de verdad entra a Aprende Ajedrez, la primera sección. */
+  function hayAvanceOCodigo(){
+    try{
+      if(localStorage.getItem('pc_cloud_sync_code_v1'))return true;
+      var ks=['wp_solved','wp2_solved','wp_hist_log','wp2_hist_log'];
+      for(var i=0;i<ks.length;i++){var v=localStorage.getItem(ks[i]);if(v&&v!=='[]'&&v!=='{}'&&v!=='null')return true;}
+    }catch(e){}
+    return false;
+  }
+  if(guardado==='2'||guardado==='3') selectApp(guardado);
+  else if(guardado!=='1'&&!hayAvanceOCodigo()) selectApp('3');
 
   /* ---- apariencia: misma clave que los métodos, así los tres van a una ---- */
   var raiz=document.documentElement, K='pc_modo';
@@ -554,7 +573,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     </div>
   </section>
 </div>
-<script type="module" src="pc-cloud-sync.js?v=5"></script>
+<script src="aa-datos.js?v=20261008-aa2"></script>
+<script type="module" src="pc-cloud-sync.js?v=6"></script>
 <script>
 /* ==================================================================
    Tutorial de bienvenida
@@ -578,9 +598,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   var bCerrar=document.getElementById('tuto-cerrar');
   var abierto=false,paso=0,reloj=null,vigia=null,estable=0;
 
-  var PASOS=[
-    {titulo:'Bienvenido al Método PC1 y PC2',texto:'Dos métodos de ajedrez en una sola app. En menos de un minuto te muestro qué tocar.',modo:'saludo'},
-    {titulo:'Elige tu método',texto:'Con este botón abres el menú y cambias entre el Método PC1 (ejercicios tácticos) y el Método PC2 (ejercicios posicionales).',padre:'menu-button',modo:'toque'},
+  var PASOS_PC=[
+    {titulo:'Bienvenido al Método PC1 y PC2',texto:'Una escuela con lecciones y dos métodos de ajedrez en una sola app. En menos de un minuto te muestro qué tocar.',modo:'saludo'},
+    {titulo:'Elige tu método',texto:'Con este botón abres el menú y cambias entre Aprende Ajedrez (lecciones por niveles), el Método PC1 (Avanzado: ejercicios tácticos) y el Método PC2 (Muy avanzado: ejercicios posicionales).',padre:'menu-button',modo:'toque'},
     {titulo:'¿Quién juega?',texto:'Aquí ves el número del ejercicio, su dificultad y qué bando mueve: «Juegan: Blancas» o «Juegan: Negras».',app:'toplay',modo:'toque'},
     {titulo:'Juega sobre el tablero',texto:'Toca una de tus piezas y arrástrala, o toca la casilla de destino. Si es la jugada correcta, el rival responde solo.',app:'board',modo:'arrastre'},
     {titulo:'Más espacio',texto:'«Ocultar» esconde el encabezado de arriba para que el tablero tenga más espacio. «Mostrar» lo vuelve a poner.',app:'b-banner',modo:'toque'},
@@ -591,6 +611,20 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     {titulo:'Tu código de progreso',texto:'Este botón guarda tu avance en la nube con tu código. En otro dispositivo, escribe el mismo código y recuperas todo.',padre:'pc-sync-fab',modo:'toque'},
     {titulo:'¡Listo para entrenar!',texto:'Resuelve, repite y acelera. Puedes volver a ver esta guía desde el menú, en «Ver tutorial».',modo:'saludo',final:true}
   ];
+  /* Recorrido de Aprende Ajedrez (la primera sección): se usa cuando es la sección abierta. */
+  var PASOS_AA=[
+    {titulo:'Bienvenido a Aprende Ajedrez',texto:'Aquí aprendes ajedrez desde cero, en seis niveles. Cuando estés listo, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado) te esperan en el menú.',modo:'saludo'},
+    {titulo:'El menú',texto:'Con este botón abres el menú y cambias entre Aprende Ajedrez, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado).',padre:'menu-button',modo:'toque'},
+    {titulo:'Tus pestañas',texto:'«Lección» es la clase actual, «Niveles» muestra los seis niveles, «Descubre» te propone posiciones para encontrar la jugada, «Favoritos» guarda lo que marques con el corazón y «Guía» explica cómo funciona todo.',app:'tabs',modo:'toque'},
+    {titulo:'Paso a paso',texto:'Cada lección avanza por etapas: Descubre, Observa, Comprende, Practica conmigo, Hazlo tú, Comprueba y Repasa.',app:'aa-etapas',modo:'toque'},
+    {titulo:'Juega sobre el tablero',texto:'Toca una pieza y arrástrala, o toca la casilla de destino. Las flechas y marcas te muestran ataques, defensas y amenazas.',app:'board',modo:'arrastre'},
+    {titulo:'Tu tutor',texto:'La mascota te explica cada paso. Si algo no queda claro, pide «Explícame otra vez» y te lo dirá más sencillo.',app:'aa-tutor',modo:'toque'},
+    {titulo:'Tus botones',texto:'«Girar» voltea el tablero, el parlante activa o silencia el sonido, el libro abre la explicación y el último botón comparte la lección. En los ejercicios, la bombilla te da pistas poco a poco.',app:'pc-fila-controles',modo:'toque'},
+    {titulo:'Favoritos',texto:'Toca el corazón para guardar la lección en una o varias carpetas. Ya tienes una carpeta por nivel.',app:'aa-corazon',modo:'toque'},
+    {titulo:'Tu código de progreso',texto:'Este botón guarda tu avance en la nube con tu código. En otro dispositivo, escribe el mismo código y recuperas todo.',padre:'pc-sync-fab',modo:'toque'},
+    {titulo:'¡A aprender!',texto:'Empieza por el Nivel 1 y avanza a tu ritmo. Puedes volver a ver esta guía desde el menú, en «Ver tutorial».',modo:'saludo',final:true}
+  ];
+  var PASOS=PASOS_PC;
 
 
   function leer(k){try{return localStorage.getItem(k);}catch(e){return null;}}
@@ -600,7 +634,16 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     try{var v=JSON.parse(leer(k)||'null');if(!v)return false;if(Array.isArray(v))return v.length>0;return typeof v==='object'&&Object.keys(v).length>0;}catch(e){return false;}
   }
   function tieneHistorial(){
-    return listaLlena('wp_solved')||listaLlena('wp2_solved')||listaLlena('wp_hist_log')||listaLlena('wp2_hist_log');
+    return listaLlena('wp_solved')||listaLlena('wp2_solved')||listaLlena('wp_hist_log')||listaLlena('wp2_hist_log')||avanceAprende();
+  }
+  /* Aprende Ajedrez registra la lección abierta al cargar; eso no es avance.
+     Cuenta como avance haber intentado o completado algo. */
+  function avanceAprende(){
+    try{
+      var p=JSON.parse(leer('aa_progreso_v1')||'null'),l=p&&p.lecciones;if(!l)return false;
+      for(var k in l){var r=l[k]||{};if(r.estado==='completada'||r.intentos>0||r.aciertos>0||(r.etapasHechas&&r.etapasHechas.length>1))return true;}
+    }catch(e){}
+    return false;
   }
   function frameActivo(){return document.querySelector('.app-frame.active');}
   function docApp(){try{var f=frameActivo();return f&&f.contentDocument;}catch(e){return null;}}
@@ -685,6 +728,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   function abrir(desde){
     if(abierto)return;
     abierto=true;paso=desde||0;
+    var fa=frameActivo();PASOS=(fa&&fa.id==='app-frame-3')?PASOS_AA:PASOS_PC;
     raiz.classList.add('open');raiz.setAttribute('aria-hidden','false');
     pintar();
     clearInterval(reloj);reloj=setInterval(function(){
@@ -696,6 +740,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   function cerrar(){
     if(!abierto)return;
     abierto=false;marcarVisto();delete raiz.dataset.manual;
+    /* Si se mostró el recorrido de Aprende Ajedrez, no se repite el de la propia sección */
+    if(PASOS===PASOS_AA){try{localStorage.setItem('aa_tour_visto_v1','1');}catch(e){}}
     mascotaTuto(false);
     clearInterval(reloj);
     raiz.classList.remove('open','con-foco');raiz.setAttribute('aria-hidden','true');raiz.style.visibility='';
@@ -743,6 +789,21 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   try{ q=new URLSearchParams(location.search); }catch(e){ return; }
   n=parseInt(q.get('ejercicio'),10);
   m=q.get('metodo');
+  /* Aprende Ajedrez: ?metodo=3&leccion=N2-005 */
+  var lec=String(q.get('leccion')||'').toUpperCase();
+  if(m==='3' && /^N[1-6]-\d{3}$/.test(lec)){
+    try{ q.delete('leccion'); q.delete('metodo'); var r3=q.toString(); history.replaceState(history.state,'',location.pathname+(r3?'?'+r3:'')+location.hash); }catch(e){}
+    var t3=Date.now();
+    (function abrir3(){
+      var b3=document.querySelector('.app-choice[data-app="3"]');
+      if(b3 && !b3.classList.contains('active')) b3.click();
+      var f3=document.getElementById('app-frame-3'),w3=null;
+      try{ w3=f3&&f3.contentWindow; }catch(e){}
+      if(w3 && w3.document && w3.document.readyState==='complete' && typeof w3.aaAbrirLeccion==='function'){ try{ w3.aaAbrirLeccion(lec); }catch(e){} return; }
+      if(Date.now()-t3<20000) setTimeout(abrir3,150);
+    })();
+    return;
+  }
   if(!(n>0) || (m!=='1' && m!=='2')) return;
   try{
     q.delete('ejercicio'); q.delete('metodo');

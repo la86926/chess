@@ -21,6 +21,13 @@ const DEVICE_MODE_KEY = 'pc_modo_dispositivo_v1';
 const PAGE1_KEY = 'pc_backup_page_state_v2:index1.html';
 const PAGE2_KEY = 'pc_backup_page_state_v2:index2.html';
 const CODE_RE = /^[A-Za-z0-9]{4,32}$/;
+// Los códigos NUEVOS (crear o renombrar) deben tener al menos 8 caracteres: así es difícil adivinarlos.
+// Los perfiles que ya existen con códigos más cortos siguen funcionando igual.
+const NEW_CODE_RE = /^[A-Za-z0-9]{8,32}$/;
+// Aprende Ajedrez (index3.html) guarda sus datos con claves «aa_»: es el tercer ámbito,
+// independiente de PC1 (l1) y PC2 (l2). Se FUSIONA registro por registro (ver aa-datos.js)
+// en lugar de sobrescribirse, para que dos dispositivos no se pisen los favoritos.
+const AA_SELLOS_KEY = 'pc_cloud_sync_aa_sellos';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -53,6 +60,8 @@ function escapeHtml(value){
 function cleanCode(value){return String(value||'').trim();}
 function codeId(value){return cleanCode(value).toLowerCase();}
 function validCode(value){return CODE_RE.test(cleanCode(value));}
+function validNewCode(value){return NEW_CODE_RE.test(cleanCode(value));}
+const NEW_CODE_MSG='Para un código nuevo usa solo letras y números, entre 8 y 32 caracteres.';
 function randomCode(){
   const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const bytes=new Uint8Array(12);
@@ -64,6 +73,9 @@ function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function isExcludedKey(key){
   return !key || key===SYNC_CODE_KEY || key===CLIENT_KEY || key===DEVICE_MODE_KEY || key.indexOf('pc_cloud_sync_')===0;
 }
+function isAaKey(key){
+  return !isExcludedKey(key) && key.indexOf('aa_')===0;
+}
 function isL2Key(key){
   return !isExcludedKey(key) && (key.indexOf('wp2_')===0 || key===PAGE2_KEY);
 }
@@ -72,6 +84,7 @@ function isL1Key(key){
   return key.indexOf('wp_')===0 || key.indexOf('pc_')===0;
 }
 function scopeForKey(key){
+  if(isAaKey(key))return 'aa';
   if(isL2Key(key))return 'l2';
   if(isL1Key(key))return 'l1';
   return null;
@@ -81,7 +94,7 @@ function captureStorage(scope){
   try{
     for(let i=0;i<localStorage.length;i++){
       const key=localStorage.key(i);
-      const include=scope==='l2'?isL2Key(key):isL1Key(key);
+      const include=scope==='aa'?isAaKey(key):scope==='l2'?isL2Key(key):isL1Key(key);
       if(include)out[key]=localStorage.getItem(key);
     }
   }catch(e){}
@@ -112,7 +125,43 @@ function remoteStamp(part){
   return Number.isFinite(n)?n:0;
 }
 function captureProfile(){
-  return {l1:captureScope('l1'),l2:captureScope('l2')};
+  return {l1:captureScope('l1'),l2:captureScope('l2'),aa:captureAa()};
+}
+/* ---------- Aprende Ajedrez (ámbito aa) ---------- */
+function aaSellos(){
+  try{const o=JSON.parse(localStorage.getItem(AA_SELLOS_KEY)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch(e){return {};}
+}
+function sellarAa(key){
+  if(!isAaKey(key))return;
+  const s=aaSellos();s[key]=Date.now();
+  try{localStorage.setItem(AA_SELLOS_KEY,JSON.stringify(s));}catch(e){}
+}
+function captureAa(){
+  return {storage:captureStorage('aa'),sellos:aaSellos(),updatedAt:Date.now()};
+}
+function fusionAa(local,remoto){
+  const D=window.AADatos;
+  if(!D)return {mapa:local.storage,sellos:local.sellos};
+  return D.fusionarMapas(local.storage,(remoto&&remoto.storage)||{},local.sellos,(remoto&&remoto.sellos)||{});
+}
+function mismoMapa(a,b){
+  const ka=Object.keys(a||{}),kb=Object.keys(b||{});
+  if(ka.length!==kb.length)return false;
+  return ka.every(k=>Object.prototype.hasOwnProperty.call(b,k)&&String(a[k])===String(b[k]));
+}
+/* Aplica la nube a este dispositivo SIN perder lo local: fusiona y escribe solo lo que cambió.
+   Las claves escritas aquí disparan el evento «storage» dentro de Aprende Ajedrez,
+   que repinta lo que se ve. Devuelve true si la nube quedó atrasada respecto de lo fusionado. */
+function aplicarAa(remoto){
+  const local=captureAa();
+  const f=fusionAa(local,remoto);
+  Object.keys(f.mapa).forEach(k=>{
+    if(!isAaKey(k))return;
+    const v=String(f.mapa[k]);
+    try{if(localStorage.getItem(k)!==v)localStorage.setItem(k,v);}catch(e){}
+  });
+  try{localStorage.setItem(AA_SELLOS_KEY,JSON.stringify(f.sellos||{}));}catch(e){}
+  return !mismoMapa(f.mapa,(remoto&&remoto.storage)||{});
 }
 
 function clearCookie(name){
@@ -126,7 +175,7 @@ function clearAllAppState(){
   const keys=[];
   try{for(let i=0;i<localStorage.length;i++)keys.push(localStorage.key(i));}catch(e){}
   keys.forEach(key=>{
-    if(isL1Key(key)||isL2Key(key)){
+    if(isL1Key(key)||isL2Key(key)||isAaKey(key)){
       try{localStorage.removeItem(key);}catch(e){}
       clearCookie(key);
     }
@@ -138,6 +187,7 @@ function clearAllAppState(){
       if(isL1Key(key)||isL2Key(key))clearCookie(key);
     });
   }catch(e){}
+  try{localStorage.removeItem(AA_SELLOS_KEY);}catch(e){}
   try{window.dispatchEvent(new StorageEvent('storage',{key:'pc_modo',newValue:null}));}catch(e){}
 }
 
@@ -200,6 +250,8 @@ function callBridge(frameId,payload,method='apply'){
 function resetFrames(){
   callBridge('app-frame-1',null,'reset');
   callBridge('app-frame-2',null,'reset');
+  // Aprende Ajedrez no tiene puente: se recarga para empezar limpio.
+  try{const f3=document.getElementById('app-frame-3');if(f3&&f3.contentWindow&&f3.getAttribute('src'))f3.contentWindow.location.reload();}catch(e){}
 }
 
 async function applyRemote(data,force){
@@ -215,6 +267,7 @@ async function applyRemote(data,force){
     const local=localStamp(scope), remoto=remoteStamp(data[scope]);
     usar[scope]=!!data[scope]&&(force||!local||remoto>local);
   });
+  let subirAaDespues=false;
   const subirDespues=['l1','l2'].filter(scope=>!usar[scope]&&(keepPending.has(scope)||localStamp(scope)>remoteStamp(data[scope])));
   try{
     const c1=usar.l1?applyStorage('l1',data.l1.storage):[];
@@ -223,8 +276,15 @@ async function applyRemote(data,force){
     if(usar.l2)setLocalStamp('l2',remoteStamp(data.l2)||Date.now());
     const changed=[...new Set(c1.concat(c2))];
 
-    const active=localStorage.getItem('pc_l3_active_app');
-    if(active==='1'||active==='2'){
+    // Aprende Ajedrez: siempre se fusiona (no hay «gana el más reciente» para todo el ámbito).
+    if(aplicarAa(data.aa))subirAaDespues=true;
+
+    // Sección abierta: se sigue la que trae la nube para este código. Si la copia de la nube
+    // no guarda ninguna (avances de antes de que existiera Aprende Ajedrez), esa persona
+    // siempre estuvo en el Método PC1, así que se abre el PC1.
+    let active=localStorage.getItem('pc_l3_active_app');
+    if(!(active==='1'||active==='2'||active==='3')&&usar.l1)active='1';
+    if(active==='1'||active==='2'||active==='3'){
       const button=document.querySelector('.app-choice[data-app="'+active+'"]');
       if(button&&!button.classList.contains('active'))button.click();
     }
@@ -236,6 +296,7 @@ async function applyRemote(data,force){
     setTimeout(()=>{
       applyingRemote=false;
       // lo de este dispositivo era más nuevo: se sube para que la nube quede al día
+      if(subirAaDespues||keepPending.has('aa'))subirDespues.push('aa');
       if(subirDespues.length&&currentRef){
         subirDespues.forEach(scope=>pendingScopes.add(scope));
         clearTimeout(uploadTimer);
@@ -272,11 +333,33 @@ async function pushPending(){
   if(scopes.includes('l2'))patch.l2=captureScope('l2');
   try{
     lastUploadAt=Date.now();
-    await setDoc(currentRef,patch,{merge:true});
+    if(patch.l1||patch.l2)await setDoc(currentRef,patch,{merge:true});
+    if(scopes.includes('aa'))await subirAa();
     setStatus('Sincronizado','ok');
   }catch(e){
     console.error('PC cloud sync:',e);
-    setStatus('Error al guardar','error');
+    // se reintenta al recuperar la conexión; lo local nunca se pierde
+    scopes.forEach(s=>pendingScopes.add(s));
+    setStatus(navigator.onLine===false?'Sin conexión':'Error al guardar','error');
+  }
+}
+/* Sube Aprende Ajedrez dentro de una transacción: lee lo que hay en la nube, lo fusiona
+   con este dispositivo y escribe el resultado. Si otro dispositivo escribió a la vez,
+   Firestore repite la transacción con el dato nuevo: ningún cambio se pierde. */
+async function subirAa(){
+  const ref=currentRef;if(!ref)return;
+  let fusion=null;
+  await runTransaction(db,async tx=>{
+    const snap=await tx.get(ref);
+    if(!snap.exists())throw new Error('El perfil ya no existe.');
+    const remoto=(snap.data()||{}).aa||null;
+    fusion=fusionAa(captureAa(),remoto);
+    tx.update(ref,{aa:{storage:fusion.mapa,sellos:fusion.sellos,updatedAt:Date.now()},timestamp:serverTimestamp(),updatedBy:clientId,schemaVersion:1});
+  });
+  lastUploadAt=Date.now();
+  if(fusion){
+    applyingRemote=true;
+    try{aplicarAa({storage:fusion.mapa,sellos:fusion.sellos});}finally{setTimeout(()=>{applyingRemote=false;},80);}
   }
 }
 
@@ -322,6 +405,7 @@ async function connectExisting(code,snapshot,force){
   startListening();
   closeModal();
   setStatus('Sincronizado','ok');
+  if(Object.keys(captureStorage('aa')).length){pendingScopes.add('aa');clearTimeout(uploadTimer);uploadTimer=setTimeout(pushPending,900);}
 }
 
 async function createCurrentProfile(code){
@@ -382,7 +466,7 @@ async function switchCode(code){
 
 async function renameCode(nextCode){
   nextCode=cleanCode(nextCode);
-  if(!validCode(nextCode))throw new Error('Usa solo letras y números, entre 4 y 32 caracteres.');
+  if(!validNewCode(nextCode))throw new Error(NEW_CODE_MSG);
   if(!currentRef||!currentCode)throw new Error('No hay un perfil activo.');
   if(codeId(nextCode)===codeId(currentCode))throw new Error('Es el mismo código.');
   const oldRef=currentRef;
@@ -440,10 +524,10 @@ function message(el,text,type=''){
 }
 
 function showCodeModal(prefill=''){
-  openModal(head('Código de sincronización','Un solo código guardará el Método PC1 y el Método PC2.')+`
+  openModal(head('Código de sincronización','Un solo código guardará el Método PC1, el Método PC2 y Aprende Ajedrez.')+`
     <label class="pc-sync-field"><span>CÓDIGO</span><input id="pc-sync-code-input" class="pc-sync-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" placeholder="Ej. Luis09" value="${escapeHtml(prefill)}"></label>
     <div class="pc-sync-row"><button id="pc-sync-generate" class="pc-sync-btn" type="button">Generar código</button><button id="pc-sync-continue" class="pc-sync-btn primary" type="button">Continuar</button></div>
-    <p class="pc-sync-note">Solo letras y números. Un código largo es más difícil de adivinar.</p><div id="pc-sync-msg" class="pc-sync-msg"></div>`);
+    <p class="pc-sync-note">Solo letras y números. Los códigos nuevos llevan al menos 8 caracteres: así nadie puede adivinarlos.</p><div id="pc-sync-msg" class="pc-sync-msg"></div>`);
   const input=document.getElementById('pc-sync-code-input');
   const go=document.getElementById('pc-sync-continue');
   const msg=document.getElementById('pc-sync-msg');
@@ -455,7 +539,9 @@ function showCodeModal(prefill=''){
     try{
       const ref=await refFor(code);
       const snap=await getDoc(ref);
-      if(snap.exists())await connectExisting(code,snap,true);else showNewCodeChoice(code);
+      if(snap.exists())await connectExisting(code,snap,true);
+      else if(!validNewCode(code)){message(msg,NEW_CODE_MSG,'error');go.disabled=false;}
+      else showNewCodeChoice(code);
     }catch(e){message(msg,e&&e.message?e.message:'No se pudo conectar.','error');go.disabled=false;}
   };
   go.onclick=submit;
@@ -502,7 +588,7 @@ function copyCode(){
 }
 
 function showSettings(){
-  openModal(head('Sincronización','Un perfil para el Método PC1 y el Método PC2.')+`
+  openModal(head('Sincronización','Un perfil para el Método PC1, el Método PC2 y Aprende Ajedrez.')+`
     <div class="pc-sync-section"><h4>Código activo</h4><div class="pc-sync-code">${escapeHtml(currentCode||'Sin código')}</div><div id="pc-sync-live-status" class="pc-sync-statusline ${statusState}"><i></i><span>${escapeHtml(statusText)}</span></div><div class="pc-sync-row" style="margin-top:12px"><button id="pc-sync-copy" class="pc-sync-btn" type="button">Copiar código</button></div><div id="pc-sync-copy-msg" class="pc-sync-msg"></div></div>
     <div class="pc-sync-sep"></div>
     <div class="pc-sync-section"><h4>Cambiar a otro código existente</h4><label class="pc-sync-field"><input id="pc-sync-switch-input" class="pc-sync-input" autocomplete="off" maxlength="32" placeholder="Código existente"></label><button id="pc-sync-switch" class="pc-sync-btn primary" style="width:100%" type="button">Cambiar código</button><div id="pc-sync-switch-msg" class="pc-sync-msg"></div></div>
@@ -530,9 +616,11 @@ function installChangeWatchers(){
   window.addEventListener('storage',e=>{
     if(applyingRemote||!e||!e.key)return;
     const scope=scopeForKey(e.key);
+    if(scope==='aa'){sellarAa(e.key);queueUpload('aa');return;}
     // la foto de página se guarda sola al cargar: se sube, pero no cuenta como cambio de la persona
     if(scope)queueUpload(scope,e.key!==PAGE1_KEY&&e.key!==PAGE2_KEY);
   });
+  window.addEventListener('online',()=>{if(currentRef&&pendingScopes.size){clearTimeout(uploadTimer);uploadTimer=setTimeout(pushPending,300);}});
   document.addEventListener('click',e=>{
     if(!currentRef||applyingRemote)return;
     if(e.target.closest&&e.target.closest('.app-choice'))setTimeout(()=>queueUpload('l1'),10);

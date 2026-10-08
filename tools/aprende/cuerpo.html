@@ -1,0 +1,310 @@
+<header class="topbar">
+  <div class="hdr-marca">
+    <button class="home-icon" id="b-home" type="button" aria-label="Ir a la lección"> <img class="crest" src="torre.png" alt="Pieza de ajedrez" > </button>
+    <span class="titulo"><b>Aprende Ajedrez</b><small id="aa-subtitulo-app">Seis niveles progresivos</small></span>
+  </div>
+  <div class="hdr-centro">
+    <!--@pc-modo-->
+    <button class="pc-tablero" id="pc-tablero-btn" type="button" aria-haspopup="dialog" aria-label="Cambiar el tema del tablero">
+      <i class="pc-muestra" aria-hidden="true"></i><span id="pc-tablero-nombre">Cielo</span>
+    </button>
+  </div>
+  <button class="gift-btn aa-oculto" id="b-gift" type="button" aria-label="Plan de entrenamiento" tabindex="-1"><img src="regalo1.png" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;display:block"></button>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-v="train">Lección</button>
+    <button class="tab" data-v="levels">Niveles</button>
+    <button class="tab" data-v="discover">Descubre</button>
+    <button class="tab" data-v="favs">Favoritos</button>
+    <button class="tab" data-v="guide">Guía</button>
+  </nav>
+</header>
+
+<section class="view active" id="v-train">
+ <div class="train">
+  <div class="boardcol">
+
+    <div class="boardhead aa-boardhead">
+      <div class="boardhead-left">
+        <button class="aa-volver" id="aa-volver" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span id="aa-volver-texto">Favoritos</span></button>
+        <div class="aa-eyebrow" id="aa-eyebrow">NIVEL UNO · LECCIÓN 1</div>
+        <h1 class="exno aa-titulo" id="aa-titulo">Aprende Ajedrez</h1>
+        <div class="aa-meta">
+          <span class="chip F" id="chip">Lección</span>
+          <span class="toplay" id="toplay">Juegan: <b>Blancas</b></span>
+          <span id="exno" class="aa-oculto"></span>
+        </div>
+      </div>
+
+      <div class="boardhead-center">
+        <button class="engine-banner-toggle" id="b-banner" type="button" aria-pressed="false">Ocultar</button>
+      </div>
+
+      <div class="aa-head-fav">
+        <button class="aa-corazon" id="aa-corazon" type="button" aria-haspopup="dialog" aria-label="Guardar en favoritos" aria-pressed="false">
+          <svg class="aa-corazon-vacio" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>
+        </button>
+      </div>
+
+      <div class="boardhead-right">
+        <button class="btn" id="b-prev-top" type="button" aria-label="Lección anterior" style="justify-content:center;padding:.55rem .8rem;font-weight:600;">◂ Ant</button>
+        <button class="btn" id="b-next-top" type="button" aria-label="Lección siguiente" style="justify-content:center;padding:.55rem .8rem;font-weight:600;">Sig ▸</button>
+      </div>
+    </div>
+
+    <nav class="aa-etapas" id="aa-etapas" aria-label="Etapas de la lección"></nav>
+
+    <div class="frame">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="aa-leyenda" id="aa-leyenda" aria-label="Significado de las señales"></div>
+
+    <section class="aa-tutor" id="aa-tutor" aria-live="polite">
+      <img class="aa-tutor-cara" src="mascota.png" alt="" aria-hidden="true">
+      <div class="aa-tutor-globo">
+        <p class="aa-tutor-texto" id="aa-dice">¡Hola! Elige una lección para empezar.</p>
+        <div class="aa-opciones" id="aa-opciones" role="group" hidden></div>
+        <div class="aa-tutor-acciones" id="aa-tutor-acciones">
+          <button class="aa-accion" id="aa-otra-vez" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Explícame otra vez</button>
+          <button class="aa-accion principal" id="aa-continuar" type="button">Continuar<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="aa-demo" id="aa-demo" role="group" aria-label="Controles de la demostración">
+      <button class="btn aa-demo-btn" id="aa-paso-ant" type="button" aria-label="Paso anterior" title="Paso anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14"/><path d="M18 6l-9 6 9 6z"/></svg></button>
+      <button class="btn aa-demo-btn aa-play" id="aa-play" type="button" aria-label="Reproducir" title="Reproducir"><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg><svg class="i-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span id="aa-play-txt">Reproducir</span></button>
+      <button class="btn aa-demo-btn" id="aa-paso-sig" type="button" aria-label="Paso siguiente" title="Paso siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14"/><path d="M6 6l9 6-9 6z"/></svg></button>
+      <span class="aa-paso-n" id="aa-paso-n">1 / 1</span>
+      <button class="btn aa-demo-btn" id="aa-velocidad" type="button" aria-label="Velocidad de la demostración" title="Velocidad">1×</button>
+      <button class="btn aa-demo-btn" id="aa-repetir" type="button" aria-label="Repetir explicación" title="Repetir explicación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+    </div>
+
+    <div style="display:flex; gap:.5rem; width:100%; max-width:620px; margin:.7rem auto 0;">
+      <button class="btn" id="b-reset" style="flex:1; justify-content:center; padding:.6rem .4rem; font-size:0.95rem; font-weight:600;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5"/></svg>Reiniciar</button>
+      <!--@boton:b-edit-->
+      <button class="btn" id="b-anotar" type="button" aria-pressed="false" style="flex:1; justify-content:center; padding:.6rem .4rem; font-size:0.95rem; font-weight:600;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L19 5"/><path d="M11 5h8v8"/></svg>Flechas</button>
+      <button class="btn" id="b-ana-prev" aria-label="Jugada anterior" style="flex:1; justify-content:center; align-items:center; padding:0 .4rem; height:2.55rem; display:none;"><svg viewBox="0 0 24 24" style="width:1.9rem;height:1.9rem" fill="currentColor"><path d="M16 4L6 12l10 8z"/></svg></button>
+      <button class="btn" id="b-ana-next" aria-label="Jugada siguiente" style="flex:1; justify-content:center; align-items:center; padding:0 .4rem; height:2.55rem; display:none;"><svg viewBox="0 0 24 24" style="width:1.9rem;height:1.9rem" fill="currentColor"><path d="M8 4l10 8-10 8z"/></svg></button>
+    </div>
+
+    <!--@bloque:engine-box-->
+
+    <div class="status" id="status"><span class="ico">♟</span><span id="statustext">Encuentra la mejor jugada.</span></div>
+
+    <!--@bloque:pc-fila-controles-->
+
+    <div class="actions pc-backup-actions" id="pc-backup-actions" style="justify-content:center">
+      <button class="btn" id="b-backup-export" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Exportar copia</button>
+      <button class="btn" id="b-backup-import" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>Importar copia</button>
+      <input id="pc-backup-file" type="file" accept="application/json,.json" hidden>
+    </div>
+
+    <div class="moves" id="movelist"></div>
+  </div>
+
+  <aside class="sidecol">
+    <div class="panel-card aa-panel-continuar">
+      <h3>Tu lección</h3>
+      <ol class="aa-ruta" id="aa-ruta"></ol>
+      <button class="btn primary aa-continuar-aprendiendo" id="aa-continuar-aprendiendo-lateral" type="button">Continuar aprendiendo</button>
+    </div>
+
+    <div class="panel-card">
+      <h3>Progreso</h3>
+      <div class="prog">
+        <div class="cell"><div class="big" id="p-num">0</div><div class="lbl">completadas</div></div>
+        <div class="cell"><div class="big" id="p-pct">0%</div><div class="lbl">del programa</div></div>
+        <div class="cell"><div class="big" id="p-streak">0</div><div class="lbl">días seguidos</div></div>
+      </div>
+      <div class="bar"><i id="p-bar"></i></div>
+      <div class="aa-niveles-mini" id="aa-niveles-mini"></div>
+      <div class="prog-actions">
+        <button class="btn" id="b-export">Exportar PGN</button>
+        <button class="btn" id="b-export-fen">Exportar FEN</button>
+        <button class="btn" id="b-import">Importar PGN/FEN</button>
+        <button class="btn" id="b-hist-open">Historial</button>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h3>Idea clave</h3>
+      <div class="ref">
+        <div class="vs" id="ref-vs">—</div>
+        <div class="ev" id="ref-ev"></div>
+        <div class="tags" id="ref-tags"></div>
+        <div class="note" id="ref-note" style="display:none"></div>
+        <details class="expl" id="expl"><summary>Lo que dijo tu tutor</summary>
+          <div class="body" id="ref-full"></div>
+        </details>
+      </div>
+    </div>
+
+    <div class="aa-oculto" id="aa-legado" aria-hidden="true">
+      <button class="btn" id="b-random" type="button" tabindex="-1">Aleatorio</button>
+      <div class="jump"><input id="jump" tabindex="-1"><button class="btn primary" id="b-go" tabindex="-1">Ir</button></div>
+      <div class="filters" id="filters"><button class="fbtn active" data-f="all" tabindex="-1">Todos<small id="c-all">0</small></button></div>
+    </div>
+  </aside>
+ </div>
+</section>
+
+<section class="view" id="v-levels">
+ <div class="aa-pagina">
+  <div class="aa-cabecera-pagina">
+    <div>
+      <span class="aa-eyebrow">PROGRAMA COMPLETO</span>
+      <h1>Seis niveles progresivos</h1>
+      <p class="lead">Avanza de los fundamentos tácticos a la estrategia de nivel intermedio. Puedes abrir cualquier lección, repetirla las veces que quieras y guardarla en tus favoritos.</p>
+    </div>
+    <div class="aa-resumen" id="aa-resumen"></div>
+  </div>
+  <div class="aa-continuar-bloque" id="aa-continuar-bloque"></div>
+  <div class="aa-niveles" id="aa-niveles"></div>
+ </div>
+</section>
+
+<section class="view" id="v-discover">
+ <div class="aa-pagina aa-pagina-estrecha">
+  <span class="aa-eyebrow">MODALIDAD</span>
+  <h1>Descubre la táctica</h1>
+  <p class="lead">Una posición, sin el nombre del tema. Encuentra la mejor jugada como en una partida real; si lo necesitas, pide pistas graduales. Al terminar te revelo qué táctica era.</p>
+  <div class="aa-descubre-stats" id="aa-descubre-stats"></div>
+  <label class="aa-campo"><span>Posiciones de</span>
+    <select id="aa-descubre-nivel" class="aa-select">
+      <option value="auto">Lo que ya estudiaste (recomendado)</option>
+      <option value="1">Hasta el NIVEL UNO</option>
+      <option value="2">Hasta el NIVEL DOS</option>
+      <option value="3">Hasta el NIVEL TRES</option>
+      <option value="4">Hasta el NIVEL CUATRO</option>
+      <option value="5">Hasta el NIVEL CINCO</option>
+      <option value="6">Hasta el NIVEL SEIS</option>
+    </select>
+  </label>
+  <button class="btn primary aa-boton-grande" id="aa-descubre-empezar" type="button">Nueva posición</button>
+  <p class="aa-nota" id="aa-descubre-nota"></p>
+ </div>
+</section>
+
+<section class="view" id="v-favs">
+ <div class="aa-pagina">
+  <div class="aa-fav-cabecera" id="aa-fav-cabecera">
+    <div>
+      <span class="aa-eyebrow">TUS CARPETAS</span>
+      <h1 id="aa-fav-titulo">Favoritos</h1>
+      <p class="lead" id="aa-fav-lead">Guarda cualquier lección con el corazón y organízala en carpetas para repasarla cuando quieras.</p>
+    </div>
+  </div>
+  <div class="aa-fav-barra">
+    <button class="aa-fv-boton" id="aa-fav-atras" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Carpetas</button>
+    <label class="aa-fv-buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="aa-fav-buscar" type="search" placeholder="Buscar técnicas guardadas" autocomplete="off" aria-label="Buscar técnicas guardadas"></label>
+    <select id="aa-fav-orden" class="aa-select aa-fv-orden" aria-label="Ordenar favoritos">
+      <option value="fecha">Más recientes</option>
+      <option value="nombre">Por nombre</option>
+      <option value="nivel">Por nivel</option>
+    </select>
+    <button class="aa-fv-boton" id="aa-fav-nueva" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v4"/><path d="M16 19h6"/><path d="M19 16v6"/></svg>Nueva carpeta</button>
+  </div>
+  <div class="aa-fav-contenido" id="aa-fav-contenido"></div>
+ </div>
+</section>
+
+<section class="view" id="v-guide">
+ <div class="reading">
+  <h1>Cómo aprender aquí</h1>
+  <p class="lead">Aprende Ajedrez enseña con el tablero: primero observas, luego practicas con ayuda y al final lo haces tú solo.</p>
+
+  <h2><span class="k">01</span> Las siete etapas de cada lección</h2>
+  <p><strong>Descubre</strong>: una posición para despertar la curiosidad; puedes mover libremente. <strong>Observa</strong>: la demostración animada, con flechas y casillas resaltadas; avanza paso a paso o pulsa Reproducir. <strong>Comprende</strong>: tu tutor resume la idea y a veces te hace una pregunta. <strong>Practica conmigo</strong>: resuelve con pistas disponibles. <strong>Hazlo tú</strong>: otra posición, ahora sin ayuda inicial. <strong>Comprueba</strong>: una evaluación breve. Y luego <strong>repasa cuando quieras</strong>: la lección queda en tu historial y puedes guardarla con el corazón.</p>
+
+  <h2><span class="k">02</span> Señales sobre el tablero</h2>
+  <p>Las señales significan siempre lo mismo y no dependen solo del color: la <strong>flecha continua dorada</strong> es una jugada; la <strong>roja con trazo grueso</strong>, un ataque; la <strong>roja discontinua</strong>, una amenaza del rival; la <strong>verde punteada</strong>, una defensa; la <strong>azul a trazos largos</strong>, una línea de influencia. Un anillo con <strong>!</strong> marca una pieza amenazada; con <strong>✓</strong>, una pieza defendida; con <strong>?</strong>, una pieza indefensa; un rombo marca una casilla clave. Debajo del tablero siempre ves la leyenda de lo que aparece.</p>
+
+  <h2><span class="k">03</span> Explícame otra vez</h2>
+  <p>Si algo no quedó claro, pulsa <strong>Explícame otra vez</strong>: la demostración vuelve al inicio, va más lento, muestra cada movimiento y cada amenaza por separado y tu tutor lo explica de otra manera, más sencilla. Puedes repetirlo cuantas veces quieras.</p>
+
+  <h2><span class="k">04</span> Descubre la táctica</h2>
+  <p>En la pestaña <strong>Descubre</strong> recibes posiciones sin saber qué táctica esconden, como en una partida real. Las pistas son graduales: primero una idea general, luego la pieza y, por último, la jugada. Al terminar descubres el nombre del motivo y puedes ir a su lección.</p>
+
+  <h2><span class="k">05</span> Favoritos en carpetas</h2>
+  <p>El <strong>corazón</strong> de cada lección abre la ventana <strong>Guardar favorito</strong>: elige una o varias carpetas y pulsa Guardar favorito. Empiezas con seis carpetas (Nivel 1 a Nivel 6) que puedes renombrar o eliminar, y puedes crear las tuyas. Una lección guardada abre su lección original, con tablero, demostración y tutor.</p>
+
+  <h2><span class="k">06</span> Tu avance se guarda</h2>
+  <p>Cada lección iniciada o completada, cada ejercicio resuelto y tu último punto de estudio quedan guardados. Con <strong>Continuar aprendiendo</strong> vuelves al lugar exacto donde te quedaste. Con tu <strong>código de sincronización</strong> (el botón de la nube) recuperas tu avance, tu historial y tus carpetas en otro dispositivo. El progreso de Aprende Ajedrez es independiente del Método PC1 y del Método PC2.</p>
+
+  <div class="callout">Consejo: antes de mover, pregúntate siempre qué amenaza tu rival y qué jaques, capturas y amenazas tienes tú. Ese hábito es la base de todas las lecciones.</div>
+ </div>
+</section>
+
+<footer>
+  Aprende Ajedrez · entrenador interactivo en español · motor de legalidad <a href="https://github.com/jhlywa/chess.js">chess.js</a>. Sitio hecho por LA.
+</footer>
+
+<!--@bloque:hist-modal-->
+<!--@bloque:aviso-modal-->
+<!--@bloque:confirm-modal-->
+<!--@bloque:random-modal-->
+<!--@bloque:promo-modal-->
+<!--@bloque:gift-modal-->
+<!--@bloque:explain-modal-->
+
+<div class="aa-fv-fondo" id="aa-fav-modal" aria-hidden="true">
+  <section class="aa-fv-panel" role="dialog" aria-modal="true" aria-labelledby="aa-fv-titulo" aria-describedby="aa-fv-subtitulo">
+    <header class="aa-fv-cab">
+      <div>
+        <h2 id="aa-fv-titulo">Guardar favorito</h2>
+        <p class="aa-fv-sub" id="aa-fv-subtitulo">Selecciona una o varias carpetas</p>
+        <p class="aa-fv-leccion" id="aa-fv-leccion"></p>
+      </div>
+      <button class="aa-fv-x" id="aa-fv-cerrar" type="button" aria-label="Cerrar"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </header>
+    <ul class="aa-fv-lista" id="aa-fv-lista" role="group" aria-label="Carpetas"></ul>
+    <button class="aa-fv-nueva" id="aa-fv-nueva" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v4"/><path d="M16 19h6"/><path d="M19 16v6"/></svg>Nueva carpeta</button>
+    <p class="aa-fv-aviso" id="aa-fv-aviso" role="status"></p>
+    <div class="aa-fv-sep"></div>
+    <footer class="aa-fv-pie">
+      <button class="aa-fv-sec" id="aa-fv-cancelar" type="button">Cancelar</button>
+      <button class="aa-fv-pri" id="aa-fv-guardar" type="button">Guardar favorito</button>
+    </footer>
+  </section>
+</div>
+
+<div class="aa-fv-fondo aa-fv-chico" id="aa-carpeta-modal" aria-hidden="true">
+  <section class="aa-fv-panel" role="dialog" aria-modal="true" aria-labelledby="aa-cm-titulo">
+    <header class="aa-fv-cab">
+      <div><h2 id="aa-cm-titulo">Nueva carpeta</h2><p class="aa-fv-sub" id="aa-cm-sub">Escribe un nombre para tu carpeta</p></div>
+      <button class="aa-fv-x" id="aa-cm-cerrar" type="button" aria-label="Cerrar"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </header>
+    <label class="aa-fv-campo"><span class="aa-oculto-visual">Nombre de la carpeta</span><input id="aa-cm-nombre" type="text" maxlength="40" autocomplete="off" placeholder="Por ejemplo: Para repasar"></label>
+    <p class="aa-fv-aviso error" id="aa-cm-error" role="alert"></p>
+    <div class="aa-fv-sep"></div>
+    <footer class="aa-fv-pie">
+      <button class="aa-fv-sec" id="aa-cm-cancelar" type="button">Cancelar</button>
+      <button class="aa-fv-pri" id="aa-cm-aceptar" type="button">Crear</button>
+    </footer>
+  </section>
+</div>
+
+<div class="aa-fv-fondo aa-fv-chico" id="aa-elegir-modal" aria-hidden="true">
+  <section class="aa-fv-panel" role="dialog" aria-modal="true" aria-labelledby="aa-em-titulo">
+    <header class="aa-fv-cab">
+      <div><h2 id="aa-em-titulo">Mover a otra carpeta</h2><p class="aa-fv-sub" id="aa-em-sub"></p></div>
+      <button class="aa-fv-x" id="aa-em-cerrar" type="button" aria-label="Cerrar"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </header>
+    <ul class="aa-fv-lista" id="aa-em-lista" role="radiogroup"></ul>
+    <div class="aa-fv-sep"></div>
+    <footer class="aa-fv-pie">
+      <button class="aa-fv-sec" id="aa-em-cancelar" type="button">Cancelar</button>
+      <button class="aa-fv-pri" id="aa-em-aceptar" type="button">Mover</button>
+    </footer>
+  </section>
+</div>
+
+<div class="aa-confirmado" id="aa-confirmado" role="status" aria-live="polite"></div>
+
+<input
+  type="file"
+  id="filein"
+  accept=".pgn,.fen,.txt,.json,text/plain,application/json,application/x-chess-pgn"
+  hidden
+>

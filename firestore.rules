@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// Reglas de Firestore para la sincronización por código (Método PC1, Método PC2 y Aprende Ajedrez).
+// Se publican desde la consola: Firebase → Firestore Database → Reglas → Publicar.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Códigos que ya existen: letras minúsculas y números, de 4 a 32 (la app los guarda en minúsculas).
+    function codigoValido(code) {
+      return code.matches('^[a-z0-9]{4,32}$');
+    }
+
+    // Códigos NUEVOS (crear o renombrar): al menos 8 caracteres, para que sean difíciles de adivinar.
+    // Los perfiles que ya existen con códigos más cortos siguen funcionando igual.
+    function codigoNuevoValido(code) {
+      return code.matches('^[a-z0-9]{8,32}$');
+    }
+
+    function validProgress(data) {
+      return data.keys().hasAll([
+        'l1', 'l2', 'timestamp', 'updatedBy', 'schemaVersion'
+      ])
+      && data.keys().hasOnly([
+        'l1', 'l2', 'aa', 'timestamp', 'updatedBy', 'schemaVersion'
+      ])
+      && data.l1 is map
+      && data.l2 is map
+      && (!('aa' in data) || data.aa is map)   // Aprende Ajedrez (opcional)
+      && data.timestamp is timestamp
+      && data.updatedBy is string
+      && data.updatedBy.size() <= 64
+      && data.schemaVersion is int;
+    }
+
+    match /progresos/{syncCode} {
+      allow get: if signedIn() && codigoValido(syncCode);
+      allow list: if false;   // nadie puede listar los códigos de otras personas
+
+      allow create: if signedIn()
+                    && codigoNuevoValido(syncCode)
+                    && validProgress(request.resource.data);
+
+      allow update: if signedIn()
+                    && codigoValido(syncCode)
+                    && validProgress(request.resource.data);
+
+      // Necesario para «Renombrar código» (la app copia el perfil al código nuevo y borra el viejo).
+      allow delete: if signedIn() && codigoValido(syncCode);
+    }
+  }
+}
