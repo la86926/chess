@@ -195,9 +195,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 .tuto.open{display:block}
 .tuto-velo{position:absolute;inset:0;background:rgba(6,9,7,.62);transition:opacity .25s}
 .tuto.con-foco .tuto-velo{opacity:0}
-.tuto-foco{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(6,9,7,.62),0 0 0 3px var(--gold);transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1),width .35s cubic-bezier(.2,.8,.2,1),height .35s cubic-bezier(.2,.8,.2,1),opacity .2s;opacity:0}
+.tuto-foco{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(6,9,7,.62),0 0 0 3px var(--tuto-acento,var(--gold));transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1),width .35s cubic-bezier(.2,.8,.2,1),height .35s cubic-bezier(.2,.8,.2,1),opacity .2s;opacity:0}
 .tuto.con-foco .tuto-foco{opacity:1}
-.tuto-foco:after{content:"";position:absolute;inset:-7px;border-radius:20px;border:2px solid var(--gold);animation:tutoPulso 1.6s ease-out infinite}
+.tuto-foco:after{content:"";position:absolute;inset:-7px;border-radius:20px;border:2px solid var(--tuto-acento,var(--gold));animation:tutoPulso 1.6s ease-out infinite}
 @keyframes tutoPulso{0%{opacity:.9;transform:scale(.97)}100%{opacity:0;transform:scale(1.08)}}
 .tuto-mano{position:absolute;left:0;top:0;width:54px;height:54px;margin:-4px 0 0 -18px;font-size:46px;line-height:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));opacity:0;transition:opacity .2s;will-change:transform}
 .tuto-mano.ver{opacity:1}
@@ -214,15 +214,16 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 .tuto-card.abajo{bottom:calc(18px + env(safe-area-inset-bottom));top:auto}
 .tuto-card.arriba{top:calc(66px + env(safe-area-inset-top));bottom:auto}
 .tuto-card.centro{top:50%;bottom:auto;transform:translate(-50%,-50%)}
-.tuto-paso{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.tuto-paso{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tuto-etiqueta,var(--gold))}
 .tuto-card h3{font-family:var(--serif);font-size:1.28rem;font-weight:600;letter-spacing:-.01em;margin:.35rem 0 .45rem}
 .tuto-card p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5}
 .tuto-puntos{display:flex;gap:6px;margin:14px 0 12px}
 .tuto-puntos i{width:7px;height:7px;border-radius:50%;background:var(--line-viva);transition:background .2s,width .2s}
-.tuto-puntos i.on{background:var(--gold);width:20px;border-radius:4px}
+.tuto-puntos i.on{background:var(--tuto-acento,var(--gold));width:20px;border-radius:4px}
 .tuto-acciones{display:flex;gap:8px;align-items:center}
 .tuto-acciones button{min-height:40px;border-radius:12px;border:1px solid var(--line);background:var(--tinte-neutro);color:var(--ink);font:600 .85rem var(--sans);padding:0 14px;cursor:pointer;touch-action:manipulation}
-.tuto-acciones .tuto-sig{background:var(--gold);border-color:var(--gold);color:#1a1408;margin-left:auto}
+/* El botón principal del tutorial toma el color del tablero elegido en la sección abierta (por defecto, Cielo) */
+.tuto-acciones .tuto-sig{background:var(--tuto-acento,#7AA4BB);border-color:var(--tuto-acento,#7AA4BB);color:var(--tuto-acento-txt,#fff);margin-left:auto}
 .tuto-acciones .tuto-cerrar{background:transparent;color:var(--muted)}
 .tuto-acciones button:disabled{opacity:.35}
 .drawer-tuto{margin:4px 2px 0;align-self:flex-start;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--r-cap);padding:.45rem .9rem;font:600 .78rem var(--sans);cursor:pointer}
@@ -254,7 +255,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 <iframe class="app-frame active" id="app-frame-1" src="index1.html?v=20261008-nombres" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
 <iframe class="app-frame" id="app-frame-2" src="index2.html?v=20261008-nombres" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
 <!-- Aprende Ajedrez se carga la primera vez que se abre (así PC1 y PC2 no tardan más en abrir). -->
-<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=20261008-aa2" title="Aprende Ajedrez" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=20261008-aa4" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -573,7 +574,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     </div>
   </section>
 </div>
-<script src="aa-datos.js?v=20261008-aa2"></script>
+<script src="aa-datos.js?v=20261008-aa4"></script>
 <script type="module" src="pc-cloud-sync.js?v=6"></script>
 <script>
 /* ==================================================================
@@ -713,7 +714,26 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     }catch(e){}
   }
 
+  /* Color del tutorial: el de la plantilla (tema de tablero) de la sección abierta.
+     Si la persona no eligió ninguna, la plantilla por defecto (Cielo). */
+  var CIELO='#7AA4BB';
+  function luz(hex){
+    var m=/^#?([0-9a-f]{6})$/i.exec(String(hex||'').trim());if(!m)return null;
+    var n=parseInt(m[1],16),c=[n>>16&255,n>>8&255,n&255].map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});
+    return .2126*c[0]+.7152*c[1]+.0722*c[2];
+  }
+  function aplicarColorTema(){
+    var col='';
+    try{var f=frameActivo(),d=f&&f.contentDocument;if(d&&d.documentElement)col=getComputedStyle(d.documentElement).getPropertyValue('--dark').trim();}catch(e){}
+    if(luz(col)==null)col=CIELO;
+    var L=luz(col);
+    raiz.style.setProperty('--tuto-acento',col);
+    raiz.style.setProperty('--tuto-acento-txt',L>.4?'#16181b':'#fff');
+    raiz.style.setProperty('--tuto-etiqueta',L>.45?'var(--muted)':col);
+  }
+
   function pintar(){
+    aplicarColorTema();
     var p=PASOS[paso];
     mascotaTuto(!!p.mascota);
     elPaso.textContent='Paso '+(paso+1)+' de '+PASOS.length;
