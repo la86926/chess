@@ -29,8 +29,10 @@ def tocar(pg,sq):
     bb=loc.bounding_box(); pg.mouse.click(bb['x']+bb['width']/2, bb['y']+bb['height']/2)
 def continuar(pg):
     pg.locator('#aa-continuar').scroll_into_view_if_needed(); pg.click('#aa-continuar'); time.sleep(0.35)
+GRUPO={'descubre':'teoria','observa':'teoria','comprende':'resolver','practica':'resolver','hazlo':'practica','comprueba':'reforzar','repasa':'repaso'}
 def etapa_nav(pg,e):
-    pg.locator('#aa-etapas [data-etapa="%s"]'%e).scroll_into_view_if_needed(); pg.click('#aa-etapas [data-etapa="%s"]'%e); time.sleep(0.35)
+    sel='#aa-etapas [data-grupo="%s"]'%GRUPO[e]
+    pg.locator(sel).scroll_into_view_if_needed(); pg.click(sel); time.sleep(0.35)
 def otra_vez(pg):
     pg.locator('#aa-otra-vez').scroll_into_view_if_needed(); pg.click('#aa-otra-vez'); time.sleep(0.6)
 def opcion(pg,i):
@@ -90,6 +92,9 @@ with sync_playwright() as p:
             resolver(pg,lid,etapa,L[etapa])
             if etapa!='comprueba': continuar(pg)
         ok(pg.evaluate("id=>JSON.parse(localStorage.aa_progreso_v1).lecciones[id].estado",lid)=='completada',lid+': la lección no quedó completada')
+        continuar(pg)                                            # Reforzar -> Repaso
+        ok(pg.evaluate("AAApp.estado.etapa")=='repasa' and pg.evaluate("document.querySelector('#aa-etapas .activa').dataset.grupo")=='repaso',lid+': Continuar no llevó a Repaso')
+        ok(pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa i')].map(i=>i.textContent).join('')")=='12345',lid+': los números de las etapas no se ven siempre')
         ok(len(errs)==n0,lid+': errores JS '+' | '.join(errs[n0:n0+2]))
         print(('✓ ' if not any(f.startswith(lid) for f in fallos) else '✗ ')+lid)
     b.close()

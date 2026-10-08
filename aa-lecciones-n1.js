@@ -196,7 +196,7 @@ L['N1-009']={
   practica:{tipo:'pregunta',fen:'8/8/3k4/8/8/8/2NK4/8 w - - 0 1',texto:'¿Cuál es el resultado de esta posición?',opciones:['Tablas: material insuficiente','Ganan las blancas','Ganan las negras'],correcta:0,
     explica:'¡Bien! Rey y caballo contra rey: nadie puede dar mate.',pista:'¿Con un caballo y el rey se puede dar mate?'},
   hazlo:{tipo:'pregunta',fen:'8/8/3k4/8/8/2R5/3K4/8 w - - 0 1',texto:'¿Y esta posición?',opciones:['Las blancas pueden ganar: la torre basta para dar mate','Tablas por material insuficiente','Tablas por ahogado'],correcta:0,
-    explica:'¡Exacto! Rey y torre contra rey es una victoria (lo aprenderás en el NIVEL DOS).',pista:'La torre es una pieza mayor.'},
+    explica:'¡Exacto! Rey y torre contra rey es una victoria (lo aprenderás en el Nivel II).',pista:'La torre es una pieza mayor.'},
   comprueba:{tipo:'pregunta',fen:'7k/8/6QK/8/8/8/8/8 b - - 0 1',texto:'Juegan las negras. ¿Qué ocurre?',opciones:['Tablas por ahogado','Ganan las blancas por mate','Tablas por material insuficiente'],correcta:0,
     explica:'¡Correcto! El rey negro no está en jaque y no tiene jugadas: ahogado.',pista:'Comprueba cada casilla vecina del rey negro.'}
 };

@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261008-aa6'
+VERSION = '20261008-aa9'
 
 
 class ErrorParche(Exception):
@@ -190,7 +190,9 @@ def construir():
     m = re.search(r'<button class="btn" id="b-edit"[^>]*>.*?</button>', i1, re.S)
     poner('<!--@boton:b-edit-->', m.group(0))
     for ident in ('engine-box', 'pc-fila-controles', 'hist-modal', 'aviso-modal', 'confirm-modal',
-                  'random-modal', 'promo-modal', 'gift-modal', 'explain-modal'):
+                  'random-modal', 'promo-modal', 'gift-modal', 'explain-modal',
+                  # selector de tableros (temas, favoritos y personalizado), igual que en PC1 y PC2
+                  'pc-perso-bg', 'pc-aviso-bg', 'pc-favs-bg', 'pc-temas-bg', 'pc-conf-bg'):
         poner('<!--@bloque:' + ident + '-->', por_id(i1, ident))
     # Ajustes de texto en los bloques reutilizados (sin cambiar su estructura).
     cuerpo = parche(cuerpo, '<h3>Historial de resueltos</h3>', '<h3>Historial de aprendizaje</h3>', nombre='historial: título')

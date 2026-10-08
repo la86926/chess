@@ -37,7 +37,8 @@
     descubre:'aa_descubre_v1'
   };
   var MAX_EVENTOS=600;
-  var CARPETAS_INICIALES=[1,2,3,4,5,6].map(function(n){return {id:'nivel-'+n,nombre:'Nivel '+n,orden:n};});
+  var ROMANOS=['','I','II','III','IV','V','VI'];
+  var CARPETAS_INICIALES=[1,2,3,4,5,6].map(function(n){return {id:'nivel-'+n,nombre:'Nivel '+ROMANOS[n],orden:n};});
 
   function plano(v){return !!v&&typeof v==='object'&&!Array.isArray(v);}
   function num(v,d){v=Number(v);return Number.isFinite(v)?v:(d||0);}
