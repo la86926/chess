@@ -146,13 +146,26 @@ body[data-aa-modo="vacia"] #b-hint,body[data-aa-modo="vacia"] #b-sol{display:non
 .aa-continuar-donde{color:var(--muted);font-size:.9rem}
 .aa-niveles{display:grid;gap:.8rem}
 .aa-nivel{padding:0!important;margin:0!important;overflow:hidden}
-.aa-nivel summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"n sub cuenta" "barra barra barra";gap:.35rem .8rem;align-items:center;padding:1rem 1.1rem}
-.aa-nivel summary::-webkit-details-marker{display:none}
+/* Cabecera del nivel (botón que abre y cierra la «persiana») */
+.aa-nivel-cab{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto auto;grid-template-areas:"n sub cuenta flecha" "barra barra barra barra";gap:.35rem .8rem;align-items:center;padding:1rem 1.1rem;-webkit-tap-highlight-color:transparent}
+.aa-nivel-cab:focus-visible{outline:2px solid var(--dark,#7AA4BB);outline-offset:-2px;border-radius:inherit}
 .aa-nivel-n{grid-area:n;font-family:var(--serif);font-weight:600;font-size:1.08rem}
 .aa-nivel-sub{grid-area:sub;color:var(--muted);font-size:.85rem}
 .aa-nivel-cuenta{grid-area:cuenta;font-family:var(--mono);font-size:.72rem;color:var(--muted2)}
+.aa-nivel-flecha{grid-area:flecha;width:10px;height:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .45s cubic-bezier(.22,.8,.2,1)}
+.aa-nivel.abierto .aa-nivel-flecha{transform:rotate(225deg) translate(-2px,-2px)}
 .aa-nivel-barra{grid-area:barra;height:6px;border-radius:3px;background:var(--tinte-neutro);border:1px solid var(--line);overflow:hidden}
 .aa-nivel-barra i{display:block;height:100%;background:var(--acento-tema,var(--gold))}
+/* Persiana: la altura se despliega suavemente y cada lección baja como una lama */
+.aa-nivel-cuerpo{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.22,.8,.2,1)}
+.aa-nivel.abierto .aa-nivel-cuerpo{grid-template-rows:1fr}
+.aa-nivel-interior{overflow:hidden;min-height:0}
+.aa-nivel-proposito{opacity:0;transform:perspective(700px) rotateX(-70deg);transform-origin:top center;transition:opacity .3s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+.aa-lista-lecciones li{opacity:0;transform:perspective(700px) rotateX(-70deg);transform-origin:top center;transition:opacity .3s ease,transform .45s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0) * 22ms + 60ms)}
+.aa-nivel.abierto .aa-nivel-proposito,.aa-nivel.abierto .aa-lista-lecciones li{opacity:1;transform:none}
+.aa-nivel:not(.abierto) .aa-lista-lecciones li{transition-delay:0s;transition-duration:.18s}
+.aa-nivel:not(.abierto) .aa-nivel-proposito{transition-duration:.18s}
+@media (prefers-reduced-motion:reduce){.aa-nivel-cuerpo,.aa-nivel-proposito,.aa-lista-lecciones li,.aa-nivel-flecha{transition:none!important}}
 .aa-nivel-proposito{margin:0;padding:0 1.1rem .8rem;color:var(--muted);font-size:.88rem;line-height:1.5}
 .aa-lista-lecciones{list-style:none;margin:0;padding:0 .6rem .7rem;display:grid;gap:2px}
 .aa-fila-leccion{width:100%;display:grid;grid-template-columns:2.1em 1fr auto auto;align-items:center;gap:.6rem;text-align:left;padding:.6rem .55rem;border:0;border-radius:11px;background:none;color:var(--ink);font:500 .92rem var(--sans);cursor:pointer;min-height:44px}
@@ -321,3 +334,17 @@ html[data-modo="oscuro"] .aa-fv-mini.peligro{color:#ff8a7a}
 
 .aa-confirmado.bajo{left:auto;transform:translateY(-6px)}
 .aa-confirmado.bajo.ver{transform:none}
+
+/* =====================================================================
+   Sección 1 (Aprende Ajedrez): diseño limpio, sin los botones de PC1
+   que aquí no se usan. No se borran del HTML porque el código del
+   tablero los usa; solo se ocultan en esta sección.
+   ===================================================================== */
+.aa-oculto-s1,#b-reset,#b-edit,#b-anotar,#b-ana-prev,#b-ana-next,#engine-box,
+#b-sound,#b-explain,#pc-backup-actions,#movelist,.aa-meta{display:none!important}
+/* Pestañas con nombres más largos (Aprendizaje, Mis favoritos): en móviles se reparten
+   el ancho según su texto y no se pegan al borde */
+@media (max-width:480px){
+  .aa-app .tabs{gap:2px}
+  .aa-app .tabs .tab{flex:1 1 auto;padding:.32rem .3rem;font-size:.76rem;white-space:nowrap;letter-spacing:-.01em}
+}

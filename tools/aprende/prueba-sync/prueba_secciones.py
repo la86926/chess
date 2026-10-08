@@ -77,6 +77,9 @@ try:
     entrar(pa,True); elegir(pa,'2'); time.sleep(1.5)
     entrar(pb,False)
     ok(esperar(lambda: activa(pb)=='app-frame-2'),'B entra con el código y queda en el Método PC2 (donde estaba A)')
+    if activa(pb)!='app-frame-2':
+        doc=json.loads(pa.evaluate("fetch('http://127.0.0.1:8799/doc/pruebasecc01').then(r=>r.text())"))
+        print('    depuración: B en',activa(pb),'| B guarda',pb.evaluate("localStorage.getItem('pc_l3_active_app')"),'| A guarda',pa.evaluate("localStorage.getItem('pc_l3_active_app')"),'| nube',(doc.get('data') or {}).get('l1',{}).get('storage',{}).get('pc_l3_active_app'))
     elegir(pa,'3')
     ok(esperar(lambda: frame3(pa) is not None and frame3(pa).evaluate("!!window.AAApp")),'A abre Aprende Ajedrez')
     frame3(pa).evaluate("AAApp.abrirLeccion('N2-010',{etapa:'practica'})"); time.sleep(0.4)
@@ -84,6 +87,8 @@ try:
     ok(esperar(lambda: activa(pb)=='app-frame-3'),'B pasa solo a Aprende Ajedrez')
     ok(esperar(lambda: frame3(pb) is not None and frame3(pb).evaluate("window.AAApp&&AAApp.estado.id")=='N2-010',12),'B abre la misma lección (N2-010)')
     ok(esperar(lambda: frame3(pb).evaluate("AAApp.estado.etapa")=='practica'),'B queda en la misma etapa (Practica conmigo)')
+    if frame3(pb) and frame3(pb).evaluate("AAApp.estado.id")!='N2-010':
+        print('    depuración: B id',frame3(pb).evaluate("AAApp.estado.id+' '+AAApp.estado.etapa"),'| B ultimo',pb.evaluate("localStorage.getItem('aa_ultimo_v1')"),'| A ultimo',pa.evaluate("localStorage.getItem('aa_ultimo_v1')"))
     elegir(pb,'1')
     ok(esperar(lambda: activa(pa)=='app-frame-1'),'si B vuelve al Método PC1, A también')
     ok(not errs,'sin errores de JavaScript '+(' | '.join(errs[:3]) if errs else ''))
