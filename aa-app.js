@@ -475,6 +475,7 @@ function etapaComprende(){
   mostrarPosicion(fen,{jugadas:jug,orient:A.lec.descubre.orient||ladoDe(A.lec.descubre.fen),sinAnimar:true});
   fijarCapa(c.flechas||[],c.marcas||[],true);
   ejercicioActual=comoEjercicio({fen:state.game.fen(),orient:state.orient},A.id);
+  A.resuelta=false;
   if(c.pregunta){
     A.tarea={tipo:'pregunta',def:c.pregunta,etapa:'comprende'};
     tutor(c.di+' '+c.pregunta.texto);
@@ -511,6 +512,9 @@ function iniciarTarea(etapa,t,opc){
   modoControles('tarea');
   ejercicioActual=comoEjercicio(t,A.id);
   limpiarCapa();
+  /* en los ejercicios de jugada el tablero vuelve a aceptar jugadas
+     (la demostración y las preguntas lo dejan bloqueado) */
+  A.bloqueado=false;
   load(ejercicioActual);
   /* Recuperar el punto exacto: rehace las jugadas ya hechas en este ejercicio */
   var n=Math.max(0,Math.min(Number(opc.jugadas)||0,ejercicioActual.u.length-1));
@@ -785,7 +789,7 @@ function cargarDescubre(it,reinicio){
   irAPestanaLeccion();
   modoControles('tarea');
   ejercicioActual=comoEjercicio(it.tarea,'descubre');
-  limpiarCapa();load(ejercicioActual);
+  limpiarCapa();A.bloqueado=false;load(ejercicioActual);
   el('aa-etapas').hidden=true;
   tutor('Juegan las '+ladoTexto(state.orient)+'. Encuentra la mejor jugada. Si te atascas, pide una pista: primero te doy una idea, luego la pieza y, al final, la jugada.');
   botonContinuar('Rendirme y ver la táctica');
