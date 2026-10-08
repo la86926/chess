@@ -1284,8 +1284,17 @@ function crearTour(){
   window.addEventListener('resize',function(){if(n.classList.contains('open'))pintarTour();});
   return n;
 }
+function colorTour(n){
+  /* color de la plantilla (tablero) elegida; por defecto, Cielo */
+  var col=(getComputedStyle(document.documentElement).getPropertyValue('--dark')||'').trim(),m=/^#?([0-9a-f]{6})$/i.exec(col);
+  if(!m){col='#7AA4BB';m=['','7AA4BB'];}
+  var x=parseInt(m[1],16),c=[x>>16&255,x>>8&255,x&255].map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}),L=.2126*c[0]+.7152*c[1]+.0722*c[2];
+  n.style.setProperty('--aa-tour-sig-txt',L>.4?'#16181b':'#fff');
+  n.style.setProperty('--aa-tour-etiqueta',L>.45?'var(--muted)':col);
+}
 function pintarTour(){
   var n=crearTour(),p=TOUR[tour.i],card=n.querySelector('.aa-tour-card'),foco=n.querySelector('.aa-tour-foco'),mano=n.querySelector('.aa-tour-mano');
+  colorTour(n);
   n.querySelector('.aa-tour-paso').textContent='Paso '+(tour.i+1)+' de '+TOUR.length;
   n.querySelector('h3').textContent=p.t;n.querySelector('p').textContent=p.x;
   n.querySelector('.aa-tour-atras').disabled=tour.i===0;
