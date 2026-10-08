@@ -210,8 +210,12 @@
     return p.lecciones[id];
   }
   function actualizarLeccion(id,cambio){
-    var p=leer(K.progreso),r=registroLeccion(p,id);
-    cambio(r);r.t=ahora();guardar(K.progreso,p);return r;
+    var p=leer(K.progreso),existia=!!p.lecciones[id],r=registroLeccion(p,id),antes=JSON.stringify(r);
+    cambio(r);
+    /* Si nada cambió (p. ej., al reabrir la lección al iniciar), no se toca la marca de tiempo:
+       así no gana a un cambio real hecho en otro dispositivo. */
+    if(existia&&JSON.stringify(r)===antes)return r;
+    r.t=ahora();guardar(K.progreso,p);return r;
   }
   /* Historial */
   function registrarEvento(tipo,leccion,detalle){

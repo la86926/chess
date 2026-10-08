@@ -245,7 +245,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
       <button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg><span class="sr">Oscuro</span></button>
       <button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg><span class="sr">Sistema</span></button>
     </div>
-    <button class="app-choice" data-app="3" type="button"><span>Aprende Ajedrez<br><small>Seis niveles progresivos</small></span></button>
+    <button class="app-choice" data-app="3" type="button"><span>Aprende Ajedrez<br><small>Temario</small></span></button>
     <button class="app-choice active" data-app="1" type="button"><span>Método PC1 (Avanzado)<br><small>Ejercicios tácticos</small></span></button>
     <button class="app-choice" data-app="2" type="button"><span>Método PC2 (Muy avanzado)<br><small>Ejercicios posicionales</small></span></button>
     <button class="drawer-tuto" id="drawer-tuto" type="button">Ver tutorial</button>
@@ -255,7 +255,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 <iframe class="app-frame active" id="app-frame-1" src="index1.html?v=20261008-nombres" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
 <iframe class="app-frame" id="app-frame-2" src="index2.html?v=20261008-nombres" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
 <!-- Aprende Ajedrez se carga la primera vez que se abre (así PC1 y PC2 no tardan más en abrir). -->
-<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=20261008-aa4" title="Aprende Ajedrez" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=20261008-aa6" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -574,8 +574,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     </div>
   </section>
 </div>
-<script src="aa-datos.js?v=20261008-aa4"></script>
-<script type="module" src="pc-cloud-sync.js?v=6"></script>
+<script src="aa-datos.js?v=20261008-aa6"></script>
+<script type="module" src="pc-cloud-sync.js?v=7"></script>
 <script>
 /* ==================================================================
    Tutorial de bienvenida
@@ -616,11 +616,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   var PASOS_AA=[
     {titulo:'Bienvenido a Aprende Ajedrez',texto:'Aquí aprendes ajedrez desde cero, en seis niveles. Cuando estés listo, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado) te esperan en el menú.',modo:'saludo'},
     {titulo:'El menú',texto:'Con este botón abres el menú y cambias entre Aprende Ajedrez, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado).',padre:'menu-button',modo:'toque'},
-    {titulo:'Tus pestañas',texto:'«Lección» es la clase actual, «Niveles» muestra los seis niveles, «Descubre» te propone posiciones para encontrar la jugada, «Favoritos» guarda lo que marques con el corazón y «Guía» explica cómo funciona todo.',app:'tabs',modo:'toque'},
+    {titulo:'Tus pestañas',texto:'«Aprendizaje» es la clase actual, «Temario» reúne todas las lecciones, «Explorar» te propone posiciones para encontrar la jugada, «Mis favoritos» guarda lo que marques con el corazón y «Ayuda» explica cómo funciona todo.',app:'tabs',modo:'toque'},
     {titulo:'Paso a paso',texto:'Cada lección avanza por etapas: Descubre, Observa, Comprende, Practica conmigo, Hazlo tú, Comprueba y Repasa.',app:'aa-etapas',modo:'toque'},
     {titulo:'Juega sobre el tablero',texto:'Toca una pieza y arrástrala, o toca la casilla de destino. Las flechas y marcas te muestran ataques, defensas y amenazas.',app:'board',modo:'arrastre'},
     {titulo:'Tu tutor',texto:'La mascota te explica cada paso. Si algo no queda claro, pide «Explícame otra vez» y te lo dirá más sencillo.',app:'aa-tutor',modo:'toque'},
-    {titulo:'Tus botones',texto:'«Girar» voltea el tablero, el parlante activa o silencia el sonido, el libro abre la explicación y el último botón comparte la lección. En los ejercicios, la bombilla te da pistas poco a poco.',app:'pc-fila-controles',modo:'toque'},
+    {titulo:'Tus botones',texto:'La bombilla te da pistas poco a poco, «Solución» te muestra la jugada, «Girar» voltea el tablero y el último botón comparte la lección.',app:'pc-fila-controles',modo:'toque'},
     {titulo:'Favoritos',texto:'Toca el corazón para guardar la lección en una o varias carpetas. Ya tienes una carpeta por nivel.',app:'aa-corazon',modo:'toque'},
     {titulo:'Tu código de progreso',texto:'Este botón guarda tu avance en la nube con tu código. En otro dispositivo, escribe el mismo código y recuperas todo.',padre:'pc-sync-fab',modo:'toque'},
     {titulo:'¡A aprender!',texto:'Empieza por el Nivel 1 y avanza a tu ritmo. Puedes volver a ver esta guía desde el menú, en «Ver tutorial».',modo:'saludo',final:true}

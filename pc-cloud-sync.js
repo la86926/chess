@@ -613,18 +613,27 @@ function showSettings(){
 }
 
 function installChangeWatchers(){
+  // Espera a que termine de aplicarse lo que llegó de la nube antes de subir
+  const cuandoLibre=fn=>{if(!applyingRemote)fn();else setTimeout(()=>cuandoLibre(fn),200);};
   window.addEventListener('storage',e=>{
-    if(applyingRemote||!e||!e.key)return;
+    if(!e||!e.key)return;
     const scope=scopeForKey(e.key);
-    if(scope==='aa'){sellarAa(e.key);queueUpload('aa');return;}
+    // Aprende Ajedrez se fusiona clave por clave: un cambio hecho mientras llega la nube
+    // (por ejemplo, abrir otra lección) se sella y se sube después; nunca se pierde.
+    if(scope==='aa'){sellarAa(e.key);cuandoLibre(()=>queueUpload('aa'));return;}
+    if(applyingRemote)return;
     // la foto de página se guarda sola al cargar: se sube, pero no cuenta como cambio de la persona
     if(scope)queueUpload(scope,e.key!==PAGE1_KEY&&e.key!==PAGE2_KEY);
   });
   window.addEventListener('online',()=>{if(currentRef&&pendingScopes.size){clearTimeout(uploadTimer);uploadTimer=setTimeout(pushPending,300);}});
+  // Cambio de sección o de apariencia hecho por la persona. Si coincide con la llegada de datos de
+  // la nube (applyingRemote), no se pierde: se sube en cuanto termina de aplicarse.
+  // Los clics que hace el propio código al aplicar la nube (isTrusted=false) no se suben.
   document.addEventListener('click',e=>{
-    if(!currentRef||applyingRemote)return;
-    if(e.target.closest&&e.target.closest('.app-choice'))setTimeout(()=>queueUpload('l1'),10);
-    if(e.target.closest&&e.target.closest('#tema button'))setTimeout(()=>queueUpload('l1'),10);
+    if(!currentRef)return;
+    if(applyingRemote&&!e.isTrusted)return;
+    const t=e.target.closest?e.target:null;if(!t)return;
+    if(t.closest('.app-choice')||t.closest('#tema button'))setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);
   },true);
   window.addEventListener('pagehide',()=>{
     if(currentRef&&!applyingRemote&&pendingScopes.size){clearTimeout(uploadTimer);pushPending();}
