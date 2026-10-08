@@ -1977,7 +1977,7 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
 header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
 .boardhead{transition:padding-left .34s cubic-bezier(.32,.72,0,1)}
 </style>
-<link rel="stylesheet" href="aa-app.css?v=20261008-aa6">
+<link rel="stylesheet" href="aa-app.css?v=20261008-aa10">
 </head>
 <body class="aa-app">
 <header class="topbar">
@@ -1997,8 +1997,7 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
   </div>
   <button class="gift-btn aa-oculto" id="b-gift" type="button" aria-label="Plan de entrenamiento" tabindex="-1"><img src="regalo1.png" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;display:block"></button>
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-v="train">Aprendizaje</button>
-    <button class="tab" data-v="levels">Temario</button>
+    <button class="tab active" data-v="levels">Temario</button>
     <button class="tab" data-v="discover">Explorar</button>
     <button class="tab" data-v="favs">Mis favoritos</button>
     <button class="tab" data-v="guide">Ayuda</button>
@@ -2011,8 +2010,8 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
 
     <div class="boardhead aa-boardhead">
       <div class="boardhead-left">
-        <button class="aa-volver" id="aa-volver" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span id="aa-volver-texto">Mis favoritos</span></button>
-        <div class="aa-eyebrow" id="aa-eyebrow">NIVEL UNO · LECCIÓN 1</div>
+        <button class="aa-volver" id="aa-volver" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span id="aa-volver-texto">Temario</span></button>
+        <div class="aa-eyebrow" id="aa-eyebrow">NIVEL I · LECCIÓN 1</div>
         <h1 class="exno aa-titulo" id="aa-titulo">Aprende Ajedrez</h1>
         <div class="aa-meta">
           <span class="chip F" id="chip">Lección</span>
@@ -2037,10 +2036,12 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
       </div>
     </div>
 
-    <nav class="aa-etapas" id="aa-etapas" aria-label="Etapas de la lección"></nav>
-
-    <div class="frame">
-      <div class="board" id="board"></div>
+    <!-- Tablero con las cinco etapas a su derecha, alineadas arriba -->
+    <div class="aa-tablero-fila">
+      <div class="frame">
+        <div class="board" id="board"></div>
+      </div>
+      <nav class="aa-etapas" id="aa-etapas" aria-label="Etapas de la lección"></nav>
     </div>
 
     <div class="aa-leyenda" id="aa-leyenda" aria-label="Significado de las señales"></div>
@@ -2172,12 +2173,12 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
   <label class="aa-campo"><span>Posiciones de</span>
     <select id="aa-descubre-nivel" class="aa-select">
       <option value="auto">Lo que ya estudiaste (recomendado)</option>
-      <option value="1">Hasta el NIVEL UNO</option>
-      <option value="2">Hasta el NIVEL DOS</option>
-      <option value="3">Hasta el NIVEL TRES</option>
-      <option value="4">Hasta el NIVEL CUATRO</option>
-      <option value="5">Hasta el NIVEL CINCO</option>
-      <option value="6">Hasta el NIVEL SEIS</option>
+      <option value="1">Hasta el Nivel I</option>
+      <option value="2">Hasta el Nivel II</option>
+      <option value="3">Hasta el Nivel III</option>
+      <option value="4">Hasta el Nivel IV</option>
+      <option value="5">Hasta el Nivel V</option>
+      <option value="6">Hasta el Nivel VI</option>
     </select>
   </label>
   <button class="btn primary aa-boton-grande" id="aa-descubre-empezar" type="button">Nueva posición</button>
@@ -2212,8 +2213,8 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
   <h1>Cómo aprender aquí</h1>
   <p class="lead">Aprende Ajedrez enseña con el tablero: primero observas, luego practicas con ayuda y al final lo haces tú solo.</p>
 
-  <h2><span class="k">01</span> Las siete etapas de cada lección</h2>
-  <p><strong>Descubre</strong>: una posición para despertar la curiosidad; puedes mover libremente. <strong>Observa</strong>: la demostración animada, con flechas y casillas resaltadas; avanza paso a paso o pulsa Reproducir. <strong>Comprende</strong>: tu tutor resume la idea y a veces te hace una pregunta. <strong>Practica conmigo</strong>: resuelve con pistas disponibles. <strong>Hazlo tú</strong>: otra posición, ahora sin ayuda inicial. <strong>Comprueba</strong>: una evaluación breve. Y luego <strong>repasa cuando quieras</strong>: la lección queda en tu historial y puedes guardarla con el corazón.</p>
+  <h2><span class="k">01</span> Las cinco etapas de cada lección</h2>
+  <p><strong>1 Teoría</strong>: una posición para explorar y la demostración animada, con flechas y casillas resaltadas. <strong>2 Resolver</strong>: tu tutor resume la idea, te hace una pregunta y resuelves un ejercicio con su ayuda. <strong>3 Práctica</strong>: otra posición, ahora sin ayuda al principio. <strong>4 Reforzar</strong>: una evaluación breve. <strong>5 Repaso</strong>: la idea clave de la lección para repasarla cuando quieras. Toca cualquier etapa para ir a ella, aunque no hayas hecho las anteriores.</p>
 
   <h2><span class="k">02</span> Señales sobre el tablero</h2>
   <p>Las señales significan siempre lo mismo y no dependen solo del color: la <strong>flecha continua dorada</strong> es una jugada; la <strong>roja con trazo grueso</strong>, un ataque; la <strong>roja discontinua</strong>, una amenaza del rival; la <strong>verde punteada</strong>, una defensa; la <strong>azul a trazos largos</strong>, una línea de influencia. Un anillo con <strong>!</strong> marca una pieza amenazada; con <strong>✓</strong>, una pieza defendida; con <strong>?</strong>, una pieza indefensa; un rombo marca una casilla clave. Debajo del tablero siempre ves la leyenda de lo que aparece.</p>
@@ -2225,10 +2226,10 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
   <p>En la pestaña <strong>Explorar</strong> recibes posiciones sin saber qué táctica esconden, como en una partida real. Las pistas son graduales: primero una idea general, luego la pieza y, por último, la jugada. Al terminar descubres el nombre del motivo y puedes ir a su lección.</p>
 
   <h2><span class="k">05</span> Mis favoritos en carpetas</h2>
-  <p>El <strong>corazón</strong> de cada lección abre la ventana <strong>Guardar favorito</strong>: elige una o varias carpetas y pulsa Guardar favorito. Empiezas con seis carpetas (Nivel 1 a Nivel 6) que puedes renombrar o eliminar, y puedes crear las tuyas. Una lección guardada abre su lección original, con tablero, demostración y tutor.</p>
+  <p>El <strong>corazón</strong> de cada lección abre la ventana <strong>Guardar favorito</strong>: elige una o varias carpetas y pulsa Guardar favorito. Empiezas con seis carpetas (Nivel I a Nivel VI) que puedes renombrar o eliminar, y puedes crear las tuyas. Una lección guardada abre su lección original, con tablero, demostración y tutor.</p>
 
   <h2><span class="k">06</span> Tu avance se guarda</h2>
-  <p>Cada lección iniciada o completada, cada ejercicio resuelto y tu último punto de estudio quedan guardados. Con <strong>Continuar donde me quedé</strong> vuelves al lugar exacto donde te quedaste. Con tu <strong>código de sincronización</strong> (el botón de la nube) recuperas tu avance, tu historial y tus carpetas en otro dispositivo. El progreso de Aprende Ajedrez es independiente del Método PC1 y del Método PC2.</p>
+  <p>Cada lección iniciada o completada, cada ejercicio resuelto y tu último punto de estudio quedan guardados; el botón del reloj, junto a Solución, abre tu <strong>historial</strong>. Con <strong>Continuar donde me quedé</strong> vuelves al lugar exacto donde te quedaste. Con tu <strong>código de sincronización</strong> (el botón de la nube) recuperas tu avance, tu historial y tus carpetas en otro dispositivo. El progreso de Aprende Ajedrez es independiente del Método PC1 y del Método PC2.</p>
 
   <div class="callout">Consejo: antes de mover, pregúntate siempre qué amenaza tu rival y qué jaques, capturas y amenazas tienes tú. Ese hábito es la base de todas las lecciones.</div>
  </div>
@@ -2417,6 +2418,135 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
       <p class="local-note">Esta explicación se construye dentro del navegador mediante reglas de ajedrez, el FEN y la línea principal. No envía información a Internet ni utiliza inteligencia artificial.</p>
     </main>
   </article>
+</div>
+<div class="pc-perso-bg" id="pc-perso-bg" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Tablero personalizado">
+  <div class="pc-temas-box">
+    <button class="pc-io-close pc-perso-cierre-flotante" id="pc-perso-x" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <div class="pc-perso-cab">
+      <div class="pc-temas-head">
+        <div class="pc-perso-titulo">
+          <h3>Tablero personalizado</h3>
+          <p>Elige los dos colores. La vista previa se actualiza mientras ajustas.</p>
+        </div>
+        <div class="pc-perso-head-acciones">
+          <div class="pc-modo pc-modo-mini pc-perso-modo" role="group" aria-label="Apariencia del tablero personalizado"><button type="button" data-modo="claro" aria-pressed="false" title="Claro" aria-label="Apariencia: Claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v2.1M12 18.7v2.1M3.2 12h2.1M18.7 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5"/></svg></button><button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg></button><button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg></button></div>
+        </div>
+      </div>
+    </div>
+    <div class="pc-perso-fijo">
+      <div class="pc-perso-previa" id="pc-perso-previa" role="img" aria-label="Vista previa del tablero"></div>
+    </div>
+    <div class="pc-editor pc-nombre-caja">
+      <div class="pc-editor-cab">
+        <span class="pc-etiqueta" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.5 12.5l-8 8-9-9V3.5H11zM7.5 7.5h.01"/></svg></span>
+        <b>Nombre del tablero</b>
+        <div class="pc-nombre-acciones">
+          <div class="pc-modo pc-modo-mini pc-nombre-modo" role="group" aria-label="Apariencia del editor de nombre"><button type="button" data-modo="claro" aria-pressed="false" title="Claro" aria-label="Apariencia: Claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v2.1M12 18.7v2.1M3.2 12h2.1M18.7 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5"/></svg></button><button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg></button><button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg></button></div>
+          <button class="pc-io-close pc-nombre-x" id="pc-nombre-x" type="button" aria-label="Cerrar la edición del nombre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+        </div>
+      </div>
+      <div class="pc-nombre-fila">
+        <input class="pc-nombre" id="pc-perso-nombre" type="text" maxlength="24" autocomplete="off" placeholder="Mi tablero 1">
+        <button class="pc-check" id="pc-perso-check" type="button" aria-label="Confirmar el nombre del tablero" title="Confirmar el nombre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5 10-11"/></svg></button>
+      </div>
+      <p class="pc-pista" id="pc-perso-pista">Escribe un nombre y toca el visto verde para seguir.</p>
+    </div>
+    <div class="pc-perso-colores" id="pc-perso-colores">
+    <div class="pc-editor">
+      <div class="pc-editor-cab"><span class="pc-chip" id="pc-chip-l"></span><b>Casillas claras</b></div>
+      <label class="pc-hexrow"><span>Hex</span><input class="pc-hex" id="pc-hex-l" type="text" spellcheck="false" autocomplete="off" maxlength="9" placeholder="EDE8D5"></label>
+      <div id="pc-sl-l"></div>
+    </div>
+    <div class="pc-editor">
+      <div class="pc-editor-cab"><span class="pc-chip" id="pc-chip-d"></span><b>Casillas oscuras</b></div>
+      <label class="pc-hexrow"><span>Hex</span><input class="pc-hex" id="pc-hex-d" type="text" spellcheck="false" autocomplete="off" maxlength="9" placeholder="7A6248"></label>
+      <div id="pc-sl-d"></div>
+    </div>
+    <div class="pc-perso-acciones">
+      <button class="btn" id="pc-perso-guardar" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l3 3v15H5zm3 1v6h8V4zm-1 11h10v5H7z"/></svg>
+        Guardar en mis tableros
+      </button>
+      <button class="btn" id="pc-perso-fav" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85z"/></svg>
+        Guardar como favorito
+      </button>
+      <button class="btn primary" id="pc-perso-usar" type="button">Usar sin guardar</button>
+      <button class="btn" id="pc-perso-cerrar" type="button">Cerrar</button>
+    </div>
+      <button class="pc-velo-bloqueo" id="pc-velo-bloqueo" type="button" aria-label="Confirma primero el nombre del tablero"></button>
+    </div>
+  </div>
+</div>
+<div class="pc-conf-bg" id="pc-aviso-bg" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Aviso">
+  <div class="pc-conf-box">
+    <h3 id="pc-aviso-titulo">Primero el nombre</h3>
+    <p id="pc-aviso-texto">&mdash;</p>
+    <div class="pc-conf-acts">
+      <button class="btn primary" id="pc-aviso-ok" type="button">Entendido</button>
+    </div>
+  </div>
+</div>
+<div class="pc-favs-bg pc-temas-bg" id="pc-favs-bg" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Tableros favoritos">
+  <div class="pc-temas-box">
+    <div class="pc-temas-fijo">
+    <div class="pc-temas-head">
+      <div>
+        <h3>Tus favoritos</h3>
+        <p>Los tableros que marcaste con la estrella. Toca uno para usarlo.</p>
+    </div>
+      <button class="pc-io-close" id="pc-favs-x" type="button" aria-label="Cerrar">&#10005;</button>
+    </div>
+    </div>
+    <div class="pc-temas-grid" id="pc-favs-grid"></div>
+    <p class="pc-favs-vacio" id="pc-favs-vacio">Todavía no marcas ninguno. Toca la estrella de cualquier tablero y aparecerá aquí.</p>
+  </div>
+</div>
+<div class="pc-temas-bg" id="pc-temas-bg" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Tema del tablero">
+  <div class="pc-temas-box">
+    <div class="pc-temas-fijo">
+    <div class="pc-temas-head">
+      <div>
+        <h3>Tema del tablero</h3>
+        <p id="pc-temas-sub">Más de 100 tableros para elegir.</p>
+      </div>
+      <button class="pc-io-close" id="pc-temas-x" type="button" aria-label="Cerrar">&#10005;</button>
+    </div>
+      <div class="pc-temas-barra">
+      <button class="pc-barra-btn" id="pc-favs-abrir" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85z"/></svg>
+        Favoritos <span class="pc-cuenta" id="pc-favs-n">0</span>
+      </button>
+        <button class="pc-barra-btn" id="pc-perso-abrir" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 100 18c1.4 0 2.2-.9 2.2-2 0-1-.7-1.7-1.6-1.7h-1c-2 0-3.4-1.2-3.4-3 0-2.4 2.2-4.3 5-4.3 3.2 0 5.6 2.1 5.6 5 0 3-2 5-2 5A9 9 0 0012 3zm-3.4 5.1a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zm7 0a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z"/></svg>
+          Personalizado
+        </button>
+      <button class="pc-interruptor" id="pc-coords" type="button" role="switch" aria-checked="false">
+        <span class="pc-riel" aria-hidden="true"><span class="pc-perilla"></span></span>
+        Coordenadas en las casillas
+      </button>
+      <div class="pc-modo pc-modo-mini" role="group" aria-label="Apariencia"><button type="button" data-modo="claro" aria-pressed="false" title="Claro" aria-label="Apariencia: Claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v2.1M12 18.7v2.1M3.2 12h2.1M18.7 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5"/></svg></button><button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg></button><button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg></button></div>
+    </div>
+        <div class="pc-buscar">
+          <svg class="pc-lupa" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.6"/><path d="M15.4 15.4L21 21"/></svg>
+          <input id="pc-buscar" type="text" autocomplete="off" spellcheck="false" placeholder="Buscar tablero por nombre" aria-label="Buscar tablero por nombre">
+          <button class="pc-buscar-x" id="pc-buscar-x" type="button" aria-label="Limpiar búsqueda" hidden>&#10005;</button>
+        </div>
+    </div>
+    <div class="pc-temas-grid" id="pc-temas-grid"></div>
+    <p class="pc-sin-resultado" id="pc-sin-resultado" style="display:none">Ningún tablero coincide con esa búsqueda.</p>
+  </div>
+</div>
+<div class="pc-conf-bg" id="pc-conf-bg" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Confirmar tablero">
+  <div class="pc-conf-box">
+    <div class="pc-conf-mini" id="pc-conf-mini" aria-hidden="true"></div>
+    <h3 id="pc-conf-titulo">&iquest;Usar este tablero?</h3>
+    <p id="pc-conf-texto">&mdash;</p>
+    <div class="pc-conf-acts">
+      <button class="btn" id="pc-conf-no" type="button">Cancelar</button>
+      <button class="btn primary" id="pc-conf-si" type="button">S&iacute;, usarlo</button>
+    </div>
+  </div>
 </div>
 
 <div class="aa-fv-fondo" id="aa-fav-modal" aria-hidden="true">
@@ -7791,11 +7921,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="aa-catalogo.js?v=20261008-aa6"></script>
-<script src="aa-datos.js?v=20261008-aa6"></script>
-<script src="aa-lecciones-n1.js?v=20261008-aa6"></script>
-<script src="aa-lecciones-n2.js?v=20261008-aa6"></script>
-<script src="aa-app.js?v=20261008-aa6"></script>
+<script src="aa-catalogo.js?v=20261008-aa10"></script>
+<script src="aa-datos.js?v=20261008-aa10"></script>
+<script src="aa-lecciones-n1.js?v=20261008-aa10"></script>
+<script src="aa-lecciones-n2.js?v=20261008-aa10"></script>
+<script src="aa-app.js?v=20261008-aa10"></script>
 <script src="pc-mascota.js?v=9"></script>
 </body>
 </html>

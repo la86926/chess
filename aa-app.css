@@ -157,8 +157,9 @@ body[data-aa-modo="vacia"] #b-hint,body[data-aa-modo="vacia"] #b-sol{display:non
 .aa-nivel-barra{grid-area:barra;height:6px;border-radius:3px;background:var(--tinte-neutro);border:1px solid var(--line);overflow:hidden}
 .aa-nivel-barra i{display:block;height:100%;background:var(--acento-tema,var(--gold))}
 /* Persiana: la altura se despliega suavemente y cada lección baja como una lama */
-.aa-nivel-cuerpo{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.22,.8,.2,1)}
-.aa-nivel.abierto .aa-nivel-cuerpo{grid-template-rows:1fr}
+/* cerrado: además de plegarse, sus lecciones no se pueden tocar ni recorrer con el teclado */
+.aa-nivel-cuerpo{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .55s cubic-bezier(.22,.8,.2,1),visibility 0s linear .55s}
+.aa-nivel.abierto .aa-nivel-cuerpo{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .55s cubic-bezier(.22,.8,.2,1),visibility 0s}
 .aa-nivel-interior{overflow:hidden;min-height:0}
 .aa-nivel-proposito{opacity:0;transform:perspective(700px) rotateX(-70deg);transform-origin:top center;transition:opacity .3s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
 .aa-lista-lecciones li{opacity:0;transform:perspective(700px) rotateX(-70deg);transform-origin:top center;transition:opacity .3s ease,transform .45s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0) * 22ms + 60ms)}
@@ -348,3 +349,39 @@ html[data-modo="oscuro"] .aa-fv-mini.peligro{color:#ff8a7a}
   .aa-app .tabs{gap:2px}
   .aa-app .tabs .tab{flex:1 1 auto;padding:.32rem .3rem;font-size:.76rem;white-space:nowrap;letter-spacing:-.01em}
 }
+
+/* =====================================================================
+   Sección 1 · versión minimalista
+   - Sin columna lateral (Tu lección, Progreso, Idea clave): una sola columna centrada.
+   - Cinco etapas con su número siempre visible.
+   ===================================================================== */
+.aa-app .sidecol{display:none!important}
+.aa-app .train{grid-template-columns:minmax(0,1fr)!important;max-width:800px}
+#b-prev-top[hidden],#b-next-top[hidden]{display:none!important}
+#b-prev-top,#b-next-top{white-space:nowrap}
+@media (max-width:700px){#b-prev-top,#b-next-top{flex:0 1 auto!important;width:auto!important;padding-inline:.85rem!important}}
+.aa-etapa.hecha i{background:var(--good,#3d8f5e);border-color:transparent;color:#fff}
+.aa-volver[hidden]{display:none!important}
+
+/* Sin «Girar» ni «Compartir» en la Sección 1 */
+#b-flip,#b-share{display:none!important}
+
+/* =====================================================================
+   Tablero con las etapas a su derecha (alineadas con el borde superior)
+   ===================================================================== */
+.aa-tablero-fila{display:flex;align-items:flex-start;gap:8px;width:100%;max-width:780px;margin:0 auto}
+.aa-tablero-fila>.frame{flex:1 1 auto;min-width:0;margin:0}
+.aa-app .aa-etapas{flex:0 0 auto;flex-direction:column;flex-wrap:nowrap;gap:6px;width:auto;max-width:none;margin:clamp(10px,2.2vw,16px) 0 0;padding:0;overflow:visible}
+.aa-app .aa-etapas[hidden]{display:none!important}
+.aa-app .aa-etapa{flex:0 0 auto;width:124px;justify-content:flex-start;padding:.42rem .6rem .42rem .4rem;border-radius:12px;font-size:.78rem}
+.aa-app .aa-etapa i{width:22px;height:22px;font-size:.7rem;flex:0 0 auto}
+/* Móvil: columna estrecha (número arriba, nombre pequeño debajo) para quitarle poco ancho al tablero */
+@media (max-width:600px){
+  .aa-tablero-fila{gap:4px}
+  .aa-app .aa-etapas{gap:5px;margin-top:6px}
+  .aa-app .aa-etapa{width:48px;flex-direction:column;justify-content:center;gap:2px;padding:.34rem 0 .28rem;font-size:.56rem;letter-spacing:-.02em;border-radius:10px}
+  .aa-app .aa-etapa span{max-width:46px;overflow:hidden;text-overflow:ellipsis}
+  .aa-app .aa-etapa i{width:21px;height:21px;font-size:.66rem}
+}
+/* Sin la barra de reproducción de la demostración: se avanza con «Siguiente paso» */
+#aa-demo{display:none!important}

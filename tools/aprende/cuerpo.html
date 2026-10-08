@@ -11,8 +11,7 @@
   </div>
   <button class="gift-btn aa-oculto" id="b-gift" type="button" aria-label="Plan de entrenamiento" tabindex="-1"><img src="regalo1.png" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;display:block"></button>
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-v="train">Aprendizaje</button>
-    <button class="tab" data-v="levels">Temario</button>
+    <button class="tab active" data-v="levels">Temario</button>
     <button class="tab" data-v="discover">Explorar</button>
     <button class="tab" data-v="favs">Mis favoritos</button>
     <button class="tab" data-v="guide">Ayuda</button>
@@ -25,8 +24,8 @@
 
     <div class="boardhead aa-boardhead">
       <div class="boardhead-left">
-        <button class="aa-volver" id="aa-volver" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span id="aa-volver-texto">Mis favoritos</span></button>
-        <div class="aa-eyebrow" id="aa-eyebrow">NIVEL UNO · LECCIÓN 1</div>
+        <button class="aa-volver" id="aa-volver" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span id="aa-volver-texto">Temario</span></button>
+        <div class="aa-eyebrow" id="aa-eyebrow">NIVEL I · LECCIÓN 1</div>
         <h1 class="exno aa-titulo" id="aa-titulo">Aprende Ajedrez</h1>
         <div class="aa-meta">
           <span class="chip F" id="chip">Lección</span>
@@ -51,10 +50,12 @@
       </div>
     </div>
 
-    <nav class="aa-etapas" id="aa-etapas" aria-label="Etapas de la lección"></nav>
-
-    <div class="frame">
-      <div class="board" id="board"></div>
+    <!-- Tablero con las cinco etapas a su derecha, alineadas arriba -->
+    <div class="aa-tablero-fila">
+      <div class="frame">
+        <div class="board" id="board"></div>
+      </div>
+      <nav class="aa-etapas" id="aa-etapas" aria-label="Etapas de la lección"></nav>
     </div>
 
     <div class="aa-leyenda" id="aa-leyenda" aria-label="Significado de las señales"></div>
@@ -168,12 +169,12 @@
   <label class="aa-campo"><span>Posiciones de</span>
     <select id="aa-descubre-nivel" class="aa-select">
       <option value="auto">Lo que ya estudiaste (recomendado)</option>
-      <option value="1">Hasta el NIVEL UNO</option>
-      <option value="2">Hasta el NIVEL DOS</option>
-      <option value="3">Hasta el NIVEL TRES</option>
-      <option value="4">Hasta el NIVEL CUATRO</option>
-      <option value="5">Hasta el NIVEL CINCO</option>
-      <option value="6">Hasta el NIVEL SEIS</option>
+      <option value="1">Hasta el Nivel I</option>
+      <option value="2">Hasta el Nivel II</option>
+      <option value="3">Hasta el Nivel III</option>
+      <option value="4">Hasta el Nivel IV</option>
+      <option value="5">Hasta el Nivel V</option>
+      <option value="6">Hasta el Nivel VI</option>
     </select>
   </label>
   <button class="btn primary aa-boton-grande" id="aa-descubre-empezar" type="button">Nueva posición</button>
@@ -208,8 +209,8 @@
   <h1>Cómo aprender aquí</h1>
   <p class="lead">Aprende Ajedrez enseña con el tablero: primero observas, luego practicas con ayuda y al final lo haces tú solo.</p>
 
-  <h2><span class="k">01</span> Las siete etapas de cada lección</h2>
-  <p><strong>Descubre</strong>: una posición para despertar la curiosidad; puedes mover libremente. <strong>Observa</strong>: la demostración animada, con flechas y casillas resaltadas; avanza paso a paso o pulsa Reproducir. <strong>Comprende</strong>: tu tutor resume la idea y a veces te hace una pregunta. <strong>Practica conmigo</strong>: resuelve con pistas disponibles. <strong>Hazlo tú</strong>: otra posición, ahora sin ayuda inicial. <strong>Comprueba</strong>: una evaluación breve. Y luego <strong>repasa cuando quieras</strong>: la lección queda en tu historial y puedes guardarla con el corazón.</p>
+  <h2><span class="k">01</span> Las cinco etapas de cada lección</h2>
+  <p><strong>1 Teoría</strong>: una posición para explorar y la demostración animada, con flechas y casillas resaltadas. <strong>2 Resolver</strong>: tu tutor resume la idea, te hace una pregunta y resuelves un ejercicio con su ayuda. <strong>3 Práctica</strong>: otra posición, ahora sin ayuda al principio. <strong>4 Reforzar</strong>: una evaluación breve. <strong>5 Repaso</strong>: la idea clave de la lección para repasarla cuando quieras. Toca cualquier etapa para ir a ella, aunque no hayas hecho las anteriores.</p>
 
   <h2><span class="k">02</span> Señales sobre el tablero</h2>
   <p>Las señales significan siempre lo mismo y no dependen solo del color: la <strong>flecha continua dorada</strong> es una jugada; la <strong>roja con trazo grueso</strong>, un ataque; la <strong>roja discontinua</strong>, una amenaza del rival; la <strong>verde punteada</strong>, una defensa; la <strong>azul a trazos largos</strong>, una línea de influencia. Un anillo con <strong>!</strong> marca una pieza amenazada; con <strong>✓</strong>, una pieza defendida; con <strong>?</strong>, una pieza indefensa; un rombo marca una casilla clave. Debajo del tablero siempre ves la leyenda de lo que aparece.</p>
@@ -221,10 +222,10 @@
   <p>En la pestaña <strong>Explorar</strong> recibes posiciones sin saber qué táctica esconden, como en una partida real. Las pistas son graduales: primero una idea general, luego la pieza y, por último, la jugada. Al terminar descubres el nombre del motivo y puedes ir a su lección.</p>
 
   <h2><span class="k">05</span> Mis favoritos en carpetas</h2>
-  <p>El <strong>corazón</strong> de cada lección abre la ventana <strong>Guardar favorito</strong>: elige una o varias carpetas y pulsa Guardar favorito. Empiezas con seis carpetas (Nivel 1 a Nivel 6) que puedes renombrar o eliminar, y puedes crear las tuyas. Una lección guardada abre su lección original, con tablero, demostración y tutor.</p>
+  <p>El <strong>corazón</strong> de cada lección abre la ventana <strong>Guardar favorito</strong>: elige una o varias carpetas y pulsa Guardar favorito. Empiezas con seis carpetas (Nivel I a Nivel VI) que puedes renombrar o eliminar, y puedes crear las tuyas. Una lección guardada abre su lección original, con tablero, demostración y tutor.</p>
 
   <h2><span class="k">06</span> Tu avance se guarda</h2>
-  <p>Cada lección iniciada o completada, cada ejercicio resuelto y tu último punto de estudio quedan guardados. Con <strong>Continuar donde me quedé</strong> vuelves al lugar exacto donde te quedaste. Con tu <strong>código de sincronización</strong> (el botón de la nube) recuperas tu avance, tu historial y tus carpetas en otro dispositivo. El progreso de Aprende Ajedrez es independiente del Método PC1 y del Método PC2.</p>
+  <p>Cada lección iniciada o completada, cada ejercicio resuelto y tu último punto de estudio quedan guardados; el botón del reloj, junto a Solución, abre tu <strong>historial</strong>. Con <strong>Continuar donde me quedé</strong> vuelves al lugar exacto donde te quedaste. Con tu <strong>código de sincronización</strong> (el botón de la nube) recuperas tu avance, tu historial y tus carpetas en otro dispositivo. El progreso de Aprende Ajedrez es independiente del Método PC1 y del Método PC2.</p>
 
   <div class="callout">Consejo: antes de mover, pregúntate siempre qué amenaza tu rival y qué jaques, capturas y amenazas tienes tú. Ese hábito es la base de todas las lecciones.</div>
  </div>
@@ -241,6 +242,11 @@
 <!--@bloque:promo-modal-->
 <!--@bloque:gift-modal-->
 <!--@bloque:explain-modal-->
+<!--@bloque:pc-perso-bg-->
+<!--@bloque:pc-aviso-bg-->
+<!--@bloque:pc-favs-bg-->
+<!--@bloque:pc-temas-bg-->
+<!--@bloque:pc-conf-bg-->
 
 <div class="aa-fv-fondo" id="aa-fav-modal" aria-hidden="true">
   <section class="aa-fv-panel" role="dialog" aria-modal="true" aria-labelledby="aa-fv-titulo" aria-describedby="aa-fv-subtitulo">
