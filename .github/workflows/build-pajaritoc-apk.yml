@@ -7,6 +7,7 @@ on:
       - 'index.html'
       - 'index1.html'
       - 'index2.html'
+      - 'index3.html'
       - '*.png'
       - '*.mp3'
       - '*.js'
@@ -32,7 +33,7 @@ jobs:
           changed = []
           old = 'var PC_JUGADA_UNICA = true;'
           new = 'var PC_JUGADA_UNICA = false;'
-          for name in ('index1.html', 'index2.html'):
+          for name in ('index1.html', 'index2.html', 'index3.html'):
               p = Path(name)
               text = p.read_text(encoding='utf-8')
               if old in text:
@@ -43,12 +44,12 @@ jobs:
 
       - name: Commit interaction change
         run: |
-          if git diff --quiet -- index1.html index2.html; then
+          if git diff --quiet -- index1.html index2.html index3.html; then
             echo "No source change needed"
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add index1.html index2.html
+            git add index1.html index2.html index3.html
             git commit -m "Use two-click interaction for unique moves"
             git push
           fi
@@ -68,7 +69,7 @@ jobs:
         run: |
           mkdir -p android-app/app/src/main/assets
           mkdir -p android-app/app/src/main/res/drawable
-          cp index.html index1.html index2.html android-app/app/src/main/assets/
+          cp index.html index1.html index2.html index3.html android-app/app/src/main/assets/
           cp -f *.png android-app/app/src/main/assets/ || true
           cp -f *.mp3 android-app/app/src/main/assets/ || true
           cp -f *.js android-app/app/src/main/assets/ || true

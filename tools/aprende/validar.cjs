@@ -111,7 +111,37 @@ async function revisarTarea(id,t,donde,sf){
   if(tipo==='casilla'){
     if(!t.casillas||!t.casillas.length)err(id,donde+': faltan casillas');
     (t.casillas||[]).forEach(s=>{if(!/^[a-h][1-8]$/.test(s))err(id,donde+': casilla inválida '+s);});
-    if(typeof t.comprobar==='function'){}
+    // verificación automática del conjunto de casillas correctas
+    if(t.verificar){
+      const [tipoV,color]=t.verificar.split(':');const esperado=new Set();
+      for(const f of FILES)for(let r=1;r<=8;r++){const s=f+r,p=g.get(s);
+        if(tipoV==='casilla'||tipoV==='rey-va'||tipoV==='clavadas')continue;
+        if(!p||p.color!==color||p.type==='k')continue;
+        const rival=color==='w'?'b':'w';
+        if(tipoV==='indefensas'&&!atacantes(g,s,color).length)esperado.add(s);
+        if(tipoV==='atacadas'&&atacantes(g,s,rival).length)esperado.add(s);
+        if(tipoV==='colgadas'&&atacantes(g,s,rival).length&&!atacantes(g,s,color).length)esperado.add(s);
+      }
+      if(tipoV==='clavadas'){ // piezas de «color» clavadas a su rey (clavada absoluta)
+        for(const f of FILES)for(let r=1;r<=8;r++){const s=f+r,p=g.get(s);
+          if(!p||p.color!==color||p.type==='k')continue;
+          const pr=t.fen.split(' ');pr[1]=color;pr[3]='-';const g1=new Chess(pr.join(' '));
+          if(g1.in_check())continue;g1.remove(s);if(g1.in_check())esperado.add(s);}
+      }
+      if(tipoV==='rey-va'){ // casillas a las que puede ir el rey de «color» (con su turno)
+        const pr=t.fen.split(' ');pr[1]=color;pr[3]='-';const gm=new Chess(pr.join(' '));
+        gm.moves({verbose:true}).forEach(m=>{if(m.piece==='k')esperado.add(m.to);});
+      }
+      if(tipoV==='pueden-jaque'||tipoV==='pueden-capturar'){
+        const pr=t.fen.split(' ');pr[1]=color;const gm=new Chess(pr.join(' '));
+        gm.moves({verbose:true}).forEach(m=>{
+          if(tipoV==='pueden-capturar'&&m.captured)esperado.add(m.from);
+          if(tipoV==='pueden-jaque'){const g6=new Chess(pr.join(' '));g6.move(m);if(g6.in_check())esperado.add(m.from);}
+        });
+      }
+      if(tipoV!=='casilla'){const dado=new Set(t.casillas);const igual=dado.size===esperado.size&&[...dado].every(x=>esperado.has(x));
+        if(!igual)err(id,donde+': las casillas correctas para «'+t.verificar+'» son '+[...esperado].sort().join(',')+' y la lección dice '+[...dado].sort().join(','));}
+    }
     return;
   }
   if(!t.linea||!t.linea.length){err(id,donde+': falta la línea');return;}
@@ -120,8 +150,13 @@ async function revisarTarea(id,t,donde,sf){
   for(let i=0;i<t.linea.length;i++){
     const fenAntes=gg.fen();const m=jugar(gg,t.linea[i]);
     if(!m){err(id,donde+': jugada ilegal '+t.linea[i]+' en '+fenAntes);return;}
-    if(!sf)continue;
     const esAlumno=i%2===0,ultima=i===t.linea.length-1;
+    if(esAlumno&&t.acepta&&t.acepta[i]){
+      if(!ultima)err(id,donde+': solo se aceptan alternativas en la última jugada del alumno');
+      for(const alt of t.acepta[i]){const g5=new Chess(fenAntes);if(!jugar(g5,alt))err(id,donde+': la alternativa '+alt+' es ilegal');}
+    }
+    if(t.meta==='mate'&&ultima&&!gg.in_checkmate())err(id,donde+': la meta es mate pero la última jugada no da mate');
+    if(!sf||t.regla)continue;
     if(esAlumno){
       const r=await sf.analyse(fenAntes,{depth:t.profundidad||16,multipv:5});
       const esperado=t.linea[i];
@@ -136,9 +171,12 @@ async function revisarTarea(id,t,donde,sf){
       if(!suya){err(id,donde+': '+esperado+' no está entre las 5 mejores de Stockfish en '+fenAntes+' (mejor: '+mejor.uci+' '+JSON.stringify(mejor.score)+')');continue;}
       const ps=puntos(suya.score),pm=puntos(mejor.score);
       if(pm-ps>60)err(id,donde+': '+esperado+' ('+JSON.stringify(suya.score)+') es claramente peor que '+mejor.uci+' ('+JSON.stringify(mejor.score)+') en '+fenAntes);
-      // otras jugadas igual de buenas y no aceptadas
-      for(const l of lineas){
+      // otras jugadas igual de buenas y no aceptadas («concepto»: la tarea pide una idea concreta,
+      // p. ej. desarrollar atacando; basta con que la jugada pedida sea buena)
+      if(!t.concepto)for(const l of lineas){
         if(aceptadas.has(l.uci))continue;
+        // en tareas de mate, un mate más lento no compite con el pedido («mate en N»)
+        if(t.meta==='mate'&&suya.score&&suya.score.mate>0&&l.score&&l.score.mate>suya.score.mate)continue;
         const pl=puntos(l.score);
         const ganaPocoMenos=(ps>=300)?(pl>=Math.min(ps-150,ps*0.6)&&pl>=250):(pl>=ps-40);
         if(ganaPocoMenos){

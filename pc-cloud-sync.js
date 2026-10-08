@@ -279,7 +279,11 @@ async function applyRemote(data,force){
     // Aprende Ajedrez: siempre se fusiona (no hay «gana el más reciente» para todo el ámbito).
     if(aplicarAa(data.aa))subirAaDespues=true;
 
-    const active=localStorage.getItem('pc_l3_active_app');
+    // Sección abierta: se sigue la que trae la nube para este código. Si la copia de la nube
+    // no guarda ninguna (avances de antes de que existiera Aprende Ajedrez), esa persona
+    // siempre estuvo en el Método PC1, así que se abre el PC1.
+    let active=localStorage.getItem('pc_l3_active_app');
+    if(!(active==='1'||active==='2'||active==='3')&&usar.l1)active='1';
     if(active==='1'||active==='2'||active==='3'){
       const button=document.querySelector('.app-choice[data-app="'+active+'"]');
       if(button&&!button.classList.contains('active'))button.click();

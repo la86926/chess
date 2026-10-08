@@ -857,6 +857,18 @@ function continuarAprendiendo(){
   abrirLeccion((sig||CAT.lista[0]).id);
 }
 el('aa-continuar-aprendiendo-lateral').onclick=continuarAprendiendo;
+/* Llega de la nube un «último punto» más reciente (otro dispositivo con el mismo código):
+   se abre esa lección en esa etapa, salvo que ya estemos exactamente ahí o haya una ventana abierta. */
+function seguirUltimoRemoto(){
+  try{
+    var u=D.leer(K.ultimo);
+    if(!u||u.modo!=='leccion'||!u.leccion||!catalogoDe(u.leccion))return;
+    if(document.querySelector('.aa-fv-fondo.open'))return;
+    var jug=(A.tarea&&A.tarea.tipo==='jugada'&&!state.freemode)?state.step:0;
+    if(A.modo==='leccion'&&A.id===u.leccion&&(A.etapa||'')===(u.etapa||'')&&(A.paso||0)===(u.paso||0)&&jug===(u.jugadas||0))return;
+    abrirLeccion(u.leccion,{etapa:u.etapa||undefined,paso:u.paso,jugadas:u.jugadas,restaurando:true});
+  }catch(e){}
+}
 
 function diasSeguidos(){
   var dias={};D.leer(K.historial).eventos.forEach(function(e){if(e.tipo!=='visita')dias[fechaClave(e.t)]=1;});
@@ -1236,6 +1248,9 @@ window.PC_ANDROID_BACK=function(){
 /* Cambios llegados de la nube (otro dispositivo): se repinta lo visible */
 window.addEventListener('storage',function(e){
   if(!e||!e.key||e.key.indexOf('aa_')!==0)return;
+  /* Mismo código en otro dispositivo: si allí se avanzó después, se continúa donde se quedó
+     (como en los métodos PC1 y PC2). Este marco nunca recibe sus propias escrituras. */
+  if(e.key===D.CLAVES.ultimo){clearTimeout(window.__aaSeguir);window.__aaSeguir=setTimeout(seguirUltimoRemoto,120);}
   clearTimeout(window.__aaRepintar);
   window.__aaRepintar=setTimeout(function(){
     try{renderProgress();actualizarCorazon();pintarEtapas();renderHead();
@@ -1309,6 +1324,8 @@ function arrancar(){
     var vigia=setInterval(function(){
       try{visto=localStorage.getItem('aa_tour_visto_v1')==='1';}catch(e){}
       if(visto){clearInterval(vigia);return;}
+      /* Dentro de la app: si el tutorial general aún no se vio (o está abierto), manda ese. */
+      try{var P=window.parent;if(P&&P!==window&&P.PCTutorial&&(P.PCTutorial.abierto()||localStorage.getItem('pc_tutorial_visto_v1')!=='1'))return;}catch(e){}
       if(document.visibilityState==='visible'&&boardEl.getBoundingClientRect().width>0&&!document.querySelector('.aa-fv-fondo.open')){clearInterval(vigia);setTimeout(abrirTour,500);}
     },600);
   }
