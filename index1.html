@@ -11,7 +11,7 @@ const RESTORE_UI='__pc_backup_restore_ui_v3';
 const NOTICE='__pc_backup_restore_notice_v3';
 const ERROR='__pc_backup_restore_error_v3';
 const PAGE_PREFIX='pc_backup_page_state_v2:';
-function appKey(k){return typeof k==='string'&&(k.startsWith('wp_')||k.startsWith('wp2_')||k.startsWith('pc_'));}
+function appKey(k){return typeof k==='string'&&(k.startsWith('wp_')||k.startsWith('wp2_')||k.startsWith('pc_')||k.startsWith('aa_'));}
 function fileName(){
   var p=location.pathname.split('/').pop()||'index1.html';
   try{return decodeURIComponent(p).toLowerCase();}catch(e){return p.toLowerCase();}
@@ -28,7 +28,7 @@ function validate(env){
   if(env.checksum!==fnv1a(JSON.stringify(env.payload)))throw new Error('Copia dañada');
   var p=env.payload;
   if(!plain(p.storage)||!plain(p.storage.local)||!plain(p.storage.session)||!plain(p.cookies)||!plain(p.page))throw new Error('Estructura inválida');
-  if(p.page.file!=='index1.html'&&p.page.file!=='index2.html')throw new Error('Index inválido');
+  if(p.page.file!=='index1.html'&&p.page.file!=='index2.html'&&p.page.file!=='index3.html')throw new Error('Index inválido');
   [p.storage.local,p.storage.session,p.cookies].forEach(function(group){
     Object.keys(group).forEach(function(k){if(!appKey(k))throw new Error('Clave inválida: '+k);});
   });
@@ -39,9 +39,11 @@ function capture(storage){
   try{for(var i=0;i<storage.length;i++){var k=storage.key(i);if(appKey(k))out[k]=storage.getItem(k);}}catch(e){}
   return out;
 }
-function clear(storage){
+function clear(storage,nuevo){
   var ks=[];
-  try{for(var i=0;i<storage.length;i++){var k=storage.key(i);if(appKey(k))ks.push(k);}}catch(e){}
+  /* Una copia sin datos de Aprende Ajedrez (aa_) no borra ese avance. */
+  var conAa=!nuevo||Object.keys(nuevo).some(function(k){return k.indexOf('aa_')===0;});
+  try{for(var i=0;i<storage.length;i++){var k=storage.key(i);if(appKey(k)&&(conAa||k.indexOf('aa_')!==0))ks.push(k);}}catch(e){}
   ks.forEach(function(k){storage.removeItem(k);});
 }
 function write(storage,data){Object.keys(data||{}).forEach(function(k){if(!appKey(k))throw new Error('Clave inválida: '+k);storage.setItem(k,String(data[k]));});}
@@ -68,7 +70,7 @@ try{
     var env=JSON.parse(raw), payload=validate(env);
     var old={local:capture(localStorage),session:capture(sessionStorage),cookies:cookies()};
     try{
-      clear(localStorage);clear(sessionStorage);
+      clear(localStorage,payload.storage.local);clear(sessionStorage,payload.storage.session);
       write(localStorage,payload.storage.local);write(sessionStorage,payload.storage.session);
       restoreCookies(payload.cookies);
       sessionStorage.setItem(RESTORE_UI,JSON.stringify({file:String(payload.page.file).toLowerCase(),ui:payload.ui||null}));
@@ -7728,8 +7730,8 @@ const PENDING_KEY='__pc_backup_pending_v3';
 const RESTORE_UI_KEY='__pc_backup_restore_ui_v3';
 const RESTORE_NOTICE_KEY='__pc_backup_restore_notice_v3';
 const RESTORE_ERROR_KEY='__pc_backup_restore_error_v3';
-const VALID_PAGES=new Set(['index1.html','index2.html']);
-function isAppKey(key){return typeof key==='string'&&(key.startsWith('wp_')||key.startsWith('wp2_')||key.startsWith('pc_'));}
+const VALID_PAGES=new Set(['index1.html','index2.html','index3.html']);
+function isAppKey(key){return typeof key==='string'&&(key.startsWith('wp_')||key.startsWith('wp2_')||key.startsWith('pc_')||key.startsWith('aa_'));}
 function currentFile(){const p=location.pathname.split('/').pop()||'index1.html';try{return decodeURIComponent(p).toLowerCase();}catch(e){return p.toLowerCase();}}
 function appDirectory(){const p=location.pathname;return p.slice(0,p.lastIndexOf('/')+1)||'/';}
 function plainObject(v){return !!v&&typeof v==='object'&&!Array.isArray(v);}
