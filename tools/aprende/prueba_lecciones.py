@@ -34,9 +34,10 @@ def atras(pg): boton(pg,'#aa-atras')
 def pausar(pg):
     if pg.evaluate("AAApp.estado.auto"): boton(pg,'#aa-pausa')
 def deshabilitado(pg,sel): return pg.evaluate("s=>document.querySelector(s).disabled",sel)
-GRUPO={'descubre':'teoria','observa':'teoria','comprende':'teoria','practica':'practica','hazlo':'practica','comprueba':'repaso'}
 def etapa_nav(pg,e):
-    sel='#aa-etapas [data-grupo="%s"]'%GRUPO[e]
+    # toca en la columna el número de ese paso (uno por paso)
+    i=pg.evaluate("e=>AAApp.pasos().findIndex(p=>p.etapa===e)",e)
+    sel='#aa-etapas [data-paso="%d"]'%i
     pg.locator(sel).scroll_into_view_if_needed(); pg.click(sel); time.sleep(0.35)
 def opcion(pg,i):
     pg.locator('#aa-opciones .aa-opcion[data-i="%d"]'%i).scroll_into_view_if_needed()
@@ -81,29 +82,33 @@ with sync_playwright() as p:
         pg.evaluate("id=>AAApp.abrirLeccion(id,{etapa:'descubre'})",lid); time.sleep(0.3)
         ok(pg.evaluate("AAApp.estado.auto")==True,lid+': la lección no empezó reproduciéndose sola')
         ok(pg.evaluate("document.getElementById('aa-continuar').hidden&&document.getElementById('aa-otra-vez').hidden"),lid+': siguen visibles «Continuar» o «Explícame otra vez»')
-        ok(deshabilitado(pg,'#aa-atras') and not deshabilitado(pg,'#aa-adelante'),lid+': en Teoría «‹» debe estar apagado y «›» encendido')
-        grupos=pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa')].map(b=>b.dataset.grupo).join(',')")
-        esperados=','.join(['teoria']+(['practica'] if any(k in tareas for k in ['practica','hazlo']) else [])+(['repaso'] if 'comprueba' in tareas else []))
-        ok(grupos==esperados,lid+': etapas visibles %s, se esperaba %s'%(grupos,esperados))
+        ok(deshabilitado(pg,'#aa-atras') and not deshabilitado(pg,'#aa-adelante'),lid+': en el número 1 «‹» debe estar apagado y «›» encendido')
+        ok(pg.evaluate("[document.getElementById('b-hint').disabled,document.getElementById('b-sol').disabled]")==[True,True],lid+': Pista y Solución deben estar apagadas en la exploración')
+        npasos=pg.evaluate("AAApp.pasos().length")
+        ok(npasos==2+len(L['observa'])+len(tareas),lid+': hay %d números y se esperaban %d'%(npasos,2+len(L['observa'])+len(tareas)))
+        ok(pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa')].map(b=>b.textContent).join(',')")==','.join(str(i+1) for i in range(npasos)),lid+': los números de los pasos no son 1, 2, 3…')
+        ok(pg.evaluate("document.querySelectorAll('#aa-etapas .aa-etapa span').length")==0,lid+': los pasos todavía muestran nombres')
         if primera:
             # reproducción automática: Teoría -> demostración -> resumen -> primer ejercicio, sin tocar nada
             ok(esperar(pg,"AAApp.estado.etapa==='observa'",14),lid+': la Teoría no pasó sola a la demostración')
             ok(esperar(pg,"AAApp.estado.etapa==='observa'&&AAApp.estado.paso>=1",14),lid+': la demostración no avanzó sola')
             ok(esperar(pg,"AAApp.estado.etapa==='comprende'",60),lid+': la demostración no terminó sola en el resumen')
-            ok(deshabilitado(pg,'#aa-atras'),lid+': en el resumen (Teoría) «‹» debe estar apagado')
             ok(esperar(pg,"e=>AAApp.estado.etapa===e",20,tareas[0]),lid+': el resumen no pasó solo al primer ejercicio')
             pausar(pg)
         else:
             pausar(pg)
             ok(pg.evaluate("document.getElementById('aa-pausa-txt').textContent")=='Reproducir',lid+': el botón no cambió a «Reproducir»')
-            adelante(pg); ok(pg.evaluate("AAApp.estado.etapa")=='observa',lid+': «›» no llevó a la demostración')
+            for k in range(len(L['observa'])):                   # «›»: un número por cada paso de la demostración
+                adelante(pg)
+                ok(pg.evaluate("AAApp.estado.etapa")=='observa' and pg.evaluate("AAApp.estado.paso")==k,lid+': «›» no llevó al paso %d de la demostración'%(k+1))
+                ok(pg.evaluate("AAApp.paso()")==k+1 and pg.evaluate("document.querySelector('#aa-etapas .activa').dataset.paso")==str(k+1),lid+': el número activo no corresponde al paso')
+                if k==0: ok(not deshabilitado(pg,'#aa-atras'),lid+': «‹» debe estar encendido desde el número 2')
             adelante(pg); ok(pg.evaluate("AAApp.estado.etapa")=='comprende',lid+': «›» no llevó al resumen')
-            ok(deshabilitado(pg,'#aa-atras'),lid+': en el resumen (Teoría) «‹» debe estar apagado')
             ok(pg.evaluate("document.getElementById('aa-opciones').hidden"),lid+': el resumen muestra opciones de respuesta')
             adelante(pg)
         ok(pg.evaluate("AAApp.estado.etapa")==tareas[0],lid+': no llegó al primer ejercicio')
-        atras(pg)                                                 # desvío: «‹» vuelve a la Teoría
-        ok(pg.evaluate("AAApp.estado.etapa")=='descubre',lid+': «‹» no volvió a la Teoría')
+        atras(pg)                                                 # desvío: «‹» vuelve al número anterior (el resumen)
+        ok(pg.evaluate("AAApp.estado.etapa")=='comprende',lid+': «‹» no volvió al resumen')
         etapa_nav(pg,tareas[0])
         for n,etapa in enumerate(tareas):
             ok(pg.evaluate("AAApp.estado.etapa")==etapa,'%s: se esperaba la etapa %s y está en %s'%(lid,etapa,pg.evaluate("AAApp.estado.etapa")))
@@ -113,6 +118,7 @@ with sync_playwright() as p:
                 adelante(pg)                                      # desvío a mitad de los ejercicios
             ok(pg.evaluate("document.getElementById('aa-continuar').hidden"),'%s %s: el botón negro aparece antes de terminar'%(lid,etapa))
             ultima=n==len(tareas)-1
+            ok(pg.evaluate("[document.getElementById('b-hint').disabled,document.getElementById('b-sol').disabled]")==[False,False],'%s %s: Pista y Solución deben estar encendidas en el ejercicio'%(lid,etapa))
             if primera and n==0: boton(pg,'#aa-pausa')        # vuelve a reproducir
             resolver(pg,lid,etapa,L[etapa])
             if primera and n==0 and not ultima:
@@ -123,7 +129,8 @@ with sync_playwright() as p:
         ok(pg.evaluate("(()=>{const b=document.getElementById('aa-continuar');return !b.hidden&&b.textContent.trim()==='Siguiente lección'&&b.classList.contains('principal')})()"),lid+': al terminar no apareció «Siguiente lección»')
         primera=False
         ok(pg.evaluate("id=>JSON.parse(localStorage.aa_progreso_v1).lecciones[id].estado",lid)=='completada',lid+': la lección no quedó completada')
-        ok(pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa i')].map(i=>i.textContent).join('')")=='123'[:len(esperados.split(','))],lid+': los números de las etapas no se ven siempre')
+        ok(pg.evaluate("document.querySelectorAll('#aa-etapas .aa-etapa.hecha').length")==npasos,lid+': no todos los números quedaron en verde al terminar')
+        ok(pg.evaluate("[document.getElementById('b-hint').disabled,document.getElementById('b-sol').disabled]")==[True,True],lid+': Pista y Solución deben apagarse al terminar')
         ok(len(errs)==n0,lid+': errores JS '+' | '.join(errs[n0:n0+2]))
         print(('✓ ' if not any(f.startswith(lid) for f in fallos) else '✗ ')+lid)
     b.close()
