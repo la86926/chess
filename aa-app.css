@@ -593,3 +593,42 @@ html[data-modo="oscuro"] .aa-app .aa-etapa.activa i{--panel2:#1b1f1c}
   .aa-app .aa-etapa.activa i{animation:aaLuciernaga2 2.6s ease-in-out infinite!important}
   .aa-app .aa-etapa.activa i b{animation:aaNumeroColor 1.5s ease-in-out infinite}
 }
+
+/* Leyenda de señales: una fila de alto fijo, siempre reservada (con o sin leyenda), en un solo
+   renglón que se desliza de lado si no cabe. Así el globo del tutor nunca sube ni baja. */
+.aa-app .aa-leyenda,.aa-app .aa-leyenda[hidden]{display:flex!important;flex-wrap:nowrap;justify-content:flex-start;align-items:center;
+  height:28px;margin:.4rem auto 0;padding:0 2px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.aa-app .aa-leyenda::-webkit-scrollbar{display:none}
+.aa-app .aa-leyenda .aa-ley{flex:0 0 auto}
+.aa-app .aa-leyenda .aa-ley:first-child{margin-left:auto}
+.aa-app .aa-leyenda .aa-ley:last-child{margin-right:auto}
+@media (max-width:600px){
+  .aa-app .aa-leyenda{gap:.25rem .55rem;font-size:.68rem}
+  .aa-app .aa-leyenda .aa-ley svg{width:22px}
+  .aa-app .aa-leyenda .aa-ley-marca{width:14px;height:14px}
+}
+
+/* =====================================================================
+   Mascota: en la Sección 1 no aparece la grande sobre el tablero; la del tutor festeja
+   ===================================================================== */
+.aa-app .pc-mascota{display:none!important}
+.aa-tutor-cara{position:relative;display:block;object-fit:initial}
+.aa-tutor-cara .aa-cara-baile{position:absolute;inset:0;transform-origin:50% 100%}
+.aa-tutor-cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;-webkit-user-drag:none}
+.aa-tutor-cara[data-pose="0"] img.p0,.aa-tutor-cara[data-pose="1"] img.p1,.aa-tutor-cara[data-pose="2"] img.p2,.aa-tutor-cara[data-pose="3"] img.p3{opacity:1}
+.aa-cara-notas{position:absolute;inset:-30% -10% 30% -25%;pointer-events:none;display:none}
+.aa-cara-notas i{position:absolute;bottom:0;width:30%;max-width:20px;aspect-ratio:1;opacity:0;animation:aaNotaSube 2.6s ease-out infinite}
+.aa-cara-notas i svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.15))}
+.aa-cara-notas .n1{left:0;animation-delay:0s}.aa-cara-notas .n2{right:0;animation-delay:-.65s}
+.aa-cara-notas .n3{left:22%;animation-delay:-1.3s}.aa-cara-notas .n4{left:55%;animation-delay:-1.95s}
+/* al resolver: baila al ritmo de la guitarra (mismo tamaño), con notas que suben */
+.aa-tutor.festeja .aa-cara-baile{animation:aaCaraBaile 1s ease-in-out infinite}
+.aa-tutor.festeja .aa-cara-notas{display:block}
+@keyframes aaCaraBaile{
+  0%{transform:translateY(0) rotate(0) scale(1,1)}
+  25%{transform:translateY(-4%) rotate(-4deg) scale(.98,1.025)}
+  50%{transform:translateY(0) rotate(0) scale(1.035,.965)}
+  75%{transform:translateY(-4%) rotate(4deg) scale(.98,1.025)}
+  100%{transform:translateY(0) rotate(0) scale(1,1)}}
+@keyframes aaNotaSube{0%{opacity:0;transform:translate(0,0) rotate(-10deg) scale(.6)}15%{opacity:1}50%{transform:translate(6px,-60%) rotate(10deg) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-4px,-130%) rotate(-8deg) scale(.9)}}
+@media (prefers-reduced-motion:reduce){.aa-tutor.festeja .aa-cara-baile{animation-duration:2s}}
