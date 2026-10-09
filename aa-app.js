@@ -275,12 +275,16 @@ function etiquetaLeccion(id){
 function pintarNavLecciones(){
   var ant=el('b-prev-top'),sig=el('b-next-top');if(!ant||!sig)return;
   /* el símbolo arriba y el nombre de la lección debajo */
-  function poner(b,simbolo,txt){b.innerHTML='<b aria-hidden="true">'+simbolo+'</b><span>'+esc(txt)+'</span>';}
-  if(A.modo==='descubre'){ant.hidden=true;sig.hidden=false;poner(sig,'▸','Otra posición');sig.setAttribute('aria-label','Otra posición');sig.removeAttribute('title');return;}
+  var TRI={'◂':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 4.5v15L5 12z"/></svg>','▸':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.5v15L19 12z"/></svg>'};
+  function poner(b,simbolo,txt){b.innerHTML='<b aria-hidden="true">'+TRI[simbolo]+'</b><span>'+esc(txt)+'</span>';}
+  if(A.modo==='descubre'){sig.classList.remove('aa-listo');ant.hidden=true;sig.hidden=false;poner(sig,'▸','Otra posición');sig.setAttribute('aria-label','Otra posición');sig.removeAttribute('title');return;}
   var i=CAT.lista.findIndex(function(c){return c.id===A.id;});
   var a=i>0?CAT.lista[i-1].id:null,b=i>=0&&i<CAT.lista.length-1?CAT.lista[i+1].id:null;
   ant.hidden=!a;sig.hidden=!b;
   if(a){poner(ant,'◂',etiquetaLeccion(a));ant.title=catalogoDe(a).titulo;ant.setAttribute('aria-label','Ir a la '+etiquetaLeccion(a).toLowerCase()+': '+catalogoDe(a).titulo);}
+  /* al resolver el último ejercicio, «Lección y» se ilumina para invitar a seguir */
+  var listo=A.modo==='leccion'&&!!A.lec&&A.resuelta&&A.etapa===ultimaTarea(A.lec);
+  sig.classList.toggle('aa-listo',!!(b&&listo));
   if(b){poner(sig,'▸',etiquetaLeccion(b));sig.title=catalogoDe(b).titulo;sig.setAttribute('aria-label','Ir a la '+etiquetaLeccion(b).toLowerCase()+': '+catalogoDe(b).titulo);}
 }
 renderRef=function(){
@@ -343,9 +347,9 @@ function pintarEtapas(){
   var nav=el('aa-etapas'),hechas=A.modo==='leccion'?etapasHechas(A.id):[];
   if(A.modo!=='leccion'||!tieneContenido(A.id)){nav.innerHTML='';nav.hidden=true;pintarRuta();return;}
   nav.hidden=false;
-  var ps=pasosDe(A.lec),actual=indicePaso(),obs=0;
+  var ps=pasosDe(A.lec),actual=indicePaso(),obs=0,completa=estadoLeccion(A.id)==='completada';
   nav.innerHTML=ps.map(function(p,i){
-    var h=pasoHecho(p,hechas),act=i===actual;
+    var h=completa||pasoHecho(p,hechas),act=i===actual;
     var nombre=p.etapa==='observa'?('Demostración '+(++obs)):NOMBRE_PASO[p.etapa];
     return '<button type="button" class="aa-etapa'+(act?' activa':'')+(h?' hecha':'')+'" data-paso="'+i+'" aria-current="'+(act?'step':'false')+'" aria-label="Paso '+(i+1)+' de '+ps.length+': '+nombre+(h?' (hecho)':'')+'"><i>'+(i+1)+'</i></button>';
   }).join('');
@@ -1154,15 +1158,47 @@ var SVG_LAPIZ='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><
 var SVG_PAPELERA='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
 var SVG_CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 
-function lecturaFavsPorLeccion(){var m={};D.itemsVivos(D.favoritos()).forEach(function(it){m[it.leccion]=1;});return m;}
+/* Un favorito guarda el nivel, la lección y el ítem (el número del paso): se registra como «N1-007@3».
+   Los favoritos antiguos (solo la lección) se pasan al ítem 1 al arrancar. */
+function refFav(id,item){return item?id+'@'+item:id;}
+function partesFav(ref){var m=/^([^@]+)(?:@(\d+))?$/.exec(String(ref||''));return m?{id:m[1],item:m[2]?Number(m[2]):0}:{id:String(ref||''),item:0};}
+function refActual(){
+  if(A.modo==='descubre'){
+    var it=A.descubreItem;if(!it||!it.revelado)return null;
+    var k=String(it.clave||'').split(':'),l=LEC[it.leccion],i=(l&&k[0]===it.leccion)?pasosDe(l).map(function(p){return p.etapa;}).indexOf(k[1]):-1;
+    return refFav(it.leccion,i>=0?i+1:1);
+  }
+  if(!A.id)return null;
+  var j=tieneContenido(A.id)?indicePaso():-1;
+  return refFav(A.id,j>=0?j+1:1);
+}
+function etiquetaFav(ref){var p=partesFav(ref);return CAT.etiqueta(p.id)+(p.item?' · ÍTEM '+p.item:'');}
+/* abre exactamente ese ítem */
+function opcionesItem(ref){
+  var p=partesFav(ref),ps=pasosDe(LEC[p.id]);if(!p.item||!ps.length)return {};
+  var x=ps[Math.min(p.item,ps.length)-1];return {etapa:x.etapa,paso:x.paso||0};
+}
+function migrarFavoritosAItems(){
+  try{
+    var f=D.favoritos(),t=Date.now(),cambio=false;
+    Object.keys(f.items).forEach(function(k){
+      var it=f.items[k];if(it.borrado||it.leccion.indexOf('@')>=0)return;
+      var ref=refFav(it.leccion,1),k2=it.carpeta+'|'+ref,n=f.items[k2];
+      if(!(n&&!n.borrado))f.items[k2]={carpeta:it.carpeta,leccion:ref,agregado:it.agregado,t:t,borrado:false};
+      it.borrado=true;it.t=t;cambio=true;
+    });
+    if(cambio)D.guardar(K.favoritos,f);
+  }catch(e){}
+}
+function lecturaFavsPorLeccion(){var m={};D.itemsVivos(D.favoritos()).forEach(function(it){m[partesFav(it.leccion).id]=1;});return m;}
 function actualizarCorazon(){
-  var b=el('aa-corazon'),id=A.modo==='descubre'?(A.descubreItem&&A.descubreItem.revelado?A.descubreItem.leccion:null):A.id;
-  b.hidden=!id;if(!id)return;
-  var n=D.carpetasDeLeccion(id).length;
+  var b=el('aa-corazon'),ref=refActual();
+  b.hidden=!ref;if(!ref)return;
+  var n=D.carpetasDeLeccion(ref).length,item=partesFav(ref).item;
   b.classList.toggle('lleno',n>0);
   b.setAttribute('aria-pressed',n>0?'true':'false');
-  b.setAttribute('aria-label',n>0?('En favoritos ('+n+' carpeta'+(n===1?'':'s')+'). Cambiar carpetas'):'Guardar en favoritos');
-  b.title=n>0?'En '+n+' carpeta'+(n===1?'':'s'):'Guardar favorito';
+  b.setAttribute('aria-label',n>0?('Ítem '+item+' en favoritos ('+n+' carpeta'+(n===1?'':'s')+'). Cambiar carpetas'):('Guardar el ítem '+item+' en favoritos'));
+  b.title=n>0?'Ítem '+item+' · en '+n+' carpeta'+(n===1?'':'s'):'Guardar el ítem '+item;
 }
 var fv={leccion:null,sel:{},inicial:{},volverFoco:null};
 function abrirModalFavorito(leccion){
@@ -1170,8 +1206,9 @@ function abrirModalFavorito(leccion){
   var f=D.favoritos();
   fv.inicial={};D.carpetasDeLeccion(leccion,f).forEach(function(c){fv.inicial[c]=1;});
   fv.sel=Object.assign({},fv.inicial);
-  var c=catalogoDe(leccion);
-  el('aa-fv-leccion').innerHTML='<span>'+esc(CAT.etiqueta(leccion))+'</span>'+esc(c?c.titulo:leccion);
+  if(leccion.indexOf('@')<0&&leccion===A.id)leccion=fv.leccion=refActual()||leccion;
+  var c=catalogoDe(partesFav(leccion).id);
+  el('aa-fv-leccion').innerHTML='<span>'+esc(etiquetaFav(leccion))+'</span>'+esc(c?c.titulo:leccion);
   pintarListaFav();
   abrirFondo('aa-fav-modal');
   setTimeout(function(){var p=el('aa-fv-lista').querySelector('[role="checkbox"]');(p||el('aa-fv-guardar')).focus();},60);
@@ -1189,7 +1226,7 @@ function pintarListaFav(){
 function avisoFav(){
   var habia=Object.keys(fv.inicial).length,ahora=Object.keys(fv.sel).filter(function(k){return fv.sel[k];}).length;
   var a=el('aa-fv-aviso');
-  if(habia&&!ahora){a.textContent='Al guardar, esta lección se quitará de favoritos.';a.className='aa-fv-aviso alerta';}
+  if(habia&&!ahora){a.textContent='Al guardar, este ítem se quitará de favoritos.';a.className='aa-fv-aviso alerta';}
   else{a.textContent='';a.className='aa-fv-aviso';}
 }
 function alternarCarpeta(fila){
@@ -1211,7 +1248,7 @@ el('aa-fv-guardar').onclick=function(){
   var nombres=D.carpetasVivas().filter(function(c){return elegidas.indexOf(c.id)>=0;}).map(function(c){return c.nombre;});
   if(elegidas.length)confirmar('Favorito guardado en '+elegidas.length+' carpeta'+(elegidas.length===1?'':'s'),nombres.join(' · '));
   else if(r.quitadas.length)confirmar('Quitado de favoritos','Tu historial y tu progreso no cambian.');
-  if(r.agregadas.length||r.quitadas.length)D.registrarEvento('favorito',fv.leccion,elegidas.length?'guardado':'quitado');
+  if(r.agregadas.length||r.quitadas.length)D.registrarEvento('favorito',partesFav(fv.leccion).id,elegidas.length?'guardado':'quitado');
   pintarFavoritos();
 };
 el('aa-fv-cancelar').onclick=function(){cerrarFondo('aa-fav-modal');};
@@ -1223,8 +1260,8 @@ el('aa-fv-nueva').onclick=function(){
   });
 };
 el('aa-corazon').onclick=function(){
-  var id=A.modo==='descubre'?(A.descubreItem&&A.descubreItem.leccion):A.id;
-  if(id)abrirModalFavorito(id);
+  var ref=refActual();
+  if(ref)abrirModalFavorito(ref);
 };
 
 var confirmarT=null;
@@ -1310,11 +1347,24 @@ el('aa-em-cerrar').onclick=function(){cerrarFondo('aa-elegir-modal');};
 
 /* Vista Favoritos */
 var vf={carpeta:null};
-function miniTablero(id){
-  var l=LEC[id],fen=l&&l.descubre?l.descubre.fen:null;
+/* posición del tablero en un ítem (para la miniatura del favorito) */
+function posicionDeItem(l,item){
+  if(!l||!l.descubre)return null;
+  var ps=pasosDe(l),p=ps[Math.max(1,Math.min(item||1,ps.length))-1],oD=l.descubre.orient||ladoDe(l.descubre.fen);
+  if(!p||p.etapa==='descubre')return {fen:l.descubre.fen,o:oD};
+  if(p.etapa==='observa'||p.etapa==='comprende'){
+    if(p.etapa==='comprende'&&l.comprende&&l.comprende.fen)return {fen:l.comprende.fen,o:oD};
+    var hasta=p.etapa==='observa'?p.paso:l.observa.length-1,base=l.descubre.fen,jug=[];
+    for(var i=0;i<=hasta;i++){var x=l.observa[i];if(x.fen){base=x.fen;jug=[];}if(x.jugada)jug.push(x.jugada);}
+    try{var g=new Chess(base);jug.forEach(function(u){g.move({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]||'q'});});return {fen:g.fen(),o:(l.observa[0]&&l.observa[0].orient)||oD};}catch(e){return {fen:base,o:oD};}
+  }
+  var t=l[p.etapa];return t&&t.fen?{fen:t.fen,o:t.orient||ladoDe(t.fen)}:{fen:l.descubre.fen,o:oD};
+}
+function miniTablero(ref){
+  var pr=partesFav(ref),l=LEC[pr.id],pos=posicionDeItem(l,pr.item),fen=pos&&pos.fen;
   if(!fen)return '<span class="aa-mini vacio" aria-hidden="true"></span>';
   var g;try{g=new Chess(fen);}catch(e){return '<span class="aa-mini vacio"></span>';}
-  var b=g.board(),o=(l.descubre.orient||ladoDe(fen)),h='';
+  var b=g.board(),o=pos.o,h='';
   for(var r=0;r<8;r++)for(var f=0;f<8;f++){
     var rr=o==='w'?r:7-r,ff=o==='w'?f:7-f,pc=b[rr][ff];
     h+='<i class="'+((rr+ff)%2?'d':'l')+'">'+(pc?PIECES[(pc.color==='w'?'w':'b')+pc.type.toUpperCase()]:'')+'</i>';
@@ -1329,32 +1379,32 @@ function pintarFavoritos(){
   el('aa-fav-atras').hidden=!vf.carpeta;
   function ordenar(lista){
     return lista.sort(function(a,b){
-      var ca=catalogoDe(a.leccion),cb=catalogoDe(b.leccion);
-      if(orden==='nombre')return (ca?ca.titulo:'').localeCompare(cb?cb.titulo:'','es');
-      if(orden==='nivel')return (ca?ca.orden:0)-(cb?cb.orden:0);
+      var pa=partesFav(a.leccion),pb=partesFav(b.leccion),ca=catalogoDe(pa.id),cb=catalogoDe(pb.id);
+      if(orden==='nombre')return (ca?ca.titulo:'').localeCompare(cb?cb.titulo:'','es')||pa.item-pb.item;
+      if(orden==='nivel')return ((ca?ca.orden:0)-(cb?cb.orden:0))||pa.item-pb.item;
       return b.agregado-a.agregado;
     });
   }
   function fila(it,mostrarCarpeta){
-    var c=catalogoDe(it.leccion);if(!c)return '';var e=estadoVisible(it.leccion);
+    var c=catalogoDe(partesFav(it.leccion).id);if(!c)return '';var e=estadoVisible(partesFav(it.leccion).id);
     var nomC=mostrarCarpeta?((carpetas.filter(function(x){return x.id===it.carpeta;})[0]||{}).nombre||''):'';
     return '<li class="aa-fav-item" data-leccion="'+it.leccion+'" data-carpeta="'+esc(it.carpeta)+'">'+
-      '<button type="button" class="aa-fav-abrir" data-accion="abrir">'+miniTablero(it.leccion)+'<span class="aa-fav-txt"><small>'+esc(CAT.etiqueta(it.leccion))+(nomC?' · '+esc(nomC):'')+'</small><b>'+esc(c.titulo)+'</b><span class="aa-fl-est e-'+e+'"><i aria-hidden="true">'+ICONO_ESTADO[e]+'</i>'+TEXTO_ESTADO[e]+'</span></span></button>'+
+      '<button type="button" class="aa-fav-abrir" data-accion="abrir">'+miniTablero(it.leccion)+'<span class="aa-fav-txt"><small>'+esc(etiquetaFav(it.leccion))+(nomC?' · '+esc(nomC):'')+'</small><b>'+esc(c.titulo)+'</b><span class="aa-fl-est e-'+e+'"><i aria-hidden="true">'+ICONO_ESTADO[e]+'</i>'+TEXTO_ESTADO[e]+'</span></span></button>'+
       '<span class="aa-fav-acciones"><button type="button" class="aa-fv-mini" data-accion="mover">Mover</button><button type="button" class="aa-fv-mini" data-accion="copiar">Copiar a…</button><button type="button" class="aa-fv-mini peligro" data-accion="quitar">Quitar</button></span></li>';
   }
   if(q){
-    var res=ordenar(items.filter(function(it){var c=catalogoDe(it.leccion);return c&&(c.titulo.toLocaleLowerCase('es').indexOf(q)>=0||it.leccion.toLowerCase().indexOf(q)>=0)&&(!vf.carpeta||it.carpeta===vf.carpeta);}));
+    var res=ordenar(items.filter(function(it){var c=catalogoDe(partesFav(it.leccion).id);return c&&(c.titulo.toLocaleLowerCase('es').indexOf(q)>=0||it.leccion.toLowerCase().indexOf(q)>=0)&&(!vf.carpeta||it.carpeta===vf.carpeta);}));
     el('aa-fav-titulo').textContent='Resultados';
-    el('aa-fav-lead').textContent=res.length?(res.length+' resultado'+(res.length===1?'':'s')+' para «'+el('aa-fav-buscar').value.trim()+'».'):'No hay técnicas guardadas que coincidan.';
+    el('aa-fav-lead').textContent=res.length?(res.length+' resultado'+(res.length===1?'':'s')+' para «'+el('aa-fav-buscar').value.trim()+'».'):'No hay favoritos que coincidan.';
     cont.innerHTML='<ul class="aa-fav-items">'+res.map(function(it){return fila(it,true);}).join('')+'</ul>';
     return;
   }
   if(!vf.carpeta){
     el('aa-fav-titulo').textContent='Mis favoritos';
-    el('aa-fav-lead').textContent='Guarda cualquier lección con el corazón y organízala en carpetas para repasarla cuando quieras.';
+    el('aa-fav-lead').textContent='Guarda cualquier ítem de una lección con el corazón y organízalo en carpetas para repasarlo cuando quieras.';
     cont.innerHTML=carpetas.length?'<ul class="aa-carpetas">'+carpetas.map(function(c){
       var n=items.filter(function(it){return it.carpeta===c.id;}).length;
-      return '<li class="aa-carpeta" data-carpeta="'+esc(c.id)+'"><button type="button" class="aa-carpeta-abrir" data-accion="ver"><span class="aa-fv-ico">'+SVG_CARPETA+'</span><span class="aa-carpeta-nombre">'+esc(c.nombre)+'</span><span class="aa-carpeta-n">'+n+' técnica'+(n===1?'':'s')+'</span></button>'+
+      return '<li class="aa-carpeta" data-carpeta="'+esc(c.id)+'"><button type="button" class="aa-carpeta-abrir" data-accion="ver"><span class="aa-fv-ico">'+SVG_CARPETA+'</span><span class="aa-carpeta-nombre">'+esc(c.nombre)+'</span><span class="aa-carpeta-n">'+n+' favorito'+(n===1?'':'s')+'</span></button>'+
         '<span class="aa-carpeta-acc"><button type="button" class="aa-icono" data-accion="renombrar" aria-label="Renombrar '+esc(c.nombre)+'" title="Renombrar">'+SVG_LAPIZ+'</button><button type="button" class="aa-icono" data-accion="eliminar" aria-label="Eliminar '+esc(c.nombre)+'" title="Eliminar">'+SVG_PAPELERA+'</button></span></li>';
     }).join('')+'</ul>':'<p class="aa-vacio">No tienes carpetas. Crea una con «Nueva carpeta».</p>';
     return;
@@ -1362,7 +1412,7 @@ function pintarFavoritos(){
   var cc=carpetas.filter(function(c){return c.id===vf.carpeta;})[0];
   var suyos=ordenar(items.filter(function(it){return it.carpeta===vf.carpeta;}));
   el('aa-fav-titulo').textContent=cc.nombre;
-  el('aa-fav-lead').textContent=suyos.length?(suyos.length+' técnica'+(suyos.length===1?'':'s')+' guardada'+(suyos.length===1?'':'s')+'. Toca una para abrir su lección.'):'Esta carpeta está vacía. Usa el corazón de cualquier lección para guardarla aquí.';
+  el('aa-fav-lead').textContent=suyos.length?(suyos.length+' favorito'+(suyos.length===1?'':'s')+'. Toca uno para abrir ese ítem.'):'Esta carpeta está vacía. Usa el corazón de cualquier ítem para guardarlo aquí.';
   cont.innerHTML=(suyos.length?'<div class="aa-fav-herr"><button type="button" class="aa-fv-mini" data-accion="copiar-todo">Copiar todo a otra carpeta</button></div>':'')+'<ul class="aa-fav-items">'+suyos.map(function(it){return fila(it,false);}).join('')+'</ul>';
 }
 el('aa-fav-contenido').addEventListener('click',function(e){
@@ -1374,13 +1424,16 @@ el('aa-fav-contenido').addEventListener('click',function(e){
     pedirNombreCarpeta({titulo:'Renombrar carpeta',boton:'Guardar',valor:c.nombre,excepto:cid},function(n){D.renombrarCarpeta(cid,n);pintarFavoritos();confirmar('Carpeta renombrada',n);});return;}
   if(acc==='eliminar'){var c2=D.carpetasVivas().filter(function(x){return x.id===cid;})[0];
     pedirConfirmacion('¿Eliminar la carpeta «'+c2.nombre+'»? Se borra solo esta organización: las lecciones originales, tu progreso y tus otras carpetas no cambian.',function(){D.eliminarCarpeta(cid);if(vf.carpeta===cid)vf.carpeta=null;pintarFavoritos();actualizarCorazon();confirmar('Carpeta eliminada',c2.nombre);});return;}
-  if(acc==='copiar-todo'){elegirCarpeta({titulo:'Copiar a otra carpeta',sub:'Las técnicas seguirán también en esta carpeta.',boton:'Copiar',excepto:vf.carpeta},function(d){var n=D.copiarCarpeta(vf.carpeta,d);pintarFavoritos();confirmar(n?('Copiadas '+n+' técnica'+(n===1?'':'s')):'Ya estaban todas en esa carpeta');});return;}
+  if(acc==='copiar-todo'){elegirCarpeta({titulo:'Copiar a otra carpeta',sub:'Los favoritos seguirán también en esta carpeta.',boton:'Copiar',excepto:vf.carpeta},function(d){var n=D.copiarCarpeta(vf.carpeta,d);pintarFavoritos();confirmar(n?('Copiado'+(n===1?'':'s')+' '+n+' favorito'+(n===1?'':'s')):'Ya estaban todos en esa carpeta');});return;}
   if(!it)return;
   var lid=it.dataset.leccion,origen=it.dataset.carpeta;
-  if(acc==='abrir'){var cn=(D.carpetasVivas().filter(function(x){return x.id===origen;})[0]||{}).nombre||'Mis favoritos';abrirLeccion(lid,{volverA:{carpeta:vf.carpeta||null,nombre:vf.carpeta?cn:'Mis favoritos'}});return;}
+  if(acc==='abrir'){var cn=(D.carpetasVivas().filter(function(x){return x.id===origen;})[0]||{}).nombre||'Mis favoritos';
+    /* lleva exactamente al nivel, la lección y el ítem guardados */
+    var op=opcionesItem(lid);op.volverA={carpeta:vf.carpeta||null,nombre:vf.carpeta?cn:'Mis favoritos'};
+    abrirLeccion(partesFav(lid).id,op);return;}
   if(acc==='quitar'){D.quitarDeCarpeta(lid,origen);pintarFavoritos();actualizarCorazon();confirmar('Quitado de la carpeta','El historial de la lección se conserva.');return;}
-  if(acc==='mover'){elegirCarpeta({titulo:'Mover a otra carpeta',sub:(catalogoDe(lid)||{}).titulo,boton:'Mover',excepto:origen},function(d){D.moverA(lid,origen,d);pintarFavoritos();confirmar('Técnica movida');});return;}
-  if(acc==='copiar'){elegirCarpeta({titulo:'Copiar a otra carpeta',sub:(catalogoDe(lid)||{}).titulo,boton:'Copiar',excepto:origen},function(d){var ok=D.copiarA(lid,d);pintarFavoritos();confirmar(ok?'Técnica copiada':'Ya estaba en esa carpeta');});return;}
+  if(acc==='mover'){elegirCarpeta({titulo:'Mover a otra carpeta',sub:etiquetaFav(lid)+' · '+(catalogoDe(partesFav(lid).id)||{}).titulo,boton:'Mover',excepto:origen},function(d){D.moverA(lid,origen,d);pintarFavoritos();confirmar('Favorito movido');});return;}
+  if(acc==='copiar'){elegirCarpeta({titulo:'Copiar a otra carpeta',sub:etiquetaFav(lid)+' · '+(catalogoDe(partesFav(lid).id)||{}).titulo,boton:'Copiar',excepto:origen},function(d){var ok=D.copiarA(lid,d);pintarFavoritos();confirmar(ok?'Favorito copiado':'Ya estaba en esa carpeta');});return;}
 });
 el('aa-fav-atras').onclick=function(){vf.carpeta=null;pintarFavoritos();};
 el('aa-fav-nueva').onclick=function(){pedirNombreCarpeta({titulo:'Nueva carpeta',boton:'Crear'},function(n){D.crearCarpeta(n);pintarFavoritos();confirmar('Carpeta creada',n);});};
@@ -1512,7 +1565,7 @@ var TOUR=[
   {t:'Pausa y avanza',x:'«Pausar» detiene la lección. Con ‹ y › pasas al número anterior o al siguiente. Al terminar el último aparece «Siguiente lección».',sel:'#aa-controles'},
   {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio.',sel:'#aa-fila-nav-izq'},
   {t:'Otras lecciones',x:'Aquí pasas a la lección anterior o a la siguiente.',sel:'.aa-fila-nav-der'},
-  {t:'Guarda tus favoritos',x:'El corazón guarda la lección en una o varias carpetas para repasarla cuando quieras.',sel:'#aa-corazon'},
+  {t:'Guarda tus favoritos',x:'El corazón guarda el ítem que estás viendo (nivel, lección y número) en una o varias carpetas. Desde Mis favoritos vuelves justo a ese ítem.',sel:'#aa-corazon'},
   {t:'Siempre a mano',x:'Las pestañas quedan arriba aunque bajes por la página. Toca «Temario» para volver a la lista de lecciones.',sel:'#tabs'},
   {t:'Tu tablero',x:'Aquí eliges el tablero. Tus tableros favoritos y personalizados son los mismos en el Método PC1 y el Método PC2.',sel:'#pc-tablero-btn'},
   {t:'¡A aprender!',x:'Tu avance se guarda solo y se sincroniza con tu código. Puedes volver a ver este recorrido desde Ayuda.',sel:null,fin:true}
@@ -1576,6 +1629,7 @@ function carpetasEnRomanos(){
 }
 function arrancar(){
   carpetasEnRomanos();
+  migrarFavoritosAItems();
   renderProgress();
   var u=D.leer(K.ultimo);
   A.sinGuardarUltimo=true;
