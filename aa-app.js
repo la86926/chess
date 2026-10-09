@@ -661,7 +661,15 @@ function navegarEtapa(d){
   if(j>=0)irAPaso(j);
 }
 el('aa-atras').onclick=function(){navegarEtapa(-1);};
-el('aa-adelante').onclick=function(){navegarEtapa(1);};
+/* «›» da por leído el paso de Teoría actual (exploración, demostración o resumen) y lo pinta de verde;
+   los ejercicios siguen marcándose solo al resolverlos. Saltar con los números no cuenta como leído. */
+el('aa-adelante').onclick=function(){
+  if(A.modo==='leccion'&&tieneContenido(A.id)){
+    var p=pasosDe(A.lec)[indicePaso()];
+    if(p&&(p.etapa==='descubre'||p.etapa==='observa'||p.etapa==='comprende')&&pasoVecino(1)>=0){clearTimeout(A.vistoT);marcarEtapa(p.clave);}
+  }
+  navegarEtapa(1);
+};
 el('aa-pausa').onclick=function(){A.auto=!A.auto;pintarPausa();if(A.auto)planificarAuto();else cancelarAuto();};
 /* En Teoría el tablero está libre: si el alumno mueve una pieza, la lección se pausa para que explore tranquilo */
 boardEl.addEventListener('pointerdown',function(){
