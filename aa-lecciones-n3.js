@@ -6,50 +6,55 @@ var L=window.AA_LECCIONES=window.AA_LECCIONES||{};
 /* N3-001 · Rayos X (Nivel IV, lección 1) */
 L['N3-001']={
   tactica:true, motivo:'Rayos X',
-  objetivo:'Vas a aprender que una pieza puede actuar a través de una pieza rival que está en medio.',
-  idea:'Hay **rayos X** cuando tu torre, alfil o dama actúa **a través de una pieza enemiga** interpuesta. Si esa pieza se mueve o captura, tu pieza de detrás entra en acción.',
-  descubre:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',di:'Tu torre de d1 mira hacia d8, pero la torre negra de d5 está en medio. ¿Sirve de algo tu torre?'},
+  objetivo:'Vas a aprender que una pieza puede actuar a través de una pieza enemiga y alcanzar a la dama o al rey de detrás.',
+  idea:'Hay **rayos X** cuando tu torre, alfil o dama actúa **a través de una pieza enemiga** que está en su línea. Si esa pieza enemiga captura o se mueve, tu línea se abre y alcanza lo que hay detrás.',
+  descubre:{fen:'3q2k1/5ppp/pQ6/3r4/8/8/P4PPP/3R2K1 w - - 0 1',di:'La dama negra de d8 está defendida por su torre de d5. Tu torre de d1 también mira hacia d8… ¿a través de qué pieza?'},
   observa:[
-    {marcas:[['d5','clave']],di:'La torre negra de d5 está en medio de la columna d.',sencillo:'Hay una torre negra en medio.'},
-    {flechas:[['d1','d8','linea']],di:'Aun así, tu torre presiona d8 **a través** de la torre negra: son los rayos X.',sencillo:'Tu torre «ve» d8 a través de la torre negra.'},
-    {jugada:'a5d8',marcas:[['g8','jaque']],di:'Dd8+: la dama se ofrece en d8. El rey no tiene casillas.',sencillo:'La dama da jaque en d8.'},
-    {jugada:'d5d8',di:'…Txd8: es la única respuesta. Al capturar, la torre negra deja libre la columna d.',sencillo:'La torre negra captura y abre la columna.'},
-    {jugada:'d1d8',marcas:[['g8','jaque']],di:'Txd8#: tu torre, que defendía d8 con rayos X, da mate.',sencillo:'¡Mate!'}
+    {flechas:[['d5','d8','defensa']],marcas:[['d8','defendida']],di:'La torre negra de d5 defiende a su dama.',sencillo:'La torre cuida a la dama.'},
+    {flechas:[['d1','d8','linea']],marcas:[['d5','clave']],di:'Tu torre de d1 apunta a d8 **a través** de la torre negra: son los rayos X.',sencillo:'Tu torre «ve» la dama a través de la torre negra.'},
+    {jugada:'b6d8',marcas:[['g8','jaque']],di:'Dxd8+!: capturas la dama con jaque. Parece un simple cambio de damas…',sencillo:'Te comes la dama con jaque.'},
+    {jugada:'d5d8',di:'…Txd8: única jugada (el rey no tiene casillas). Al capturar, la torre negra deja libre la columna d.',sencillo:'La torre negra recaptura y abre la columna.'},
+    {jugada:'d1d8',marcas:[['g8','jaque']],di:'Txd8#: tu torre llega a d8. Ganaste la dama y diste mate.',sencillo:'¡Mate!'},
+    {fen:'rq6/1R6/8/4P2k/5P2/6PP/8/2Q3K1 w - - 0 1',marcas:[['h5','clave']],di:'Los rayos X también atraviesan al **rey**. Mira el rey negro de h5.',sencillo:'Ahora, a través del rey.'},
+    {jugada:'b7h7',marcas:[['h5','jaque']],di:'Th7+: el rey solo puede ir a g6, al lado de tu torre.',sencillo:'Jaque de torre.'},
+    {jugada:'h5g6',di:'…Rg6: el rey amenaza comerse la torre.',sencillo:'El rey ataca a tu torre.'},
+    {jugada:'c1c2',flechas:[['c2','h7','linea']],marcas:[['g6','jaque']],di:'Dc2#: la dama da jaque y, a través del rey, protege h7. El rey no puede capturar la torre.',sencillo:'¡Mate! La dama protege la torre a través del rey.'}
   ],
-  comprende:{di:'Una pieza rival en tu línea no siempre la corta: si captura o se mueve, tu pieza de detrás actúa.'},
-  practica:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',linea:['a5d8','d5d8','d1d8'],meta:'mate',
-    di:'Mate en dos con rayos X.',pistas:['Tu torre defiende d8 a través de la torre negra.','Da jaque en d8.'],
-    bien:'¡Mate! La única defensa, …Txd8, abrió la columna a tu torre.'},
-  hazlo:{fen:'3r2k1/1Q3pp1/7p/8/q2R4/4P3/P4PPP/6K1 b - - 0 1',linea:['a4d1','d4d1','d8d1'],meta:'mate',
-    di:'Juegas con negras. Mate en dos con rayos X.',pistas:['Tu torre de d8 actúa a través de la torre blanca.'],
-    bien:'¡Correcto! …Dd1+, Txd1 y …Txd1#.'},
-  comprueba:{fen:'1k6/ppp4p/3p4/4r2Q/8/P7/1PP3q1/1K2R3 w - - 0 1',linea:['h5e8','e5e8','e1e8'],meta:'mate',
-    di:'Encuentra el mate en dos.',pistas:['¿Qué ve tu torre de e1 a través de la torre negra?'],
-    bien:'¡Excelente! De8+, Txe8 y Txe8#.'}
+  comprende:{di:'Si tu pieza actúa a través de una pieza enemiga, piensa qué pasa cuando esa pieza captura o se mueve: tu línea se abre y alcanza a la dama o al rey.'},
+  practica:{fen:'3q2k1/5ppp/pQ6/3r4/8/8/P4PPP/3R2K1 w - - 0 1',linea:['b6d8','d5d8','d1d8'],meta:'mate',
+    di:'Gana la dama y da mate con rayos X.',pistas:['Tu torre de d1 ve d8 a través de la torre negra.','Captura la dama con jaque.'],
+    bien:'¡Mate! Al recapturar, la torre negra abrió la columna a tu torre.'},
+  hazlo:{fen:'6qr/6R1/8/k2P4/2P5/PP6/8/1K3Q2 w - - 0 1',linea:['g7a7','a5b6','f1f2'],meta:'mate',
+    di:'Mate en dos. Tu dama puede actuar a través del rey negro.',pistas:['Empieza con un jaque de torre.','Después, una dama que proteja la torre a través del rey.'],
+    bien:'¡Correcto! Ta7+, Rb6 y Df2#: la dama protege a7 a través del rey.'},
+  comprueba:{fen:'1k2r3/ppp4p/8/8/4R3/6qP/PPP5/1K2Q3 b - - 0 1',linea:['g3e1','e4e1','e8e1'],meta:'mate',
+    di:'Juegas con negras. Encuentra la combinación de rayos X.',pistas:['Tu torre de e8 ve e1 a través de la torre blanca.'],
+    bien:'¡Excelente! …Dxe1+, Txe1 y …Txe1#.'}
 };
 
 /* N3-002 · Desviación (Nivel IV, lección 2) */
 L['N3-002']={
   tactica:true, motivo:'Desviación',
   objetivo:'Vas a aprender a ofrecer material para que un defensor abandone su tarea.',
-  idea:'En la **desviación** ofreces una pieza. Si el defensor rival la captura, **abandona** la casilla o la línea que protegía, y tú la aprovechas.',
-  descubre:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',di:'Tu peón de d7 quiere coronar, pero la torre de d8 lo frena. ¿Cómo la sacas de ahí?'},
+  idea:'En la **desviación** ofreces una pieza. Si el defensor rival la captura, **abandona** la pieza, la casilla o la línea que protegía, y tú la aprovechas.',
+  descubre:{fen:'rnbqkb1r/pp2pppp/5n2/8/2B1P3/2N5/PPP2PPP/R1BQK2R w - - 0 1',di:'Tu dama de d1 mira a la dama negra de d8. ¿Quién la defiende?'},
   observa:[
-    {marcas:[['d8','clave']],di:'La torre de d8 tiene un trabajo: frenar tu peón.',sencillo:'La torre tapa al peón.'},
-    {jugada:'c1c8',flechas:[['c8','d8','ataque']],di:'Tc8!: ofreces tu torre. Parece un regalo.',sencillo:'Tu torre se ofrece.'},
-    {jugada:'d8c8',di:'…Txc8: la torre negra acepta… y abandona d8.',sencillo:'La torre negra se la come y deja libre d8.'},
-    {jugada:'d7c8q',marcas:[['g8','jaque']],di:'dxc8=D#: el peón corona con mate. (Si las negras no aceptan, Txd8+ gana la torre).',sencillo:'¡Corona con mate!'}
+    {flechas:[['d1','d8','ataque']],marcas:[['d8','amenazada']],di:'Tu dama ataca a la dama negra por la columna d.',sencillo:'Tu dama mira a la dama negra.'},
+    {flechas:[['e8','d8','defensa']],marcas:[['e8','clave']],di:'Su único defensor es el **rey** de e8.',sencillo:'Solo el rey cuida a la dama.'},
+    {jugada:'c4f7',marcas:[['e8','jaque']],di:'Axf7+!: ofreces el alfil con jaque.',sencillo:'El alfil se entrega con jaque.'},
+    {jugada:'e8f7',di:'…Rxf7: es la única jugada legal. Al capturar, el rey abandona a su dama.',sencillo:'El rey se come el alfil y deja sola a la dama.'},
+    {jugada:'d1d8',di:'Dxd8: ganas la dama por un alfil.',sencillo:'¡Te comes la dama!'}
   ],
-  comprende:{di:'Pregúntate qué protege cada pieza rival. Ofrécele algo que la obligue a dejar su puesto.'},
-  practica:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',linea:['c1c8','d8c8','d7c8q'],meta:'mate',
-    di:'Desvía a la torre que frena tu peón.',pistas:['Ofrece tu torre en la octava fila.'],
-    bien:'¡Mate! Y si no aceptan el sacrificio, Txd8+ gana la torre.'},
-  hazlo:{fen:'5rk1/ppb1qppp/5n2/8/8/2NB3Q/PP3PPP/R5K1 w - - 0 1',linea:['c3d5','f6d5','h3h7'],meta:'mate',
-    di:'El caballo de f6 defiende h7. Desvíalo con un sacrificio.',pistas:['Pon una pieza donde el caballo pueda capturarla.','Busca una casilla que además ataque a la dama.'],
-    bien:'¡Mate! Si no capturan, Cxe7+ gana la dama.'},
-  comprueba:{fen:'r5k1/pp3ppp/2nb3q/8/8/5N2/PPB1QPPP/5RK1 b - - 0 1',linea:['c6d4','f3d4','h6h2'],meta:'mate',
-    di:'Juegas con negras. El caballo de f3 defiende h2. Desvíalo.',pistas:['Ofrece tu caballo donde también ataque a la dama.'],
-    bien:'¡Correcto! …Cd4: si Cxd4, …Dxh2#; si no, …Cxe2+.'}
+  comprende:{di:'Pregúntate qué protege cada pieza rival, incluso el rey. Ofrécele algo que la obligue a dejar su puesto.'},
+  practica:{fen:'rnbqkb1r/pp2pppp/5n2/8/2B1P3/2N5/PPP2PPP/R1BQK2R w - - 0 1',linea:['c4f7','e8f7','d1d8'],
+    di:'Desvía al único defensor de la dama negra.',pistas:['El rey de e8 defiende a su dama.','Ofrece una pieza con jaque.'],
+    bien:'¡Bien! El rey capturó y dejó sola a su dama.'},
+  hazlo:{fen:'8/3P4/8/k2r4/8/6R1/5K2/8 w - - 0 1',linea:['g3g5','d5g5','d7d8q','a5b5','d8g5'],
+    di:'La torre negra frena tu peón. Desvíala y corona.',pistas:['La torre negra está en la misma fila que su rey.','Ofrece tu torre en esa fila.'],
+    bien:'¡Correcto! Si …Txg5, d8=D+ y Dxg5. Si la torre deja la columna d, coronas igual.'},
+  comprueba:{fen:'4r1k1/1p1q1ppp/p2p1P2/1n1P4/1P1Q4/6P1/P4PKP/4R3 w - - 0 3',linea:['d4g4','d7g4','e1e8'],meta:'mate',
+    di:'La dama negra defiende la torre de e8. Desvíala.',pistas:['Ofrece tu dama donde la negra pueda capturarla.','Además amenazas Dxg7#.'],
+    bien:'¡Excelente! Si …Dxg4, Txe8#. Si …g6, Dxd7 gana la dama.'}
 };
 
 /* N3-003 · Atracción (Nivel IV, lección 3) */
