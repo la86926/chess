@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261009-aa28'
+VERSION = '20261009-aa29'
 
 
 class ErrorParche(Exception):
@@ -173,6 +173,11 @@ def construir():
     for k in ('wp_banner', 'wp_daily_goal', 'wp_error_book', 'wp_explain_theme', 'wp_hist_log_backup',
               'wp_hist_log', 'wp_solved_at_backup', 'wp_solved_at', 'wp_solved', 'wp_sound', 'wp_ultimo'):
         logica = logica.replace("'" + k + "'", "'aa_" + k[3:] + "'")
+    # Aprende no tiene sonido: ni el tablero ni ninguna otra parte (el botón ya está oculto).
+    logica = parche(logica, "let soundOn = localStorage.getItem('aa_sound')!=='0';",
+                    "let soundOn = false; /* Aprende: sin sonido */", nombre='sin sonido')
+    logica = parche(logica, "const AUDIOS={\n  move:    new Audio('Move.mp3'),\n  capture: new Audio('Capture.mp3'),\n  error:   new Audio('Error.mp3')\n};",
+                    "const AUDIOS={}; /* Aprende: sin sonido, no se descargan los audios */", nombre='sin audios')
     logica = parche(logica, "'pc_tab_ultimo_l1'", "'aa_tab_ultimo'", veces=2, nombre='pestaña')
     # «Ocultar/Mostrar» del encabezado: en la Sección 1 empieza OCULTO (para no abrumar a quien
     # empieza); si la persona elige «Mostrar», se respeta y viaja con su ID (clave aa_banner).

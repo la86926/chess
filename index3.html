@@ -1977,7 +1977,7 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
 header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
 .boardhead{transition:padding-left .34s cubic-bezier(.32,.72,0,1)}
 </style>
-<link rel="stylesheet" href="aa-app.css?v=20261009-aa28">
+<link rel="stylesheet" href="aa-app.css?v=20261009-aa29">
 </head>
 <body class="aa-app">
 <header class="topbar">
@@ -2001,6 +2001,7 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
 <!-- Barra fija: las pestañas siempre a la vista y, dentro de una lección, el botón para volver a la lista -->
 <div class="aa-barra-fija" id="aa-barra-fija">
   <nav class="tabs" id="tabs">
+    <button class="tab" data-v="mia">Mi lección</button>
     <button class="tab active" data-v="levels">Temario</button>
     <button class="tab" data-v="favs">Mis favoritos</button>
     <button class="tab" data-v="discover">Repaso</button>
@@ -2180,6 +2181,14 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
   </div>
   <div class="aa-continuar-bloque" id="aa-continuar-bloque"></div>
   <div class="aa-niveles" id="aa-niveles"></div>
+ </div>
+</section>
+
+<section class="view" id="v-mia">
+ <div class="aa-pagina aa-pagina-estrecha aa-mia-vacia">
+  <h1>Mi lección</h1>
+  <p class="lead">Aún no has empezado ninguna lección. Elige una en el Temario.</p>
+  <button class="btn primary aa-boton-grande" id="aa-mia-temario" type="button">Ir al Temario</button>
  </div>
 </section>
 
@@ -6099,7 +6108,7 @@ document.addEventListener('keydown',e=>{
   else if(k==='e'){$('b-explain').click();}
 });
 
-let soundOn = localStorage.getItem('aa_sound')!=='0';
+let soundOn = false; /* Aprende: sin sonido */
 let audioCtx=null;
 function beep(freq,dur,vol,tipo){
   if(!soundOn) return;
@@ -6114,11 +6123,7 @@ function beep(freq,dur,vol,tipo){
   }catch(e){}
 }
 
-const AUDIOS={
-  move:    new Audio('Move.mp3'),
-  capture: new Audio('Capture.mp3'),
-  error:   new Audio('Error.mp3')
-};
+const AUDIOS={}; /* Aprende: sin sonido, no se descargan los audios */
 function play(nombre){
   if(!soundOn) return;
   try{
@@ -7938,13 +7943,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="aa-catalogo.js?v=20261009-aa28"></script>
-<script src="aa-datos.js?v=20261009-aa28"></script>
-<script src="aa-lecciones-n1.js?v=20261009-aa28"></script>
-<script src="aa-lecciones-n2.js?v=20261009-aa28"></script>
-<script src="aa-lecciones-n3.js?v=20261009-aa28"></script>
-<script src="aa-lecciones-n4.js?v=20261009-aa28"></script>
-<script src="aa-app.js?v=20261009-aa28"></script>
+<script src="aa-catalogo.js?v=20261009-aa29"></script>
+<script src="aa-datos.js?v=20261009-aa29"></script>
+<script src="aa-lecciones-n1.js?v=20261009-aa29"></script>
+<script src="aa-lecciones-n2.js?v=20261009-aa29"></script>
+<script src="aa-lecciones-n3.js?v=20261009-aa29"></script>
+<script src="aa-lecciones-n4.js?v=20261009-aa29"></script>
+<script src="aa-app.js?v=20261009-aa29"></script>
 <script src="pc-mascota.js?v=9"></script>
 </body>
 </html>

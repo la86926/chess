@@ -482,13 +482,13 @@ L['N1-026']={
   descubre:{fen:INICIAL,di:'Es la primera jugada. ¿Qué peón moverías? Piensa en el centro del tablero.'},
   observa:[
     {marcas:[['d4','clave'],['e4','clave'],['d5','clave'],['e5','clave']],di:'Estas cuatro casillas son el **centro**. Quien lo controla tiene más espacio para sus piezas.',sencillo:'El centro es como el medio de una cancha: desde ahí llegas a todas partes.'},
-    {jugada:'e2e4',flechas:[['e4','d5','ataque'],['e4','f5','ataque']],di:'1.e4 ocupa el centro y vigila d5 y f5. Además abre camino para la dama y el alfil.',sencillo:'El peón ocupa una casilla central y deja salir a otras piezas.'},
-    {jugada:'e7e5',flechas:[['e5','d4','ataque'],['e5','f4','ataque']],di:'1…e5: las negras hacen lo mismo y disputan el centro.',sencillo:'Las negras también quieren el centro.'},
-    {jugada:'d2d4',flechas:[['d4','e5','ataque']],di:'2.d4 desafía el centro de las negras. Las aperturas giran alrededor de esta lucha.',sencillo:'Otro peón al centro: la pelea empieza ahí.'}
+    {jugada:'d2d4',flechas:[['d4','e5','ataque'],['d4','c5','ataque']],di:'**Sistema Londres**: 1.d4 ocupa el centro, vigila e5 y c5 y abre camino al alfil de c1.',sencillo:'El peón ocupa el centro y deja salir al alfil.'},
+    {jugada:'d7d5',flechas:[['d5','e4','ataque'],['d5','c4','ataque']],di:'1…d5: las negras también ocupan el centro y frenan a tu peón.',sencillo:'Las negras también quieren el centro.'},
+    {jugada:'c1f4',flechas:[['f4','e5','linea']],di:'2.Af4: el alfil sale y también vigila e5. Peones y piezas luchan por el centro.',sencillo:'El alfil del Londres también mira al centro.'}
   ],
-  comprende:{di:'Primeras jugadas: peones centrales (e4, d4) y después piezas que miren al centro.'},
-  practica:{fen:INICIAL,linea:['e2e4'],acepta:{0:['d2d4']},regla:true,di:'Haz una primera jugada que ocupe el centro con un peón.',pistas:['Los peones de d2 y e2 pueden avanzar dos casillas.'],bien:'¡Muy bien! Un peón en el centro.'},
-  hazlo:{fen:'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',linea:['e7e5'],acepta:{0:['d7d5','c7c5']},regla:true,di:'Juegas con negras tras 1.e4. Responde luchando por el centro.',pistas:['Un peón central negro también puede avanzar dos casillas.'],bien:'¡Correcto! Disputas el centro desde la primera jugada.'},
+  comprende:{di:'Primeras jugadas: peones centrales (d4, e4) y después piezas que miren al centro.'},
+  practica:{fen:INICIAL,linea:['d2d4'],acepta:{0:['e2e4']},regla:true,di:'Haz una primera jugada que ocupe el centro con un peón.',pistas:['Los peones de d2 y e2 pueden avanzar dos casillas.'],bien:'¡Muy bien! Un peón en el centro.'},
+  hazlo:{fen:'rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2',linea:['d7d5'],regla:true,di:'Juegas con negras: **Caro-Kann**, 1.e4 c6 2.d4. Disputa el centro con un peón.',pistas:['Tu peón de c6 ya protege la casilla d5.'],bien:'¡Correcto! …d5 ataca e4: así se juega la Caro-Kann.'},
   comprueba:{fen:'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1',linea:['d7d5'],concepto:true,
     objetivoEquilibrio:true,di:'Juegas con negras tras **1.d4**. Ocupa el centro con un peón.',pistas:['El peón de d7 puede avanzar dos casillas.'],
     mal:{'*':'Busca un peón que llegue a una casilla del centro sin perderse.'},bien:'¡Bien! …d5 ocupa el centro y frena al peón de d4.'}
@@ -497,37 +497,37 @@ L['N1-026']={
 /* N1-027 · Principios de apertura: desarrollar caballos y alfiles */
 L['N1-027']={
   objetivo:'Vas a sacar tus piezas menores a casillas activas.',
-  idea:'**Desarrollar** es llevar caballos y alfiles desde su casilla inicial a casillas desde donde miren el centro. Un buen orden: caballos primero, luego alfiles.',
-  descubre:{fen:'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',di:'Ya tienes un peón en el centro. ¿Qué pieza sacarías ahora?'},
+  idea:'**Desarrollar** es llevar caballos y alfiles a casillas desde donde **miren el centro**. Saca una pieza nueva en cada jugada y deja la dama para después.',
+  descubre:{fen:'rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2',di:'Sistema Londres. Ya tienes un peón en el centro. ¿Qué pieza sacarías ahora?'},
   observa:[
-    {jugada:'g1f3',flechas:[['f3','e5','ataque'],['f3','d4','linea']],di:'2.Cf3: el caballo sale hacia el centro y además ataca el peón de e5.',sencillo:'El caballo sale de su casa y mira al centro.'},
-    {jugada:'b8c6',flechas:[['c6','e5','defensa']],di:'2…Cc6: las negras desarrollan y defienden e5.',sencillo:'El caballo negro sale y protege a su peón.'},
-    {jugada:'f1c4',flechas:[['c4','f7','linea']],di:'3.Ac4: el alfil apunta al punto débil f7. Ya hay dos piezas desarrolladas y el rey casi listo para enrocar.',sencillo:'El alfil sale a una diagonal larga y abierta.'}
+    {jugada:'g1f3',flechas:[['f3','e5','ataque']],di:'2.Cf3: el caballo sale hacia el centro y vigila e5.',sencillo:'El caballo sale de su casa y mira al centro.'},
+    {jugada:'g8f6',flechas:[['f6','e4','ataque']],di:'2…Cf6: las negras también desarrollan y vigilan e4.',sencillo:'El caballo negro sale.'},
+    {jugada:'c1f4',flechas:[['f4','e5','linea']],di:'3.Af4: el alfil sale **antes** de jugar e3, para no quedar encerrado detrás de sus peones. Es la idea del Londres.',sencillo:'El alfil sale a tiempo, antes de cerrarse el camino.'}
   ],
   comprende:{di:'En la apertura, cada jugada debería sacar una pieza nueva. Los caballos rinden más en c3, f3 (c6, f6), mirando al centro.'},
-  practica:{fen:'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',linea:['g1f3'],acepta:{0:['b1c3','f1c4','f1b5']},regla:true,di:'Desarrolla una pieza menor (caballo o alfil) hacia el centro.',pistas:['Por ejemplo, el caballo de g1 a f3.'],bien:'¡Bien desarrollado!'},
-  hazlo:{fen:'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',linea:['b8c6'],acepta:{0:['g8f6']},regla:true,di:'Juegas con negras. Desarrolla un caballo.',pistas:['Tu peón de e5 está atacado: un caballo puede desarrollarse y defenderlo.'],bien:'¡Correcto! Desarrollo con defensa.'},
-  comprueba:{fen:'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',linea:['g8f6'],acepta:{0:['f8c5','f8e7']},concepto:true,
-    objetivoEquilibrio:true,di:'Juegas con negras tras 1.e4 e5 2.Cf3 Cc6 3.Ac4. Desarrolla una pieza menor que todavía no se haya movido.',pistas:['Te quedan en casa el caballo de g8 y el alfil de f8.','…Cf6 o …Ac5.'],
-    mal:{'*':'Esa jugada no saca una pieza nueva. Desarrolla el caballo de g8 o el alfil de f8.'},bien:'¡Bien! Otra pieza fuera y tu rey más cerca de enrocar.'}
+  practica:{fen:'rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2',linea:['g1f3'],acepta:{0:['c1f4','b1c3','b1d2','c1g5']},regla:true,di:'Desarrolla una pieza menor (caballo o alfil) hacia el centro.',pistas:['Por ejemplo, el caballo de g1 a f3.'],bien:'¡Bien desarrollado!'},
+  hazlo:{fen:'rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4',linea:['c8f5'],acepta:{0:['g8f6','b8d7']},regla:true,di:'Juegas con negras en la **Caro-Kann**. Desarrolla una pieza menor.',pistas:['Tu alfil de c8 tiene libre la diagonal hasta f5.'],bien:'¡Correcto! …Af5 es el desarrollo clásico de la Caro-Kann.'},
+  comprueba:{fen:'rn1qkbnr/pp2pppp/2p3b1/8/3P4/5NN1/PPP2PPP/R1BQKB1R b KQkq - 4 6',linea:['b8d7'],acepta:{0:['g8f6']},concepto:true,
+    objetivoEquilibrio:true,di:'Juegas con negras en la Caro-Kann clásica: tu alfil ya está en g6. Desarrolla un caballo.',pistas:['Tus dos caballos siguen en casa.','…Cd7 o …Cf6.'],
+    mal:{'*':'Esa jugada no saca un caballo. Desarrolla el de b8 o el de g8.'},bien:'¡Bien! Otra pieza fuera y tu rey más cerca de enrocar.'}
 };
 
 /* N1-028 · Principios de apertura: enrocar pronto */
 L['N1-028']={
   objetivo:'Vas a poner a salvo a tu rey antes de que empiece la lucha.',
-  idea:'Con el centro abierto el rey corre peligro en e1 (o e8). **Enroca pronto**: el rey queda protegido detrás de sus peones y la torre entra en juego.',
-  descubre:{fen:'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',di:'Los dos bandos desarrollaron caballos y alfiles. ¿Qué jugada pone a salvo a tu rey?'},
+  idea:'Si el centro se abre, el rey corre peligro en e1 (o e8). **Enroca pronto**: el rey queda protegido detrás de sus peones y la torre entra en juego.',
+  descubre:{fen:'r1bq1rk1/pp3ppp/2nbpn2/2pp4/3P4/2PBPNB1/PP3PPP/RN1QK2R w KQ - 1 8',di:'Sistema Londres. Ya sacaste las piezas del flanco de rey. ¿Qué jugada pone a salvo a tu rey?'},
   observa:[
-    {marcas:[['e1','clave']],flechas:[['c5','f2','linea']],di:'Tu rey sigue en el centro, donde las columnas pueden abrirse. El alfil de c5 ya apunta a f2.',sencillo:'El rey en el medio está expuesto a los ataques.'},
-    {jugada:'e1g1',marcas:[['g1','clave'],['f1','clave']],di:'5.0-0: el rey se esconde en g1 tras los peones y la torre de f1 se suma al juego.',sencillo:'Enrocando, el rey se va a un rincón seguro.'},
-    {jugada:'e8g8',di:'5…0-0: las negras hacen lo mismo. Ahora ambos reyes están a salvo.',sencillo:'Las negras también protegen a su rey.'}
+    {marcas:[['e1','clave']],flechas:[['c5','d4','ataque']],di:'Tu rey sigue en e1 y las negras ya presionan el centro con …c5. Si el centro se abre, el rey estará en peligro.',sencillo:'El rey en el medio está expuesto a los ataques.'},
+    {jugada:'e1g1',marcas:[['g1','clave'],['f1','clave']],di:'8.0-0: el rey se esconde en g1 tras los peones y la torre de f1 se suma al juego.',sencillo:'Enrocando, el rey se va a un rincón seguro.'},
+    {flechas:[['f1','e1','mov']],di:'Con el rey a salvo, la torre ya puede ir a e1 para apoyar el centro. Ahora los dos reyes están seguros.',sencillo:'Rey seguro y torre lista.'}
   ],
   comprende:{di:'Lo habitual es enrocar entre la jugada 5 y la 10, después de desarrollar las piezas del lado del enroque.'},
-  practica:{fen:'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',linea:['e1g1'],regla:true,di:'Pon a salvo a tu rey.',pistas:['Puedes enrocar corto.'],bien:'¡Rey seguro!'},
-  hazlo:{fen:'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R b KQkq - 0 5',linea:['e8g8'],regla:true,di:'Juegas con negras: enroca.',pistas:['El camino entre tu rey y la torre de h8 está libre.'],bien:'¡Correcto!'},
-  comprueba:{fen:'r1bqk2r/ppp2ppp/2n2n2/2b5/2B5/2N2N2/PPP2PPP/R1BQK2R w KQkq - 0 7',linea:['e1g1'],concepto:true,
-    objetivoEquilibrio:true,di:'Ya no quedan peones en las columnas d y e: el centro está abierto y tu rey sigue en e1. Ponlo a salvo.',pistas:['Con el centro abierto, el rey corre peligro en e1.','Enroca corto.'],
-    mal:{'*':'Lo más urgente es poner a salvo tu rey: enroca.'},bien:'¡Bien! Con el centro abierto, el enroque pone a salvo al rey a tiempo.'}
+  practica:{fen:'r1bq1rk1/pp3ppp/2nbpn2/2pp4/3P4/2PBPNB1/PP3PPP/RN1QK2R w KQ - 1 8',linea:['e1g1'],regla:true,di:'Pon a salvo a tu rey.',pistas:['Puedes enrocar corto.'],bien:'¡Rey seguro!'},
+  hazlo:{fen:'r2qk2r/pp1nbppp/2p1pn2/8/2PP4/3Q1NN1/PP3PPP/R1B1R1K1 b kq - 0 11',linea:['e8g8'],regla:true,di:'Juegas con negras en la **Caro-Kann**. Las blancas ya enrocaron: enroca tú.',pistas:['El camino entre tu rey y la torre de h8 está libre.'],bien:'¡Correcto!'},
+  comprueba:{fen:'r2qk2r/pp1nbpp1/2p1pn1p/7P/3P4/3Q1NN1/PPPB1PP1/1K1R3R b kq - 5 13',linea:['e8g8'],concepto:true,
+    objetivoEquilibrio:true,di:'Juegas con negras en la Caro-Kann clásica. Las blancas enrocaron largo y tu rey sigue en el centro. Ponlo a salvo.',pistas:['Tu rey sigue en e8.','Enroca corto.'],
+    mal:{'*':'Lo más urgente es poner a salvo tu rey: enroca.'},bien:'¡Bien! …0-0, como en la línea principal.'}
 };
 
 /* N1-029 · No sacar la dama demasiado pronto */
@@ -555,35 +555,36 @@ L['N1-030']={
   idea:'En la apertura, **cada jugada cuenta**. Mover la misma pieza una y otra vez deja a las demás en casa mientras el rival se desarrolla.',
   descubre:{fen:INICIAL,di:'Observa cuántas piezas saca cada bando en las primeras jugadas.'},
   observa:[
-    {jugada:'e2e4',di:'1.e4…',sencillo:'Empiezan con peones al centro…'},
-    {jugada:'e7e5',di:'1…e5',sencillo:'…los dos.'},
-    {jugada:'g1f3',di:'2.Cf3: buena jugada de desarrollo.',sencillo:'Las blancas sacan el caballo.'},
-    {jugada:'b8c6',di:'2…Cc6',sencillo:'Las negras también.'},
-    {jugada:'f3g5',flechas:[['g5','f7','ataque']],di:'3.Cg5?! El mismo caballo vuelve a moverse para atacar f7…',sencillo:'Las blancas mueven otra vez el mismo caballo…'},
-    {jugada:'d7d5',di:'3…d5: las negras defienden y ganan espacio.',sencillo:'Las negras se defienden y siguen jugando.'},
-    {jugada:'g5f3',di:'4.Cf3: ¡el caballo vuelve atrás! Las blancas gastaron dos jugadas para nada.',sencillo:'El caballo regresó: dos jugadas perdidas.'},
-    {jugada:'g8f6',marcas:[['c6','clave'],['f6','clave'],['f3','clave']],di:'4…Cf6: las negras ya tienen dos piezas fuera y peones en el centro; las blancas, solo una.',sencillo:'Cuenta las piezas fuera: las negras van adelantadas.'}
+    {jugada:'d2d4',di:'1.d4…',sencillo:'Empiezan con peones al centro…'},
+    {jugada:'d7d5',di:'1…d5',sencillo:'…los dos.'},
+    {jugada:'c1f4',di:'2.Af4: Sistema Londres. El alfil sale.',sencillo:'Las blancas sacan el alfil.'},
+    {jugada:'g8f6',di:'2…Cf6: buena jugada de desarrollo.',sencillo:'Las negras sacan el caballo.'},
+    {jugada:'e2e3',di:'3.e3: abre paso al otro alfil.',sencillo:'Las blancas preparan otra pieza.'},
+    {jugada:'f6g4',di:'3…Cg4?! El mismo caballo vuelve a moverse, sin un objetivo claro…',sencillo:'Las negras mueven otra vez el mismo caballo…'},
+    {jugada:'h2h3',flechas:[['h3','g4','ataque']],di:'4.h3: un peón lo ataca…',sencillo:'Las blancas lo echan con un peón.'},
+    {jugada:'g4f6',di:'4…Cf6: ¡el caballo vuelve atrás! Las negras gastaron dos jugadas para nada.',sencillo:'El caballo regresó: dos jugadas perdidas.'},
+    {jugada:'g1f3',marcas:[['f4','clave'],['f3','clave'],['f6','clave']],di:'5.Cf3: las blancas ya tienen dos piezas fuera; las negras, solo una.',sencillo:'Cuenta las piezas fuera: las blancas van adelantadas.'}
   ],
   comprende:{di:'Salvo para capturar o evitar una amenaza, saca una pieza nueva en cada jugada de la apertura.'},
-  practica:{fen:'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 5',linea:['b1c3'],acepta:{0:['f1b5','f1d3','f1e2','e4d5']},regla:true,di:'Te toca. Saca una pieza que todavía no se haya movido (o captura en el centro).',pistas:['Tu caballo de b1 y tu alfil de f1 siguen en casa.'],bien:'¡Bien! Una pieza nueva al juego.'},
-  comprueba:{fen:'r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 4 4',linea:['f1b5'],acepta:{0:['f1c4','f1e2','f1d3']},concepto:true,
-    objetivoEquilibrio:true,di:'Tras 1.e4 e5 2.Cf3 Cc6 3.Cc3 Cf6 tus dos caballos ya salieron. Saca una pieza que todavía no se haya movido.',pistas:['No muevas otra vez los caballos.','Saca el alfil de f1.'],
-    mal:{'*':'Esa jugada no saca una pieza nueva: el alfil de f1 sigue en casa.'},bien:'¡Bien! En la apertura, cada jugada saca una pieza nueva.'}
+  practica:{fen:'rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3',linea:['g1f3'],acepta:{0:['b1d2','b1c3']},regla:true,di:'Te toca. Saca un caballo que todavía no se haya movido.',pistas:['Tus caballos de b1 y g1 siguen en casa. No muevas otra vez el alfil.'],bien:'¡Bien! Una pieza nueva al juego.'},
+  comprueba:{fen:'rnbqkb1r/pp3ppp/4pn2/2pp4/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 0 5',linea:['b1d2'],acepta:{0:['f1d3','f1e2','b1c3','f1b5']},concepto:true,
+    objetivoEquilibrio:true,di:'Sistema Londres: tu caballo de f3 y tu alfil de f4 ya salieron. Saca una pieza que todavía no se haya movido.',pistas:['No muevas otra vez el caballo ni el alfil.','Te quedan el caballo de b1 y el alfil de f1.'],
+    mal:{'*':'Esa jugada no saca una pieza nueva: el caballo de b1 y el alfil de f1 siguen en casa.'},bien:'¡Bien! En la apertura, cada jugada saca una pieza nueva.'}
 };
 
 /* N1-031 · Conectar las torres */
 L['N1-031']={
   objetivo:'Vas a terminar el desarrollo conectando tus torres.',
   idea:'Las torres están **conectadas** cuando no hay piezas entre ellas en la primera fila: se defienden mutuamente y pueden ir juntas a las columnas abiertas.',
-  descubre:{fen:'r2q1rk1/ppp2ppp/2nbbn2/3pp3/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w - - 0 8',di:'Las dos partes desarrollaron y enrocaron. ¿Qué pieza blanca separa todavía a las torres?'},
+  descubre:{fen:'r2q1rk1/pb3ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP1N1PPP/R2Q1RK1 w - - 2 10',di:'Sistema Londres: los dos bandos desarrollaron y enrocaron. ¿Qué pieza blanca separa todavía a las torres?'},
   observa:[
     {marcas:[['d1','clave']],di:'La dama de d1 está entre la torre de a1 y la de f1. Las torres no se «ven».',sencillo:'La dama tapa el camino entre las dos torres.'},
-    {jugada:'d1e2',flechas:[['a1','f1','linea']],di:'8.De2: la dama sale de la primera fila y ahora las torres están **conectadas**.',sencillo:'La dama subió un piso y las torres ya se ven.'},
-    {jugada:'d8e7',flechas:[['a8','f8','linea']],di:'8…De7: las negras hacen lo mismo. Con todo desarrollado, empieza el medio juego.',sencillo:'Las negras también conectan sus torres.'}
+    {jugada:'d1e2',flechas:[['a1','f1','linea']],di:'10.De2: la dama sale de la primera fila y ahora las torres están **conectadas**.',sencillo:'La dama subió un piso y las torres ya se ven.'},
+    {jugada:'d8c7',flechas:[['a8','f8','linea']],di:'10…Dc7: las negras hacen lo mismo. Con todo desarrollado, empieza el medio juego.',sencillo:'Las negras también conectan sus torres.'}
   ],
   comprende:{di:'El desarrollo termina cuando las piezas menores están fuera, el rey enrocado y las torres conectadas.'},
-  practica:{fen:'r2q1rk1/ppp2ppp/2nbbn2/3pp3/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w - - 0 8',linea:['d1e2'],acepta:{0:['d1d2','d1e1']},regla:true,di:'Conecta tus torres.',pistas:['Mueve la dama.'],bien:'¡Bien! Torres conectadas.'},
-  comprueba:{fen:'r2q1rk1/ppp2ppp/2nbbn2/3pp3/3PP3/2NBBN2/PPP1QPPP/R4RK1 b - - 1 8',linea:['d8e7'],acepta:{0:['d8d7','d8e8']},regla:true,di:'Juegas con negras: conecta tus torres.',pistas:['Tu dama está entre las torres.'],bien:'¡Correcto!'}
+  practica:{fen:'r2q1rk1/pb3ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP1N1PPP/R2Q1RK1 w - - 2 10',linea:['d1e2'],acepta:{0:['d1c2','d1e1','d1b1','d1b3','d1a4']},regla:true,di:'Conecta tus torres.',pistas:['Mueve la dama.'],bien:'¡Bien! Torres conectadas.'},
+  comprueba:{fen:'r2q1rk1/pb3ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP1NQPPP/R4RK1 b - - 3 10',linea:['d8c7'],acepta:{0:['d8e7','d8d7','d8e8']},regla:true,di:'Juegas con negras: conecta tus torres.',pistas:['Tu dama está entre las torres.'],bien:'¡Correcto!'}
 };
 
 /* N1-032 · La debilidad de f7 y f2 */
