@@ -573,47 +573,6 @@ L['N4-016']={
     di:'Juegas con negras. Gana material con jaque.',pistas:['Captura con el peón de d5.'],bien:'¡Correcto! …dxe4+.'}
 };
 
-/* N4-017 · Sacrificio de atracción */
-L['N4-017']={
-  tactica:true, motivo:'Sacrificio de atracción',
-  objetivo:'Vas a practicar sacrificios que atraen una pieza rival a una casilla fatal.',
-  idea:'Con un **sacrificio de atracción** obligas a una pieza rival (a menudo el rey o la dama) a ir a la casilla donde la espera un **tenedor** o un **mate**.',
-  descubre:{fen:'4r1k1/5ppp/8/8/1n6/8/PP1Q4/K7 b - - 0 1',di:'Juegas con negras. Tu caballo daría un tenedor en c2 si la dama blanca estuviera en e1. ¿Puedes llevarla allí?'},
-  observa:[
-    {jugada:'e8e1',marcas:[['a1','jaque']],di:'…Te1+: la torre se sacrifica con jaque.',sencillo:'La torre se ofrece.'},
-    {jugada:'d2e1',di:'Dxe1: la dama fue atraída a e1.',sencillo:'La dama se come la torre.'},
-    {jugada:'b4c2',flechas:[['c2','e1','ataque']],marcas:[['a1','jaque'],['e1','amenazada']],di:'…Cc2+: tenedor al rey y a la dama.',sencillo:'¡Tenedor!'}
-  ],
-  comprende:{di:'Primero decide la casilla del tenedor; luego busca cómo llevar allí a la pieza rival.'},
-  practica:{fen:'4r1k1/5ppp/8/8/1n6/8/PP1Q4/K7 b - - 0 1',linea:['e8e1','d2e1','b4c2'],
-    di:'Juegas con negras. Atrae la dama y gánala.',pistas:['Sacrifica la torre con jaque.'],bien:'¡Bien! …Te1+, Dxe1 y …Cc2+.'},
-  hazlo:{fen:'rk6/1pp5/8/8/1n6/8/1PP5/1K2Q3 b - - 0 1',linea:['a8a1','b1a1','b4c2'],
-    di:'Juegas con negras. Atrae al rey y gana la dama.',pistas:['Sacrifica la torre en a1.'],bien:'¡Correcto! …Ta1+, Rxa1 y …Cxc2+.'},
-  comprueba:{fen:'k7/pp1q4/8/1N6/8/8/PPP5/1K2R3 w - - 0 1',linea:['e1e8','d7e8','b5c7'],
-    di:'Atrae la dama negra a una casilla de tenedor.',pistas:['Da jaque en la última fila.'],bien:'¡Excelente! Te8+, Dxe8 y Cc7+.'}
-};
-
-/* N4-018 · Sacrificio de desviación */
-L['N4-018']={
-  tactica:true, motivo:'Sacrificio de desviación',
-  objetivo:'Vas a practicar sacrificios que apartan a un defensor de su puesto.',
-  idea:'Con un **sacrificio de desviación** ofreces una pieza para que el defensor rival la capture y **abandone** la casilla o la línea que vigilaba.',
-  descubre:{fen:'1k2r3/ppp1P3/8/8/8/8/PPP5/1K3R2 w - - 0 1',di:'Tu peón de e7 quiere coronar, pero la torre de e8 lo frena. ¿Cómo la apartas?'},
-  observa:[
-    {jugada:'f1f8',flechas:[['f8','e8','ataque']],di:'Tf8!: la torre se ofrece en f8.',sencillo:'La torre se sacrifica.'},
-    {jugada:'e8f8',di:'…Txf8',sencillo:'La torre negra la captura.'},
-    {jugada:'e7f8q',marcas:[['b8','jaque']],di:'exf8=D+: el peón corona con jaque.',sencillo:'¡Corona!'}
-  ],
-  comprende:{di:'Si un defensor tiene una tarea vital, ofrécele algo que no pueda rechazar.'},
-  practica:{fen:'1k2r3/ppp1P3/8/8/8/8/PPP5/1K3R2 w - - 0 1',linea:['f1f8'],
-    di:'Desvía a la torre que frena tu peón.',pistas:['Ataca a la torre de e8 desde la última fila.'],bien:'¡Bien! Si …Txf8, exf8=D+.'},
-  hazlo:{fen:'r4rk1/pp3ppp/3b3q/4p3/8/5N2/PP3PPP/R2Q1RK1 b - - 0 1',linea:['e5e4'],
-    di:'Juegas con negras. El caballo de f3 defiende h2. Desvíalo.',pistas:['Tu dama y tu alfil apuntan a h2.','Ataca al caballo con un peón.'],
-    bien:'¡Correcto! …e4: si el caballo se va, …Dxh2+.'},
-  comprueba:{fen:'1k2r3/ppp5/8/4q3/8/4Q3/PPP5/1K1R4 w - - 0 1',linea:['e3e5'],
-    di:'La torre de e8 tiene dos tareas. Aprovéchalo.',pistas:['Defiende su dama y la última fila.'],bien:'¡Excelente! Si …Txe5, Td8#.'}
-};
-
 /* N4-019 · Sacrificar para abrir */
 L['N4-019']={
   tactica:true, motivo:'Sacrificio para abrir líneas',

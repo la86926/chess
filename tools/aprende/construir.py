@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261009-aa27'
+VERSION = '20261009-aa28'
 
 
 class ErrorParche(Exception):

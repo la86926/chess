@@ -102,13 +102,13 @@ A.velocidad=(function(){var v=Number(prefs().velocidad);return VELOCIDADES.index
 var SENAL={
   mov:{n:'Jugada',c:'var(--aa-mov)',w:.17,d:''},
   ataque:{n:'Ataque',c:'var(--aa-ataque)',w:.2,d:''},
-  amenaza:{n:'Amenaza del rival',c:'var(--aa-ataque)',w:.15,d:'.28 .18'},
+  amenaza:{n:'Amenaza',c:'var(--aa-ataque)',w:.15,d:'.28 .18'},
   defensa:{n:'Defensa',c:'var(--aa-defensa)',w:.15,d:'.04 .2'},
-  linea:{n:'Línea de influencia',c:'var(--aa-linea)',w:.13,d:'.5 .22'}
+  linea:{n:'Línea',c:'var(--aa-linea)',w:.13,d:'.5 .22'}
 };
 var MARCA={
-  amenazada:{n:'Pieza amenazada',g:'!'},defendida:{n:'Pieza defendida',g:'✓'},indefensa:{n:'Pieza indefensa',g:'?'},
-  clave:{n:'Casilla clave',g:''},jaque:{n:'Rey en jaque',g:'+'},escape:{n:'Casilla de escape',g:''},bloqueada:{n:'Casilla sin salida',g:'×'}
+  amenazada:{n:'Amenazada',g:'!'},defendida:{n:'Defendida',g:'✓'},indefensa:{n:'Sin defensa',g:'?'},
+  clave:{n:'Clave',g:''},jaque:{n:'Jaque',g:'+'},escape:{n:'Escape',g:''},bloqueada:{n:'Cerrada',g:'×'}
 };
 function coord(sq){var f='abcdefgh'.indexOf(sq[0]),r=Number(sq[1]);return state.orient==='w'?{x:f+.5,y:8-r+.5}:{x:7-f+.5,y:r-1+.5};}
 function svgFlecha(f,i,animar){
@@ -160,9 +160,11 @@ function pintarLeyenda(){
   var tipos={},marcas={};
   (A.capa.flechas||[]).forEach(function(f){tipos[SENAL[f[2]]?f[2]:'mov']=1;});
   (A.capa.marcas||[]).forEach(function(m){marcas[MARCA[m[1]]?m[1]:'clave']=1;});
-  var h='';
-  Object.keys(tipos).forEach(function(t){h+='<span class="aa-ley"><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="22" y2="5" stroke="'+SENAL[t].c+'" stroke-width="'+(SENAL[t].w*14)+'"'+(SENAL[t].d?' stroke-dasharray="'+SENAL[t].d.split(' ').map(function(x){return x*14;}).join(' ')+'" stroke-linecap="round"':'')+'/><polygon points="29,5 21,1 21,9" fill="'+SENAL[t].c+'"/></svg>'+SENAL[t].n+'</span>';});
-  Object.keys(marcas).forEach(function(t){h+='<span class="aa-ley"><i class="aa-ley-marca t-'+t+'">'+esc(MARCA[t].g)+'</i>'+MARCA[t].n+'</span>';});
+  /* lo mínimo: sin las señales que se entienden solas (jugada, casilla clave, jaque) y como mucho tres */
+  delete tipos.mov;delete marcas.clave;delete marcas.jaque;
+  var h='',n=0;
+  Object.keys(tipos).forEach(function(t){if(++n>3)return;h+='<span class="aa-ley"><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="22" y2="5" stroke="'+SENAL[t].c+'" stroke-width="'+(SENAL[t].w*14)+'"'+(SENAL[t].d?' stroke-dasharray="'+SENAL[t].d.split(' ').map(function(x){return x*14;}).join(' ')+'" stroke-linecap="round"':'')+'/><polygon points="29,5 21,1 21,9" fill="'+SENAL[t].c+'"/></svg>'+SENAL[t].n+'</span>';});
+  Object.keys(marcas).forEach(function(t){if(++n>3)return;h+='<span class="aa-ley"><i class="aa-ley-marca t-'+t+'">'+esc(MARCA[t].g)+'</i>'+MARCA[t].n+'</span>';});
   /* la fila de la leyenda siempre ocupa su lugar (vacía o no): así el globo del tutor no se mueve */
   cont.innerHTML=h;cont.hidden=false;cont.classList.toggle('vacia',!h);
 }
@@ -279,7 +281,8 @@ renderHead=function(){
 /* Botones de abajo: «◂ Lección 1» y «Lección 3 ▸» (la anterior y la siguiente del temario) */
 function etiquetaLeccion(id){
   var c=catalogoDe(id),act=catalogoDe(A.id);if(!c)return '';
-  return (act&&act.nivel!==c.nivel?'Nivel '+CAT.romano[c.nivel]+' · ':'')+'Lección '+c.num;
+  /* si cambia de nivel, más corto para que quepa en el móvil: «Nivel II · 38» */
+  return act&&act.nivel!==c.nivel?'Nivel '+CAT.romano[c.nivel]+' · '+c.num:'Lección '+c.num;
 }
 function pintarNavLecciones(){
   var ant=el('b-prev-top'),sig=el('b-next-top');if(!ant||!sig)return;
@@ -1197,6 +1200,8 @@ function pintarNiveles(){
   el('aa-continuar-aprendiendo').onclick=continuarAprendiendo;
   /* niveles abiertos: se recuerdan mientras la página esté abierta; al principio, el de la última lección */
   if(!A.nivelesAbiertos){A.nivelesAbiertos={};A.nivelesAbiertos[cont?cont.nivel:1]=true;}
+  /* la última lección abierta queda sombreada y su nivel desplegado, para saber dónde te quedaste */
+  var marca=cont?u.leccion:'';if(cont)A.nivelesAbiertos[cont.nivel]=true;
   el('aa-niveles').innerHTML=CAT.niveles.map(function(nv,i){
     var hechos=r.porNivel[i],pc=Math.round(hechos/nv.t.length*100),listos=nv.ids.filter(tieneContenido).length,ab=!!A.nivelesAbiertos[i+1];
     return '<section class="aa-nivel panel-card'+(ab?' abierto':'')+'" data-nivel="'+(i+1)+'"><button type="button" class="aa-nivel-cab" aria-expanded="'+ab+'" aria-controls="aa-nivel-c'+(i+1)+'"><span class="aa-nivel-n">'+nv.nombre+'</span><span class="aa-nivel-sub">'+nv.sub+'</span>'+
@@ -1205,14 +1210,14 @@ function pintarNiveles(){
       '<div class="aa-nivel-cuerpo" id="aa-nivel-c'+(i+1)+'"><div class="aa-nivel-interior">'+
       '<p class="aa-nivel-proposito">'+esc(nv.proposito)+'</p><ol class="aa-lista-lecciones">'+
       nv.ids.map(function(id,j){var c=catalogoDe(id),e=estadoVisible(id);
-        return '<li style="--i:'+Math.min(j,24)+'"><button type="button" class="aa-fila-leccion e-'+e+'" data-leccion="'+id+'"><span class="aa-fl-num">'+c.num+'</span><span class="aa-fl-tit">'+esc(c.titulo)+'</span>'+
+        return '<li style="--i:'+Math.min(j,24)+'"><button type="button" class="aa-fila-leccion e-'+e+(id===marca?' aa-ultima':'')+'" data-leccion="'+id+'"'+(id===marca?' aria-current="true"':'')+'><span class="aa-fl-num">'+c.num+'</span><span class="aa-fl-tit">'+esc(c.titulo)+'</span>'+
           (favs[id]?'<span class="aa-fl-fav" title="En favoritos" aria-label="En favoritos">♥</span>':'')+
           '<span class="aa-fl-est" title="'+TEXTO_ESTADO[e]+'"><i aria-hidden="true">'+ICONO_ESTADO[e]+'</i>'+TEXTO_ESTADO[e]+'</span></button></li>';}).join('')+
       '</ol></div></div></section>';
   }).join('');
 }
 el('aa-niveles').addEventListener('click',function(e){
-  var b=e.target.closest('[data-leccion]');if(b){abrirLeccion(b.dataset.leccion);window.scrollTo({top:0});return;}
+  var b=e.target.closest('[data-leccion]');if(b){A.temario={y:window.scrollY,id:b.dataset.leccion};abrirLeccion(b.dataset.leccion);window.scrollTo({top:0});return;}
   var cab=e.target.closest('.aa-nivel-cab');if(!cab)return;
   /* persiana: el nivel se despliega (o se recoge) con su lista de lecciones */
   var sec=cab.parentNode,n=sec.dataset.nivel,ab=!sec.classList.contains('abierto');
@@ -1563,6 +1568,12 @@ function pestana(v){
   if(v!=='train'){pararDemo();quitarMascota();}
 }
 function irAPestanaLeccion(){pestana('train');}
+function volverAlTemario(){
+  var fila=document.querySelector('#aa-niveles .aa-ultima'),t=A.temario;
+  if(t&&fila&&fila.dataset.leccion===t.id){window.scrollTo(0,t.y);return;}
+  if(fila){var r=fila.getBoundingClientRect();window.scrollTo(0,Math.max(0,window.scrollY+r.top-(window.innerHeight-r.height)/2));return;}
+  window.scrollTo(0,0);
+}
 
 /* Fila bajo el tutor: Historial · Pista · Solución a la izquierda; lección anterior y siguiente a la derecha.
    Historial solo con su icono, del mismo tamaño que la bombilla. */
@@ -1607,7 +1618,10 @@ function pintarAyudas(){
   h.disabled=!activo;so.disabled=!activo&&!sonando;
 }
 document.querySelectorAll('#tabs .tab').forEach(function(t){
-  t.onclick=function(){A.vistaAuto=false;if(t.dataset.v==='favs'&&A.volverA&&document.body.classList.contains('aa-en-leccion'))vf.carpeta=A.volverA.carpeta;pestana(t.dataset.v);window.scrollTo({top:0,behavior:'smooth'});};
+  t.onclick=function(){A.vistaAuto=false;var desde=document.body.classList.contains('aa-en-leccion');if(t.dataset.v==='favs'&&A.volverA&&desde)vf.carpeta=A.volverA.carpeta;pestana(t.dataset.v);
+    /* Temario: vuelve justo adonde estabas al abrir la lección (o a la última lección, sombreada) */
+    if(t.dataset.v==='levels'&&desde){volverAlTemario();return;}
+    window.scrollTo({top:0,behavior:'smooth'});};
 });
 el('b-home').onclick=function(){A.vistaAuto=false;pestana('levels');};
 

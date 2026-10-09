@@ -664,3 +664,51 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-app .aa-fila-nav .btn:disabled,.aa-app .aa-ctrl:disabled{box-shadow:none;transform:none;opacity:.35}
 /* «Lección y» encendida conserva su brillo */
 .aa-app .aa-fila-nav .btn.aa-nav-lec.aa-listo{border:2.5px solid transparent}
+
+/* =====================================================================
+   Pantallas horizontales (escritorio y tableta apaisada): el tablero a la izquierda,
+   del alto de la pantalla; título, leyenda, globo del tutor y botones a su derecha.
+   ===================================================================== */
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .train{max-width:min(1240px,96vw)!important}
+  .aa-app .boardcol{display:grid;grid-template-columns:auto minmax(330px,420px);
+    grid-template-areas:"tab head" "tab ley" "tab tutor" "tab nav" "tab resto";grid-template-rows:auto auto auto auto 1fr;
+    column-gap:clamp(18px,2.4vw,34px);align-items:start;justify-content:center}
+  .aa-app .boardcol>*{grid-column:2}
+  .aa-app .aa-boardhead{grid-area:head;margin:0;padding-top:4px}
+  .aa-app .aa-tablero-fila{grid-area:tab;grid-column:1;width:calc(100dvh - 104px + 50px);max-width:min(780px,58vw);min-width:380px;margin:0}
+  .aa-app .aa-leyenda,.aa-app .aa-leyenda[hidden]{grid-area:ley;max-width:none;margin:.5rem 0 0}
+  .aa-app .aa-leyenda .aa-ley:first-child{margin-left:0}
+  .aa-app .aa-tutor{grid-area:tutor;max-width:none;margin:.6rem 0 0}
+  .aa-app .aa-tutor-texto{height:calc(1.5em * 6)}
+  .aa-app .aa-fila-nav{grid-area:nav;max-width:none;margin:.9rem 0 0;flex-wrap:wrap;row-gap:.6rem}
+  .aa-app .aa-fila-nav .btn{min-height:46px}
+  .aa-app #aa-controles .aa-ctrl{min-height:46px}
+}
+/* leyenda: un solo renglón bajo, con pocas señales */
+.aa-app .aa-leyenda,.aa-app .aa-leyenda[hidden]{height:20px;margin-top:.3rem;font-size:.7rem;gap:.7rem}
+.aa-app .aa-leyenda .aa-ley{display:inline-flex;align-items:center;gap:.3rem;line-height:1}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .aa-fila-nav-izq,.aa-app .aa-fila-nav-der{display:flex;flex:1 1 100%;gap:.6rem}
+  .aa-app .aa-fila-nav-izq>.btn,.aa-app .aa-fila-nav-der>.btn{flex:1 1 0;justify-content:center}
+  .aa-app .aa-fila-nav-izq>.aa-btn-icono{flex:0 0 52px}
+  .aa-app .aa-tutor-acciones .aa-controles{width:100%;display:flex;gap:.6rem}
+  .aa-app .aa-tutor-acciones .aa-controles .aa-ctrl{flex:0 0 52px;justify-content:center}
+  .aa-app .aa-tutor-acciones .aa-controles .aa-ctrl-play{flex:1 1 auto}
+}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .aa-boardhead{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;column-gap:.5rem}
+  .aa-app .aa-boardhead .boardhead-left{min-width:0;overflow:hidden;justify-self:stretch}
+}
+.aa-app .aa-boardhead .boardhead-left{justify-self:stretch}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .boardcol{grid-template-columns:auto minmax(360px,440px)}
+  .aa-app .aa-tablero-fila{max-width:min(780px,calc(96vw - 360px - 40px))}
+  .aa-app .aa-eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .aa-boardhead,[data-enmarcado] .aa-app .aa-boardhead{padding-left:0!important}
+}
+/* Temario: la última lección abierta queda sombreada */
+.aa-fila-leccion.aa-ultima{background:color-mix(in srgb,var(--ink) 10%,transparent);box-shadow:inset 3px 0 0 var(--acento-tema,var(--gold))}
+.aa-fila-leccion.aa-ultima:hover{background:color-mix(in srgb,var(--ink) 14%,transparent)}
