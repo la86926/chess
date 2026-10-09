@@ -18,7 +18,7 @@ html[data-modo="oscuro"]{--aa-mov:#e7b75a;--aa-ataque:#ef6a5a;--aa-defensa:#45b9
 /* ---------- cabecera de la lección ---------- */
 .aa-boardhead .boardhead-left{min-width:0;display:flex;flex-direction:column;gap:.2rem}
 .aa-eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
-.aa-titulo{margin:0;font-size:clamp(1.05rem,4.6vw,1.4rem)!important;line-height:1.15;white-space:normal!important;overflow-wrap:anywhere}
+.aa-titulo{margin:0;font-size:clamp(1.05rem,4.6vw,1.4rem)!important;line-height:1.15;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .aa-meta{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .aa-boardhead .boardhead-right{display:flex;align-items:center;gap:.4rem}
 .aa-head-fav{display:flex;align-items:center;margin-left:auto;padding-left:.4rem;align-self:flex-start}
@@ -632,3 +632,35 @@ html[data-modo="oscuro"] .aa-app .aa-etapa.activa i{--panel2:#1b1f1c}
   100%{transform:translateY(0) rotate(0) scale(1,1)}}
 @keyframes aaNotaSube{0%{opacity:0;transform:translate(0,0) rotate(-10deg) scale(.6)}15%{opacity:1}50%{transform:translate(6px,-60%) rotate(10deg) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-4px,-130%) rotate(-8deg) scale(.9)}}
 @media (prefers-reduced-motion:reduce){.aa-tutor.festeja .aa-cara-baile{animation-duration:2s}}
+
+/* =====================================================================
+   Estilo Apple pedido por la persona
+   - Pestañas: control segmentado (fondo gris claro, la elegida en blanco con sombra suave).
+   - Botones: blancos, esquinas de 14px y sombra amplia; en computadora suben un poco al pasar el mouse.
+   Modo claro con sus colores; modo oscuro adaptado (mismo diseño, tonos oscuros).
+   ===================================================================== */
+html{--nav-fondo:#202522;--nav-elegida:#3a403c;--nav-sombra:0 2px 8px rgba(0,0,0,.45);--nav-tx:#a9b2ab;--nav-tx-el:#F2F4F1;
+  --b8-fondo:#262b28;--b8-tx:#EEF1EC;--b8-sombra:0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06)}
+html[data-modo="claro"]{--nav-fondo:#f0f0f3;--nav-elegida:#ffffff;--nav-sombra:0 2px 8px #0001;--nav-tx:#6b6b72;--nav-tx-el:#1d1d1f;
+  --b8-fondo:#ffffff;--b8-tx:#333333;--b8-sombra:0 12px 30px #0002}
+
+.aa-barra-fija .tabs{display:flex;gap:5px;align-items:center;justify-content:space-around;padding:6px;background:var(--nav-fondo);border:0;border-radius:16px;box-shadow:none;min-height:0}
+.aa-barra-fija .tabs .tab{flex:1 1 auto;padding:8px 10px;border:0;border-radius:11px;background:transparent;color:var(--nav-tx);font-weight:600;box-shadow:none;transition:background .2s,color .2s,box-shadow .2s}
+.aa-barra-fija .tabs .tab.active{background:var(--nav-elegida);color:var(--nav-tx-el);box-shadow:var(--nav-sombra)}
+@media (hover:hover){.aa-barra-fija .tabs .tab:not(.active):hover{color:var(--nav-tx-el)}}
+@media (max-width:430px){.aa-barra-fija .tabs{gap:3px;padding:5px}.aa-barra-fija .tabs .tab{padding:8px 4px;font-size:.76rem}}
+
+.aa-app .aa-fila-nav .btn,.aa-app .aa-ctrl,.aa-app .aa-accion,.aa-app .aa-fv-boton,.aa-app .aa-fv-mini,
+.aa-app .aa-boton-grande,.aa-app .aa-continuar-aprendiendo,.aa-app #v-guide .reading>.btn{
+  border:0;border-radius:14px;background:var(--b8-fondo);color:var(--b8-tx);font-weight:600;box-shadow:var(--b8-sombra);
+  cursor:pointer;transition:transform .22s,box-shadow .22s,opacity .2s}
+@media (hover:hover){
+  .aa-app .aa-fila-nav .btn:not(:disabled):hover,.aa-app .aa-ctrl:not(:disabled):hover,.aa-app .aa-accion:hover,.aa-app .aa-fv-boton:hover,.aa-app .aa-fv-mini:hover,
+  .aa-app .aa-boton-grande:hover,.aa-app .aa-continuar-aprendiendo:hover,.aa-app #v-guide .reading>.btn:hover{transform:translateY(-3px)}
+}
+.aa-app .aa-fv-mini.peligro{color:#d1453b}
+html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
+/* apagados: sin sombra ni elevación */
+.aa-app .aa-fila-nav .btn:disabled,.aa-app .aa-ctrl:disabled{box-shadow:none;transform:none;opacity:.35}
+/* «Lección y» encendida conserva su brillo */
+.aa-app .aa-fila-nav .btn.aa-nav-lec.aa-listo{border:2.5px solid transparent}
