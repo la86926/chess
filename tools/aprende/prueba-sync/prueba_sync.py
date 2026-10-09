@@ -15,11 +15,11 @@ def preparar(ctx):
         ctx.route('https://www.gstatic.com/firebasejs/12.18.0/'+k, lambda r,req,v=v: r.fulfill(path=str(AQUI/v), content_type='application/javascript'))
     ctx.add_init_script("try{localStorage.setItem('pc_tutorial_visto_v1','1');localStorage.setItem('aa_tour_visto_v1','1')}catch(e){}")
 def entrar(pg,nuevo):
-    pg.goto(URL); pg.wait_for_selector('#pc-sync-code-input',timeout=8000)
-    pg.fill('#pc-sync-code-input',CODIGO); pg.click('#pc-sync-continue')
-    if nuevo:
-        pg.wait_for_selector('#pc-sync-keep'); pg.click('#pc-sync-keep')
-    pg.wait_for_function("document.getElementById('pc-sync-fab').dataset.state==='ok'",timeout=8000)
+    # «Mi ID» (menú): Crear la primera vez, Entrar en el otro dispositivo
+    pg.goto(URL); pg.wait_for_function("!!window.PCSync",timeout=8000)
+    pg.click('#menu-button'); pg.click('.app-choice[data-app="id"]')
+    pg.fill('#mi-id-input',CODIGO); pg.click('.mi-id-form [data-modo="%s"]'%('crear' if nuevo else 'entrar'))
+    pg.wait_for_function("window.PCSync.estado==='ok'&&!!window.PCSync.id",timeout=8000)
 def abrir_aa(pg):
     pg.click('#menu-button'); pg.click('.app-choice[data-app="3"]')
     pg.wait_for_function("(()=>{try{return !!document.getElementById('app-frame-3').contentWindow.AAApp}catch(e){return false}})()",timeout=10000)
