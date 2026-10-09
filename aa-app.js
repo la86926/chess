@@ -55,9 +55,13 @@ function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){retur
 function rico(t){
   var s=esc(t);
   s=s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  /* ⟦…⟧: lo que invita a mover («Mueve en el tablero», «blancas/negras») brilla un momento */
+  s=s.replace(/⟦(.+?)⟧/g,'<b class="aa-llamado">$1</b>');
   return s;
 }
-function plano(t){return String(t||'').replace(/\*\*/g,'');}
+function plano(t){return String(t||'').replace(/\*\*|⟦|⟧/g,'');}
+/* «Mueve en el tablero con las blancas/negras»: siempre se dice qué bando mueve */
+function pedirMover(lado,resto){return '⟦Mueve en el tablero⟧ con las ⟦'+ladoTexto(lado)+'⟧'+(resto||'.');}
 function tieneContenido(id){var l=LEC[id];return !!(l&&l.observa&&l.observa.length&&tareasDe(l).length);}
 function ladoDe(fen){return String(fen||'').split(' ')[1]==='b'?'b':'w';}
 function ladoTexto(c){return c==='w'?'blancas':'negras';}
@@ -684,9 +688,12 @@ function iniciarTarea(etapa,t,opc){
     state.step=n;if(state.step%2===1){/* le tocaba al rival: vuelve a la jugada del alumno */state.game.undo();state.step--;}
     renderBoard();renderMoves();
   }
-  var intro=t.di||('Te toca: juegan las '+ladoTexto(state.orient)+'.');
-  /* frase directa: hay que mover en el tablero (no basta con pulsar un botón) */
-  var pre=etapa==='practica'?'**Mueve en el tablero.** ':etapa==='hazlo'?'**Mueve en el tablero**, ahora sin ayuda. ':'**Mueve en el tablero** para terminar. ';
+  /* «Juegas con negras.» ya lo dice la frase de arriba: no se repite */
+  var intro=String(t.di||'').replace(/^Juegas con (las )?(negras|blancas)[.:,]?\s*/i,'');
+  if(intro)intro=intro.charAt(0).toUpperCase()+intro.slice(1);
+  /* frase directa y con el bando: hay que mover en el tablero, y con qué color */
+  var lado=ladoDe(t.fen);
+  var pre=pedirMover(lado,etapa==='hazlo'?', ahora sin ayuda. ':'. ');
   A.consigna=null;tutor(pre+intro);A.consigna=intro;
   botonContinuar('Saltar ejercicio',true,true);
   renderHead();
@@ -808,7 +815,7 @@ setStatus=function(kind,msg){
   try{
     if(!A.tarea||A.tarea.tipo!=='jugada'||A.resuelta)return r;
     if(kind==='ok'&&/rival responde/i.test(msg||''))tutor('¡Correcto! Tu rival responde…','bien');
-    else if(kind==='idle'&&/Sigue la línea/i.test(msg||''))tutor('Bien. Vuelve a mover en el tablero.','bien');
+    else if(kind==='idle'&&/Sigue la línea/i.test(msg||''))tutor('Bien. '+pedirMover((state.game&&state.game.turn())||'w',' otra vez.'),'bien');
     else if(kind==='done'&&/Línea completa/i.test(msg||'')){tutor('Esa era la solución. Ahora inténtalo tú para que cuente.','');el('aa-reintentar').hidden=false;}
   }catch(e){}
   return r;
@@ -963,7 +970,7 @@ function cargarDescubre(it,reinicio){
   ejercicioActual=comoEjercicio(it.tarea,'descubre');
   limpiarCapa();A.bloqueado=false;el('aa-reintentar').hidden=true;load(ejercicioActual);
   el('aa-etapas').hidden=true;
-  A.consigna=null;tutor('**Mueve en el tablero.** Juegan las '+ladoTexto(state.orient)+': encuentra la mejor jugada. Si te atascas, toca la bombilla para recibir una pista.');
+  A.consigna=null;tutor(pedirMover(ladoDe(it.tarea.fen),': encuentra la mejor jugada.')+' Si te atascas, toca la bombilla para recibir una pista.');
   A.consigna='Juegan las '+ladoTexto(state.orient)+': encuentra la mejor jugada.';
   botonContinuar('Ver la solución',true,true);
   renderHead();renderRef();pintarRuta();guardarUltimo();
@@ -1568,7 +1575,7 @@ var TOUR=[
   {t:'Guarda tus favoritos',x:'El corazón guarda el ítem que estás viendo (nivel, lección y número) en una o varias carpetas. Desde Mis favoritos vuelves justo a ese ítem.',sel:'#aa-corazon'},
   {t:'Siempre a mano',x:'Las pestañas quedan arriba aunque bajes por la página. Toca «Temario» para volver a la lista de lecciones.',sel:'#tabs'},
   {t:'Tu tablero',x:'Aquí eliges el tablero. Tus tableros favoritos y personalizados son los mismos en el Método PC1 y el Método PC2.',sel:'#pc-tablero-btn'},
-  {t:'¡A aprender!',x:'Tu avance se guarda solo y se sincroniza con tu código. Puedes volver a ver este recorrido desde Ayuda.',sel:null,fin:true}
+  {t:'¡A aprender!',x:'Tu avance se guarda solo y, con tu ID, se sincroniza en tus dispositivos. Puedes volver a ver este recorrido desde Ayuda.',sel:null,fin:true}
 ];
 var tour={i:0,nodo:null};
 function crearTour(){

@@ -27,17 +27,14 @@ def esperar(cond,seg=10):
         time.sleep(0.25)
     return False
 def cerrar_modal_codigo(pg):
-    # La ventana del código aparece al entrar; para estas pruebas se cierra sin código.
-    try:
-        pg.wait_for_selector('#pc-sync-code-input',timeout=6000)
-        pg.evaluate("(()=>{const b=document.getElementById('pc-sync-modal-bg');if(b)b.classList.remove('open')})()")
-    except Exception: pass
+    # Con «Mi ID» ya no aparece ninguna ventana al entrar: el ID es opcional.
+    pass
 def entrar(pg,nuevo):
-    pg.goto(URL); pg.wait_for_selector('#pc-sync-code-input',timeout=8000)
-    pg.fill('#pc-sync-code-input',CODIGO); pg.click('#pc-sync-continue')
-    if nuevo:
-        pg.wait_for_selector('#pc-sync-keep'); pg.click('#pc-sync-keep')
-    pg.wait_for_function("document.getElementById('pc-sync-fab').dataset.state==='ok'",timeout=8000)
+    # «Mi ID» (menú): Crear la primera vez, Entrar en el otro dispositivo
+    pg.goto(URL); pg.wait_for_function("!!window.PCSync",timeout=8000)
+    pg.click('#menu-button'); pg.click('.app-choice[data-app="id"]')
+    pg.fill('#mi-id-input',CODIGO); pg.click('.mi-id-form [data-modo="%s"]'%('crear' if nuevo else 'entrar'))
+    pg.wait_for_function("window.PCSync.estado==='ok'&&!!window.PCSync.id",timeout=8000)
 def elegir(pg,n):
     pg.click('#menu-button'); pg.click('.app-choice[data-app="%s"]'%n)
 def frame3(pg):

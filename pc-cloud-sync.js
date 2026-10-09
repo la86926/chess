@@ -61,7 +61,7 @@ function cleanCode(value){return String(value||'').trim();}
 function codeId(value){return cleanCode(value).toLowerCase();}
 function validCode(value){return CODE_RE.test(cleanCode(value));}
 function validNewCode(value){return NEW_CODE_RE.test(cleanCode(value));}
-const NEW_CODE_MSG='Para un código nuevo usa solo letras y números, entre 8 y 32 caracteres.';
+const NEW_CODE_MSG='Para un ID nuevo usa solo letras y números, entre 8 y 32 caracteres: así nadie puede adivinarlo.';
 function randomCode(){
   const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const bytes=new Uint8Array(12);
@@ -284,7 +284,10 @@ async function applyRemote(data,force){
     // siempre estuvo en el Método PC1, así que se abre el PC1.
     let active=localStorage.getItem('pc_l3_active_app');
     if(!(active==='1'||active==='2'||active==='3')&&usar.l1)active='1';
-    if(active==='1'||active==='2'||active==='3'){
+    // En «Mi ID» no se saca a la persona de la página, salvo justo al entrar con su ID (force):
+    // entonces se la lleva a la sección donde se quedó.
+    const enMiId=!force&&!!document.querySelector('.app-choice.active[data-app="id"]');
+    if(!enMiId&&(active==='1'||active==='2'||active==='3')){
       const button=document.querySelector('.app-choice[data-app="'+active+'"]');
       if(button&&!button.classList.contains('active'))button.click();
     }
@@ -309,10 +312,7 @@ async function applyRemote(data,force){
 function setStatus(text,state){
   statusText=text;
   statusState=state||'busy';
-  const fab=document.getElementById('pc-sync-fab');
-  if(fab){fab.dataset.state=statusState;fab.title=currentCode?('Sincronización · '+statusText):'Configurar sincronización';}
-  const line=document.getElementById('pc-sync-live-status');
-  if(line){line.className='pc-sync-statusline '+statusState;line.innerHTML='<i></i><span>'+escapeHtml(statusText)+'</span>';}
+  try{pintarMiId();}catch(e){}
 }
 
 function queueUpload(scope,marcar){
@@ -379,6 +379,15 @@ function startListening(){
       return;
     }
     const data=snapshot.data();
+    // El ID cambió en otro dispositivo: este dispositivo se pasa solo al ID nuevo.
+    const moved=movedTo(data);
+    if(moved){
+      if(data.updatedBy!==clientId){
+        stopListening();
+        seguirIdNuevo(moved.code).then(()=>toast('Tu ID cambió a «'+moved.code+'» en otro dispositivo')).catch(e=>{console.error('PC cloud sync:',e);setStatus('Sin conexión','error');});
+      }
+      return;
+    }
     if(data&&data.updatedBy===clientId&&Date.now()-lastUploadAt<1800){
       setStatus('Sincronizado','ok');
       return;
@@ -390,121 +399,208 @@ function startListening(){
   });
 }
 
+/* ---------- Mi ID ----------
+   Igual que en Círculos Music: el ID es opcional. Sin ID, todo queda en este dispositivo.
+   Con ID, el avance de Aprende Ajedrez, el Método PC1 y el Método PC2 viaja a todos los
+   dispositivos donde se escriba el mismo ID. «Cambiar ID» deja el ID viejo como aviso que
+   apunta al nuevo, para que los demás dispositivos se cambien solos. */
+const MOVED_KEY='pc_cloud_moved_to';
+const MOVED_CODE_KEY='pc_cloud_moved_code';
+const LAST_ID_KEY='pc_cloud_sync_ultimo_id';
+function movedTo(data){
+  const st=data&&data.l1&&data.l1.storage;
+  return st&&st[MOVED_KEY]?{id:st[MOVED_KEY],code:st[MOVED_CODE_KEY]||st[MOVED_KEY]}:null;
+}
+function vivo(snap){return !!(snap&&snap.exists()&&!movedTo(snap.data()));}
 async function refFor(code){return doc(db,COLLECTION,codeId(code));}
+function recordar(code){
+  try{localStorage.setItem(SYNC_CODE_KEY,code);localStorage.setItem(LAST_ID_KEY,codeId(code));}catch(e){}
+}
 async function connectExisting(code,snapshot,force){
   code=cleanCode(code);
   const ref=await refFor(code);
   const snap=snapshot||await getDoc(ref);
-  if(!snap.exists())throw new Error('Ese código no existe.');
+  if(!snap.exists())throw new Error('No existe el ID «'+code+'». Si es la primera vez, toca Crear.');
+  const moved=movedTo(snap.data());
+  if(moved)return connectExisting(moved.code,null,force);
   stopListening();
   applyingRemote=true;
   currentCode=code;
   currentRef=ref;
-  try{localStorage.setItem(SYNC_CODE_KEY,currentCode);}catch(e){}
+  recordar(currentCode);
   await applyRemote(snap.data(),!!force);
   startListening();
   closeModal();
   setStatus('Sincronizado','ok');
   if(Object.keys(captureStorage('aa')).length){pendingScopes.add('aa');clearTimeout(uploadTimer);uploadTimer=setTimeout(pushPending,900);}
 }
-
+/* Crea el ID con todo lo que hay en este dispositivo */
 async function createCurrentProfile(code){
   code=cleanCode(code);
   const ref=await refFor(code);
-  const existing=await getDoc(ref);
-  if(existing.exists()){await connectExisting(code,existing);return;}
   const state=captureProfile();
   await setDoc(ref,{...state,timestamp:serverTimestamp(),updatedBy:clientId,schemaVersion:1});
+  stopListening();
   currentCode=code;
   currentRef=ref;
-  try{localStorage.setItem(SYNC_CODE_KEY,currentCode);}catch(e){}
+  recordar(currentCode);
   startListening();
   closeModal();
   setStatus('Sincronizado','ok');
 }
-
-async function createFreshProfile(code){
-  code=cleanCode(code);
-  const ref=await refFor(code);
-  const existing=await getDoc(ref);
-  if(existing.exists()){await connectExisting(code,existing);return;}
+/* «Lo de tu ID»: este dispositivo se reemplaza por lo que guarda el ID */
+async function usarLoDelId(code,snap){
   stopListening();
   applyingRemote=true;
   clearAllAppState();
-  resetFrames();
-  const l1=document.querySelector('.app-choice[data-app="1"]');
-  if(l1&&!l1.classList.contains('active'))l1.click();
-  await wait(180);
-  const state=captureProfile();
-  await setDoc(ref,{...state,timestamp:serverTimestamp(),updatedBy:clientId,schemaVersion:1});
-  currentCode=code;
-  currentRef=ref;
-  try{localStorage.setItem(SYNC_CODE_KEY,currentCode);}catch(e){}
-  applyingRemote=false;
-  startListening();
-  closeModal();
-  setStatus('Sincronizado','ok');
-}
-
-async function switchCode(code){
-  code=cleanCode(code);
-  if(!validCode(code))throw new Error('Usa solo letras y números, entre 4 y 32 caracteres.');
-  if(codeId(code)===codeId(currentCode))return;
-  const ref=await refFor(code);
-  const snap=await getDoc(ref);
-  if(!snap.exists())throw new Error('Ese código no existe.');
-  stopListening();
-  applyingRemote=true;
-  clearAllAppState();
-  currentCode=code;
-  currentRef=ref;
-  try{localStorage.setItem(SYNC_CODE_KEY,currentCode);}catch(e){}
+  currentCode=cleanCode(code);
+  currentRef=await refFor(code);
+  recordar(currentCode);
   await applyRemote(snap.data(),true);
   startListening();
-  closeModal();
+  setStatus('Sincronizado','ok');
 }
-
-async function renameCode(nextCode){
-  nextCode=cleanCode(nextCode);
-  if(!validNewCode(nextCode))throw new Error(NEW_CODE_MSG);
-  if(!currentRef||!currentCode)throw new Error('No hay un perfil activo.');
-  if(codeId(nextCode)===codeId(currentCode))throw new Error('Es el mismo código.');
-  const oldRef=currentRef;
-  const newRef=await refFor(nextCode);
-  await runTransaction(db,async tx=>{
-    const oldSnap=await tx.get(oldRef);
-    if(!oldSnap.exists())throw new Error('El perfil actual ya no existe.');
-    const newSnap=await tx.get(newRef);
-    if(newSnap.exists())throw new Error('Ese nuevo código ya existe.');
-    const data=oldSnap.data();
-    tx.set(newRef,{...data,timestamp:serverTimestamp(),updatedBy:clientId,schemaVersion:1});
-    tx.delete(oldRef);
-  });
+async function seguirIdNuevo(code){
+  const ref=await refFor(code);
+  const snap=await getDoc(ref);
+  if(!vivo(snap))throw new Error('El ID nuevo no está disponible.');
   stopListening();
-  currentCode=nextCode;
-  currentRef=newRef;
-  try{localStorage.setItem(SYNC_CODE_KEY,currentCode);}catch(e){}
+  currentCode=cleanCode(code);currentRef=ref;recordar(currentCode);
   startListening();
-  showSettings();
   setStatus('Sincronizado','ok');
 }
 
+/* Resumen de lo guardado (para la ventana «¿Qué quieres usar?» y la página Mi ID) */
+function contarLista(raw){
+  try{const v=JSON.parse(raw||'null');if(Array.isArray(v))return v.length;if(v&&typeof v==='object')return Object.keys(v).length;}catch(e){}
+  return 0;
+}
+function contarAa(raw){
+  try{const p=JSON.parse(raw||'null'),l=p&&p.lecciones;if(!l)return 0;return Object.keys(l).filter(k=>l[k]&&l[k].estado==='completada').length;}catch(e){return 0;}
+}
+function resumenLocal(){
+  const g=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+  return {aa:contarAa(g('aa_progreso_v1')),pc1:contarLista(g('wp_solved')),pc2:contarLista(g('wp2_solved'))};
+}
+function resumenRemoto(data){
+  const st=(scope)=>(data&&data[scope]&&data[scope].storage)||{};
+  return {aa:contarAa(st('aa')['aa_progreso_v1']),pc1:contarLista(st('l1')['wp_solved']),pc2:contarLista(st('l2')['wp2_solved'])};
+}
+function hayAvanceLocal(){
+  const r=resumenLocal();if(r.aa||r.pc1||r.pc2)return true;
+  try{
+    const p=JSON.parse(localStorage.getItem('aa_progreso_v1')||'null'),l=p&&p.lecciones;
+    if(l)for(const k in l){const x=l[k]||{};if(x.intentos>0||x.aciertos>0)return true;}
+    if(contarLista(localStorage.getItem('wp_hist_log'))||contarLista(localStorage.getItem('wp2_hist_log')))return true;
+  }catch(e){}
+  return false;
+}
+function hayAvanceRemoto(data){const r=resumenRemoto(data);return !!(r.aa||r.pc1||r.pc2);}
+function textoResumen(r){
+  const t=[];
+  if(r.aa)t.push(r.aa+(r.aa===1?' lección':' lecciones'));
+  if(r.pc1)t.push('PC1: '+r.pc1);
+  if(r.pc2)t.push('PC2: '+r.pc2);
+  return t.join(' · ')||'Sin avance';
+}
+
+/* Entrar con un ID que ya existe */
+/* La sesión anónima de Firebase se abre cuando hace falta (al entrar o crear un ID) */
+let sesion=null;
+function asegurarSesion(){if(!sesion)sesion=signInAnonymously(auth).catch(e=>{sesion=null;throw e;});return sesion;}
+async function entrar(code){
+  await asegurarSesion();
+  code=cleanCode(code);
+  if(!validCode(code))throw new Error('Usa solo letras y números, entre 4 y 32 caracteres.');
+  setStatus('Conectando…','busy');
+  let ref=await refFor(code),snap=await getDoc(ref);
+  const moved=snap.exists()?movedTo(snap.data()):null;
+  if(moved){code=moved.code;ref=await refFor(code);snap=await getDoc(ref);}
+  if(!vivo(snap)){setStatus(currentCode?statusText:'Sin ID',currentCode?statusState:'off');throw new Error('No existe el ID «'+code+'». Si es la primera vez, toca Crear.');}
+  const data=snap.data();
+  const yaEstuvo=(()=>{try{return localStorage.getItem(LAST_ID_KEY)===codeId(code);}catch(e){return false;}})();
+  /* Primera vez con este ID en este dispositivo y hay avance en los dos lados: la persona elige */
+  if(!yaEstuvo&&hayAvanceLocal()&&hayAvanceRemoto(data)){
+    const elegido=await preguntarQueUsar(code,resumenLocal(),resumenRemoto(data));
+    if(!elegido){setStatus(currentCode?'Sincronizado':'Sin ID',currentCode?'ok':'off');throw Object.assign(new Error(''),{cancelado:true});}
+    if(elegido==='id'){await usarLoDelId(code,snap);toast('¡Hola, '+code+'! Todo quedó sincronizado.');return;}
+    await createCurrentProfile(code);          // lo de este dispositivo reemplaza lo del ID
+    toast('Listo: lo de este dispositivo quedó guardado en «'+code+'».');
+    return;
+  }
+  if(yaEstuvo)await connectExisting(code,snap,false);                       // vuelve a su ID: gana lo más reciente
+  else if(hayAvanceLocal()&&!hayAvanceRemoto(data))await createCurrentProfile(code);  // el ID estaba vacío: se guarda lo de aquí
+  else await connectExisting(code,snap,true);                             // dispositivo sin avance: se trae lo del ID
+  toast('¡Hola, '+code+'! Todo quedó sincronizado.');
+}
+/* Crear un ID nuevo con lo de este dispositivo */
+async function crear(code){
+  await asegurarSesion();
+  code=cleanCode(code);
+  if(!validNewCode(code))throw new Error(NEW_CODE_MSG);
+  setStatus('Conectando…','busy');
+  const snap=await getDoc(await refFor(code));
+  if(vivo(snap)){setStatus(currentCode?'Sincronizado':'Sin ID',currentCode?'ok':'off');throw new Error('El ID «'+code+'» ya existe. Si es tuyo, toca Entrar; si no, elige otro.');}
+  await createCurrentProfile(code);
+  toast('Listo, creaste el ID «'+code+'». Tu avance de este dispositivo quedó guardado en él.');
+}
+/* Cambiar el ID: el avance pasa al ID nuevo y el viejo queda como aviso que apunta al nuevo */
+async function renameCode(oldCode,nextCode){
+  await asegurarSesion();
+  oldCode=cleanCode(oldCode);nextCode=cleanCode(nextCode);
+  if(!validCode(oldCode))throw new Error('Escribe tu ID actual (solo letras y números).');
+  if(!validNewCode(nextCode))throw new Error(NEW_CODE_MSG);
+  if(codeId(nextCode)===codeId(oldCode))throw new Error('El ID nuevo es igual al actual.');
+  const oldRef=await refFor(oldCode),newRef=await refFor(nextCode);
+  await runTransaction(db,async tx=>{
+    const oldSnap=await tx.get(oldRef);
+    if(!vivo(oldSnap))throw new Error('No existe el ID «'+oldCode+'». Revisa cómo lo escribiste.');
+    const newSnap=await tx.get(newRef);
+    if(vivo(newSnap))throw new Error('El ID «'+nextCode+'» ya lo usa alguien. Elige otro.');
+    const data=oldSnap.data(),meta={timestamp:serverTimestamp(),updatedBy:clientId,schemaVersion:1};
+    tx.set(newRef,{...data,...meta});
+    const l1=data.l1||{storage:{},page:{}};
+    tx.set(oldRef,{...data,l1:{...l1,storage:{...(l1.storage||{}),[MOVED_KEY]:codeId(nextCode),[MOVED_CODE_KEY]:nextCode}},...meta});
+  });
+  if(currentCode&&codeId(currentCode)===codeId(oldCode)){
+    stopListening();
+    currentCode=nextCode;currentRef=newRef;recordar(currentCode);
+    startListening();
+  }
+  setStatus(currentCode?'Sincronizado':'Sin ID',currentCode?'ok':'off');
+  toast('Listo, ahora tu ID es «'+nextCode+'»');
+}
+function salir(){
+  stopListening();
+  clearTimeout(uploadTimer);pendingScopes.clear();
+  currentCode='';currentRef=null;
+  try{localStorage.removeItem(SYNC_CODE_KEY);}catch(e){}
+  setStatus('Sin ID','off');
+  toast('Saliste. Tu avance sigue en este dispositivo.');
+}
+
+/* ---------- Ventanas ---------- */
 function ensureUi(){
   if(document.getElementById('pc-sync-root'))return;
   const root=document.createElement('div');
   root.id='pc-sync-root';
   root.innerHTML=`
-    <button id="pc-sync-fab" class="pc-sync-fab" data-state="busy" type="button" aria-label="Sincronización" title="Sincronización">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 18.2h9.4a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.5-1.6A4.8 4.8 0 0 0 7.2 18.2Z"/><path d="m9.2 13.1 1.7 1.7 3.9-4.2"/></svg><span class="pc-sync-dot"></span>
-    </button>
-    <div id="pc-sync-modal-bg" class="pc-sync-modal-bg" aria-hidden="true"><div id="pc-sync-modal" class="pc-sync-modal" role="dialog" aria-modal="true"></div></div>`;
+    <div id="pc-sync-modal-bg" class="pc-sync-modal-bg" aria-hidden="true"><div id="pc-sync-modal" class="pc-sync-modal" role="dialog" aria-modal="true"></div></div>
+    <div id="pc-sync-toast" class="pc-sync-toast" role="status" aria-live="polite"></div>`;
   document.body.appendChild(root);
-  document.getElementById('pc-sync-fab').addEventListener('click',()=>currentCode?showSettings():showCodeModal());
-  document.getElementById('pc-sync-modal-bg').addEventListener('click',e=>{if(e.target.id==='pc-sync-modal-bg')closeModal();});
+  document.getElementById('pc-sync-modal-bg').addEventListener('click',e=>{if(e.target.id==='pc-sync-modal-bg'&&!document.querySelector('#pc-sync-modal .idc'))closeModal();});
 }
-function openModal(html){
+let toastT=null;
+function toast(text){
+  ensureUi();
+  const t=document.getElementById('pc-sync-toast');if(!t||!text)return;
+  t.textContent=text;t.classList.add('ver');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('ver'),3400);
+}
+function openModal(html,clase){
   ensureUi();
   const modal=document.getElementById('pc-sync-modal');
+  modal.className='pc-sync-modal'+(clase?' '+clase:'');
   modal.innerHTML=html;
   const bg=document.getElementById('pc-sync-modal-bg');
   bg.classList.add('open');bg.setAttribute('aria-hidden','false');
@@ -522,94 +618,103 @@ function message(el,text,type=''){
   el.className='pc-sync-msg '+type;
   el.textContent=text||'';
 }
-
-function showCodeModal(prefill=''){
-  openModal(head('Código de sincronización','Un solo código guardará el Método PC1, el Método PC2 y Aprende Ajedrez.')+`
-    <label class="pc-sync-field"><span>CÓDIGO</span><input id="pc-sync-code-input" class="pc-sync-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" placeholder="Ej. Luis09" value="${escapeHtml(prefill)}"></label>
-    <div class="pc-sync-row"><button id="pc-sync-generate" class="pc-sync-btn" type="button">Generar código</button><button id="pc-sync-continue" class="pc-sync-btn primary" type="button">Continuar</button></div>
-    <p class="pc-sync-note">Solo letras y números. Los códigos nuevos llevan al menos 8 caracteres: así nadie puede adivinarlos.</p><div id="pc-sync-msg" class="pc-sync-msg"></div>`);
-  const input=document.getElementById('pc-sync-code-input');
-  const go=document.getElementById('pc-sync-continue');
-  const msg=document.getElementById('pc-sync-msg');
-  document.getElementById('pc-sync-generate').onclick=()=>{input.value=randomCode();input.focus();input.select();};
-  const submit=async()=>{
-    const code=cleanCode(input.value);
-    if(!validCode(code)){message(msg,'Usa solo letras y números, entre 4 y 32 caracteres.','error');return;}
-    go.disabled=true;message(msg,'Comprobando…');
-    try{
-      const ref=await refFor(code);
-      const snap=await getDoc(ref);
-      if(snap.exists())await connectExisting(code,snap,true);
-      else if(!validNewCode(code)){message(msg,NEW_CODE_MSG,'error');go.disabled=false;}
-      else showNewCodeChoice(code);
-    }catch(e){message(msg,e&&e.message?e.message:'No se pudo conectar.','error');go.disabled=false;}
-  };
-  go.onclick=submit;
-  input.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
-  setTimeout(()=>input.focus(),20);
-}
-
-function showNewCodeChoice(code){
-  openModal(head('Código nuevo','Todavía no existe un perfil con este código.')+`
-    <div class="pc-sync-code">${escapeHtml(code)}</div>
-    <button id="pc-sync-keep" class="pc-sync-btn primary" style="width:100%;margin-bottom:9px" type="button">Vincular y conservar datos actuales</button>
-    <button id="pc-sync-fresh" class="pc-sync-btn" style="width:100%" type="button">Iniciar perfil desde cero</button>
-    <div id="pc-sync-msg" class="pc-sync-msg"></div>`);
-  const msg=document.getElementById('pc-sync-msg');
-  document.getElementById('pc-sync-keep').onclick=async function(){
-    this.disabled=true;message(msg,'Guardando tu avance actual…');
-    try{await createCurrentProfile(code);}catch(e){message(msg,e&&e.message?e.message:'No se pudo crear el perfil.','error');this.disabled=false;}
-  };
-  document.getElementById('pc-sync-fresh').onclick=()=>showFreshConfirm(code);
-}
-
-function showFreshConfirm(code){
-  openModal(head('Iniciar desde cero','Confirma antes de restablecer este dispositivo.')+`
-    <div class="pc-sync-warning"><strong>Aviso:</strong> Se restablecerá el avance visible en este dispositivo</div>
-    <div class="pc-sync-row"><button class="pc-sync-btn" type="button" id="pc-sync-back">Cancelar</button><button class="pc-sync-btn danger" type="button" id="pc-sync-confirm-fresh">Restablecer y crear</button></div>
-    <div id="pc-sync-msg" class="pc-sync-msg"></div>`);
-  document.getElementById('pc-sync-back').onclick=()=>showNewCodeChoice(code);
-  const btn=document.getElementById('pc-sync-confirm-fresh');
-  const msg=document.getElementById('pc-sync-msg');
-  btn.onclick=async()=>{
-    btn.disabled=true;message(msg,'Restableciendo…');
-    try{await createFreshProfile(code);}catch(e){applyingRemote=false;message(msg,e&&e.message?e.message:'No se pudo crear el perfil.','error');btn.disabled=false;}
-  };
-}
-
-function copyCode(){
-  const text=currentCode;
-  if(!text)return Promise.resolve(false);
-  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(text).then(()=>true);
-  return new Promise(resolve=>{
-    const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
-    try{resolve(document.execCommand('copy'));}catch(e){resolve(false);}finally{ta.remove();}
+const ICON_NUBE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18.5h10.2a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.2 9.5 4.5 4.5 0 0 0 7 18.5Z"/></svg>';
+const ICON_TEL='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"/><path d="M10.5 18.5h3"/></svg>';
+const ICON_AVISO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4Z"/><path d="M12 10v4.5M12 17.2v.1"/></svg>';
+/* ¿Lo de tu ID o lo de este dispositivo? (con confirmación si se reemplaza lo del ID) */
+function preguntarQueUsar(code,mio,suyo){
+  return new Promise(listo=>{
+    const paso1=`<div class="idc"><div class="idc-box"><h3>¿Qué quieres usar?</h3></div>
+      <button class="idc-opt" type="button" data-elegir="id"><span class="idc-ic nube">${ICON_NUBE}</span><span class="idc-txt"><strong>Lo de tu ID «${escapeHtml(code)}»</strong><small>${escapeHtml(textoResumen(suyo))}</small></span></button>
+      <button class="idc-opt" type="button" data-elegir="dispositivo"><span class="idc-ic">${ICON_TEL}</span><span class="idc-txt"><strong>Lo de este dispositivo</strong><small>${escapeHtml(textoResumen(mio))}</small></span></button>
+      <button class="idc-cancelar" type="button" data-elegir="">Cancelar</button></div>`;
+    const paso2=`<div class="idc"><div class="idc-box"><span class="idc-aviso">${ICON_AVISO}</span><h3>¿Reemplazar lo de tu ID?</h3><p>Se borra lo que tenía «${escapeHtml(code)}».</p></div>
+      <button class="idc-peligro" type="button" data-elegir="dispositivo!">Reemplazar</button>
+      <button class="idc-cancelar" type="button" data-volver>Volver</button></div>`;
+    openModal(paso1,'transparente');
+    const modal=document.getElementById('pc-sync-modal');
+    const fin=v=>{modal.onclick=null;closeModal();listo(v);};
+    modal.onclick=e=>{
+      if(e.target.closest('[data-volver]')){modal.innerHTML=paso1;return;}
+      const b=e.target.closest('[data-elegir]');if(!b)return;
+      const v=b.dataset.elegir;
+      if(v==='dispositivo'){modal.innerHTML=paso2;return;}
+      fin(v==='dispositivo!'?'dispositivo':v);
+    };
   });
 }
+/* Ventana «Cambiar ID»: ID actual e ID nuevo */
+function abrirCambiarId(){
+  openModal(head('Cambiar ID','')+`
+    <label class="pc-sync-field"><span>ID ACTUAL</span><input id="pc-id-viejo" class="pc-sync-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" placeholder="Tu ID de ahora" value="${escapeHtml(currentCode)}"></label>
+    <label class="pc-sync-field"><span>ID NUEVO</span><input id="pc-id-nuevo" class="pc-sync-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" placeholder="El que quieres usar"></label>
+    <p class="pc-sync-note">Solo letras y números, de 8 a 32. Tu avance pasa al ID nuevo en todos tus dispositivos.</p>
+    <div id="pc-id-cambio-msg" class="pc-sync-msg"></div>
+    <button id="pc-id-cambiar" class="pc-sync-btn primary" style="width:100%" type="button">Cambiar ID</button>`);
+  const btn=document.getElementById('pc-id-cambiar'),msg=document.getElementById('pc-id-cambio-msg');
+  btn.onclick=async()=>{
+    btn.disabled=true;btn.textContent='Cambiando…';message(msg,'');
+    try{await renameCode(document.getElementById('pc-id-viejo').value,document.getElementById('pc-id-nuevo').value);closeModal();}
+    catch(e){console.error('Mi ID:',e);message(msg,e&&e.message?e.message:'No se pudo cambiar el ID.','error');}
+    finally{btn.disabled=false;btn.textContent='Cambiar ID';}
+  };
+  setTimeout(()=>document.getElementById(currentCode?'pc-id-nuevo':'pc-id-viejo').focus(),60);
+}
 
-function showSettings(){
-  openModal(head('Sincronización','Un perfil para el Método PC1, el Método PC2 y Aprende Ajedrez.')+`
-    <div class="pc-sync-section"><h4>Código activo</h4><div class="pc-sync-code">${escapeHtml(currentCode||'Sin código')}</div><div id="pc-sync-live-status" class="pc-sync-statusline ${statusState}"><i></i><span>${escapeHtml(statusText)}</span></div><div class="pc-sync-row" style="margin-top:12px"><button id="pc-sync-copy" class="pc-sync-btn" type="button">Copiar código</button></div><div id="pc-sync-copy-msg" class="pc-sync-msg"></div></div>
-    <div class="pc-sync-sep"></div>
-    <div class="pc-sync-section"><h4>Cambiar a otro código existente</h4><label class="pc-sync-field"><input id="pc-sync-switch-input" class="pc-sync-input" autocomplete="off" maxlength="32" placeholder="Código existente"></label><button id="pc-sync-switch" class="pc-sync-btn primary" style="width:100%" type="button">Cambiar código</button><div id="pc-sync-switch-msg" class="pc-sync-msg"></div></div>
-    <div class="pc-sync-sep"></div>
-    <div class="pc-sync-section"><h4>Renombrar código actual</h4><label class="pc-sync-field"><input id="pc-sync-rename-input" class="pc-sync-input" autocomplete="off" maxlength="32" placeholder="Nuevo código"></label><button id="pc-sync-rename" class="pc-sync-btn" style="width:100%" type="button">Renombrar</button><div id="pc-sync-rename-msg" class="pc-sync-msg"></div></div>`);
-
-  document.getElementById('pc-sync-copy').onclick=async()=>{
-    const ok=await copyCode();message(document.getElementById('pc-sync-copy-msg'),ok?'Código copiado.':'No se pudo copiar.',ok?'ok':'error');
-  };
-  document.getElementById('pc-sync-switch').onclick=async function(){
-    const msg=document.getElementById('pc-sync-switch-msg');
-    const code=cleanCode(document.getElementById('pc-sync-switch-input').value);
-    this.disabled=true;message(msg,'Comprobando…');
-    try{await switchCode(code);}catch(e){message(msg,e&&e.message?e.message:'No se pudo cambiar.','error');this.disabled=false;}
-  };
-  document.getElementById('pc-sync-rename').onclick=async function(){
-    const msg=document.getElementById('pc-sync-rename-msg');
-    const code=cleanCode(document.getElementById('pc-sync-rename-input').value);
-    this.disabled=true;message(msg,'Renombrando…');
-    try{await renameCode(code);}catch(e){message(msg,e&&e.message?e.message:'No se pudo renombrar.','error');this.disabled=false;}
-  };
+/* ---------- Página «Mi ID» (sección del menú) ---------- */
+const ICON_ENTRAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l4-4-4-4M14 12H4"/></svg>';
+const ICON_CREAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+const ICON_EDITAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="M13.5 6.5l4 4"/></svg>';
+const ICON_SALIR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M15 16l4-4-4-4M19 12H9"/></svg>';
+const ICON_CHEV='<svg class="ids-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const SECCIONES=[
+  {app:'3',t:'Aprende Ajedrez',n:r=>r.aa,u:'lecciones',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 12 3l8 3.5-8 3.5Z"/><path d="M7.5 8.3v4.4c0 1.6 2 2.8 4.5 2.8s4.5-1.2 4.5-2.8V8.3"/><path d="M20 6.5v5"/></svg>'},
+  {app:'1',t:'Método PC1',n:r=>r.pc1,u:'ejercicios',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20h8M9 16.5h6l1 3.5H8Z"/><path d="M9.5 16.5 10 9h4l.5 7.5"/><path d="M8.5 9h7M9 4.5h6V9H9Z"/></svg>'},
+  {app:'2',t:'Método PC2',n:r=>r.pc2,u:'ejercicios',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20h10M8 16.5h8l1 3.5H7Z"/><path d="M9 16.5c0-4 1-6.5 3-9.5 2 3 3 5.5 3 9.5"/><circle cx="12" cy="5" r="1.6"/></svg>'}
+];
+function pintarMiId(){
+  const cuenta=document.getElementById('mi-id-cuenta'),res=document.getElementById('mi-id-resumen');
+  const sub=document.getElementById('mi-id-sub');
+  if(sub)sub.textContent=currentCode?('Tu ID: '+currentCode):'Crea tu ID y sincroniza tus dispositivos';
+  if(!cuenta)return;
+  if(currentCode){
+    const etiqueta={ok:'Sincronizado · se actualiza solo en tus dispositivos',busy:statusText||'Conectando…',error:statusText||'Sin conexión: guardado en este dispositivo',off:''}[statusState]||statusText;
+    cuenta.innerHTML=`<div class="mi-id-usuario"><span class="mi-id-punto ${statusState}"></span><div><small class="mi-id-etq">Tu ID</small><strong>${escapeHtml(currentCode)}</strong><small>${escapeHtml(etiqueta)}</small></div></div>
+      <div class="mi-id-acciones dos"><button type="button" class="mi-id-btn" data-id-accion="cambiar">${ICON_EDITAR}Cambiar ID</button><button type="button" class="mi-id-btn" data-id-accion="salir">${ICON_SALIR}Salir</button></div>`;
+  }else if(!cuenta.querySelector('form')){
+    cuenta.innerHTML=`<form class="mi-id-form" autocomplete="off"><label for="mi-id-input">Escribe tu ID para ver tu avance en cualquier dispositivo. ¿Primera vez? Toca <b>Crear</b>.</label>
+      <input class="mi-id-input" id="mi-id-input" maxlength="32" placeholder="Tu ID" autocapitalize="off" autocomplete="off" spellcheck="false">
+      <div class="mi-id-acciones"><button type="submit" class="mi-id-btn" data-modo="entrar">${ICON_ENTRAR}Entrar</button><button type="submit" class="mi-id-btn" data-modo="crear">${ICON_CREAR}Crear</button><button type="button" class="mi-id-btn" data-id-accion="cambiar">${ICON_EDITAR}Cambiar ID</button></div>
+      <p class="mi-id-error" role="alert"></p></form>`;
+  }
+  if(res){
+    const r=resumenLocal();
+    res.innerHTML=`<p class="ids-head">${currentCode?'Se sincroniza con «'+escapeHtml(currentCode)+'»':'Guardado solo en este dispositivo'}</p>
+      <div class="ids-list">${SECCIONES.map(x=>`<button type="button" class="ids-row" data-id-abrir="${x.app}"><span class="ids-ic">${x.ic}</span><span class="ids-t">${x.t}</span><span class="ids-n">${x.n(r)}</span>${ICON_CHEV}</button>`).join('')}</div>`;
+  }
+}
+function instalarMiId(){
+  const pagina=document.getElementById('mi-id');if(!pagina)return;
+  pagina.addEventListener('submit',async e=>{
+    if(!e.target.closest('.mi-id-form'))return;
+    e.preventDefault();
+    const input=document.getElementById('mi-id-input'),msg=pagina.querySelector('.mi-id-error');
+    const modo=(e.submitter&&e.submitter.dataset.modo)||'entrar';
+    const botones=pagina.querySelectorAll('.mi-id-form button');botones.forEach(b=>b.disabled=true);
+    try{msg.textContent='';if(modo==='crear')await crear(input.value);else await entrar(input.value);}
+    catch(err){if(!err.cancelado){console.error('Mi ID:',err);msg.textContent=err&&err.message?err.message:'No se pudo conectar. Revisa tu internet.';}}
+    finally{botones.forEach(b=>b.disabled=false);pintarMiId();}
+  });
+  pagina.addEventListener('click',e=>{
+    const a=e.target.closest('[data-id-accion]');
+    if(a&&a.dataset.idAccion==='cambiar'){abrirCambiarId();return;}
+    if(a&&a.dataset.idAccion==='salir'){salir();return;}
+    const s=e.target.closest('[data-id-abrir]');
+    if(s){const b=document.querySelector('.app-choice[data-app="'+s.dataset.idAbrir+'"]');if(b)b.click();}
+  });
+  // al abrir la página se actualizan los números
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.app-choice[data-app="id"]'))setTimeout(pintarMiId,0);},true);
+  pintarMiId();
 }
 
 function installChangeWatchers(){
@@ -629,10 +734,12 @@ function installChangeWatchers(){
   // Cambio de sección o de apariencia hecho por la persona. Si coincide con la llegada de datos de
   // la nube (applyingRemote), no se pierde: se sube en cuanto termina de aplicarse.
   // Los clics que hace el propio código al aplicar la nube (isTrusted=false) no se suben.
+  // «Mi ID» no es una sección de avance: abrirla no se sincroniza.
   document.addEventListener('click',e=>{
     if(!currentRef)return;
     if(applyingRemote&&!e.isTrusted)return;
     const t=e.target.closest?e.target:null;if(!t)return;
+    if(t.closest('.app-choice[data-app="id"]'))return;
     if(t.closest('.app-choice')||t.closest('#tema button'))setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);
   },true);
   window.addEventListener('pagehide',()=>{
@@ -644,31 +751,36 @@ async function boot(){
   ensureUi();
   installFrameBridges();
   installChangeWatchers();
-  setStatus('Conectando…','busy');
-  try{
-    await signInAnonymously(auth);
-  }catch(e){
-    console.error('PC cloud auth:',e);
-    setStatus('Sin conexión','error');
-    return;
-  }
+  instalarMiId();
   let stored='';
   try{stored=cleanCode(localStorage.getItem(SYNC_CODE_KEY));}catch(e){}
   if(stored&&!validCode(stored)){
     try{localStorage.removeItem(SYNC_CODE_KEY);}catch(e){}
     stored='';
   }
-  if(!stored){
-    currentCode='';currentRef=null;setStatus('Sin código','busy');showCodeModal();return;
+  // Sin ID: todo queda en este dispositivo (el ID se crea cuando la persona quiera, en «Mi ID»)
+  if(!stored){currentCode='';currentRef=null;setStatus('Sin ID','off');return;}
+  currentCode=stored;setStatus('Conectando…','busy');
+  try{
+    await asegurarSesion();
+  }catch(e){
+    console.error('PC cloud auth:',e);
+    setStatus('Sin conexión','error');
+    return;
   }
   try{
     const ref=await refFor(stored);
     const snap=await getDoc(ref);
-    if(snap.exists())await connectExisting(stored,snap);else{currentCode='';currentRef=null;setStatus('Código pendiente','busy');showNewCodeChoice(stored);}
+    if(snap.exists())await connectExisting(stored,snap);
+    else{currentCode='';currentRef=null;try{localStorage.removeItem(SYNC_CODE_KEY);}catch(e){}setStatus('Sin ID','off');toast('Tu ID «'+stored+'» ya no existe. Entra con otro desde «Mi ID».');}
   }catch(e){
     console.error('PC cloud boot:',e);
     setStatus('Sin conexión','error');
   }
 }
+window.PCSync={
+  get id(){return currentCode;},get estado(){return statusState;},
+  entrar,crear,cambiar:renameCode,salir,pintar:pintarMiId
+};
 
 boot();
