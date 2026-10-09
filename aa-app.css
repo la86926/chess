@@ -385,3 +385,64 @@ html[data-modo="oscuro"] .aa-fv-mini.peligro{color:#ff8a7a}
 }
 /* Sin la barra de reproducción de la demostración: se avanza con «Siguiente paso» */
 #aa-demo{display:none!important}
+
+/* =====================================================================
+   Barra fija: pestañas siempre visibles + «Volver al Temario» en la lección
+   ===================================================================== */
+.aa-barra-fija{position:sticky;top:0;z-index:30;padding:8px clamp(.5rem,3vw,1.6rem) 6px;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);
+  border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.aa-barra-fija .tabs{max-width:520px;margin:0 auto;width:100%}
+/* dentro de la app, el botón del menú lateral queda arriba a la izquierda: se le deja su espacio */
+@media (max-width:700px){[data-enmarcado="si"] .aa-barra-fija{padding-left:58px}}
+.aa-barra-volver{display:none;max-width:780px;margin:6px auto 0}
+body.aa-en-leccion .aa-barra-volver{display:flex}
+.aa-barra-volver:has(.aa-volver[hidden]){display:none!important}
+.aa-app .aa-volver{display:inline-flex;align-items:center;gap:.3rem;min-height:34px;padding:0 .9rem 0 .55rem;border-radius:999px;
+  border:1px solid var(--dark,#7AA4BB);background:var(--panel);color:var(--ink);font:600 .84rem var(--sans);cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.06),0 3px 10px rgba(0,0,0,.07);-webkit-tap-highlight-color:transparent;transition:transform .15s ease,box-shadow .15s ease}
+.aa-app .aa-volver svg{width:17px;height:17px;stroke:var(--dark,#7AA4BB);stroke-width:2.4}
+.aa-app .aa-volver:hover{box-shadow:0 2px 4px rgba(0,0,0,.08),0 8px 20px rgba(0,0,0,.1)}
+.aa-app .aa-volver:active{transform:scale(.97)}
+/* body con overflow «hidden/auto» impide que la barra quede fija (sticky): «clip» recorta igual sin crear scroll propio */
+body.aa-app{overflow-x:clip!important;overflow-y:visible!important}
+
+/* Consigna del ejercicio, repetida bajo cada mensaje hasta terminarlo */
+.aa-consigna{display:block;margin-top:.4rem;padding-top:.4rem;border-top:1px dashed var(--line);color:var(--muted);font-size:.92em}
+
+/* Fila de navegación: Historial (izquierda) · Lección x · Lección y (derecha) */
+.aa-fila-nav{display:flex;align-items:center;justify-content:space-between;gap:.5rem;width:100%;max-width:780px;margin:.7rem auto 0}
+.aa-fila-nav-der{display:flex;gap:.45rem;margin-left:auto}
+.aa-fila-nav .btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;min-height:42px;padding:0 .85rem;font-weight:600;white-space:nowrap}
+.aa-btn-historial svg{width:18px;height:18px}
+.aa-app .boardhead-right{display:none!important}
+@media (max-width:380px){.aa-fila-nav{gap:.3rem}.aa-fila-nav-der{gap:.3rem}.aa-fila-nav .btn{padding:0 .55rem;font-size:.82rem}}
+
+/* =====================================================================
+   Controles de la lección en el globo del tutor: ‹ · Pausar/Reproducir · ›
+   ===================================================================== */
+.aa-tutor-acciones{align-items:center}
+.aa-controles{display:flex;align-items:center;gap:.35rem;margin-right:auto}
+.aa-controles[hidden]{display:none!important}
+.aa-ctrl{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;height:38px;min-width:38px;padding:0 .55rem;
+  border-radius:11px;border:1px solid var(--line);background:var(--tinte-neutro);color:var(--ink);font:600 .82rem var(--sans);cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:opacity .15s ease,transform .1s ease}
+.aa-ctrl svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.aa-ctrl:active:not(:disabled){transform:scale(.95)}
+.aa-ctrl:disabled{opacity:.32;cursor:default}
+.aa-ctrl:focus-visible{outline:2px solid var(--acento-tema,var(--crest));outline-offset:2px}
+.aa-ctrl-play{min-width:7.4em;padding:0 .75rem}
+.aa-ctrl-play .i-play{display:none;fill:currentColor;stroke-width:1.6}
+.aa-ctrl-play.en-pausa .i-play{display:block}
+.aa-ctrl-play.en-pausa .i-pausa{display:none}
+/* línea que se llena mientras la lección está por avanzar sola */
+.aa-cuenta{position:absolute;left:0;right:0;bottom:0;height:2px;background:currentColor;opacity:.4;transform:scaleX(0);transform-origin:left center;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.aa-cuenta{display:none}}
+
+/* «Lección x» y «Lección y»: más grandes, el símbolo arriba y el nombre debajo */
+.aa-fila-nav{align-items:stretch}
+.aa-fila-nav .btn.aa-nav-lec,.aa-fila-nav .btn.aa-btn-historial{flex-direction:column;gap:.12rem;min-height:58px;min-width:96px;padding:.45rem .9rem;line-height:1.1;white-space:normal;text-align:center}
+.aa-nav-lec b{font-size:1.25rem;line-height:1;font-weight:700}
+.aa-nav-lec span,.aa-btn-historial span{font-size:.8rem;font-weight:600;max-width:9.5em}
+.aa-fila-nav .btn.aa-btn-historial svg{width:20px;height:20px}
+@media (max-width:380px){.aa-fila-nav .btn.aa-nav-lec,.aa-fila-nav .btn.aa-btn-historial{min-width:0;padding:.4rem .6rem}.aa-nav-lec span,.aa-btn-historial span{font-size:.74rem}}

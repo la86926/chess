@@ -1,13 +1,13 @@
 # Recorre en el navegador cada lección con contenido COMO LO HARÍA UN ALUMNO:
-# toca los botones (Continuar, pasos de la demostración, etapas), responde tocando las
-# opciones, mueve las piezas tocando la casilla de origen y la de destino, y usa
-# «Explícame otra vez» a mitad de la lección (en Comprende y en Hazlo tú) para comprobar
-# que después todo sigue respondiendo.
+# usa los controles del tutor (‹ · Pausar · ›) y las etapas, responde tocando las opciones,
+# mueve las piezas tocando la casilla de origen y la de destino, y vuelve atrás con ‹ a mitad
+# de la lección para comprobar que después todo sigue respondiendo.
+# En la primera lección deja la reproducción automática encendida y comprueba que avanza sola.
 # Uso: python3 -m http.server 8765 (en la raíz) y luego
 #      python3 tools/aprende/prueba_lecciones.py [ID ...]
 import sys, time
 from playwright.sync_api import sync_playwright
-URL='http://localhost:8765/index3.html'
+URL='http://127.0.0.1:8765/index3.html'
 pedidas=[a.upper() for a in sys.argv[1:]]
 fallos=[]
 def ok(c,m):
@@ -27,14 +27,17 @@ def tocar(pg,sq):
     sin_mascota(pg)
     loc=pg.locator('#board .sq[data-sq="%s"]'%sq); loc.scroll_into_view_if_needed()
     bb=loc.bounding_box(); pg.mouse.click(bb['x']+bb['width']/2, bb['y']+bb['height']/2)
-def continuar(pg):
-    pg.locator('#aa-continuar').scroll_into_view_if_needed(); pg.click('#aa-continuar'); time.sleep(0.35)
-GRUPO={'descubre':'teoria','observa':'teoria','comprende':'resolver','practica':'resolver','hazlo':'practica','comprueba':'reforzar','repasa':'repaso'}
+def boton(pg,sel):
+    pg.locator(sel).scroll_into_view_if_needed(); pg.click(sel); time.sleep(0.35)
+def adelante(pg): boton(pg,'#aa-adelante')
+def atras(pg): boton(pg,'#aa-atras')
+def pausar(pg):
+    if pg.evaluate("AAApp.estado.auto"): boton(pg,'#aa-pausa')
+def deshabilitado(pg,sel): return pg.evaluate("s=>document.querySelector(s).disabled",sel)
+GRUPO={'descubre':'teoria','observa':'teoria','comprende':'preguntas','practica':'preguntas','hazlo':'practica','comprueba':'repaso'}
 def etapa_nav(pg,e):
     sel='#aa-etapas [data-grupo="%s"]'%GRUPO[e]
     pg.locator(sel).scroll_into_view_if_needed(); pg.click(sel); time.sleep(0.35)
-def otra_vez(pg):
-    pg.locator('#aa-otra-vez').scroll_into_view_if_needed(); pg.click('#aa-otra-vez'); time.sleep(0.6)
 def opcion(pg,i):
     pg.locator('#aa-opciones .aa-opcion[data-i="%d"]'%i).scroll_into_view_if_needed()
     pg.click('#aa-opciones .aa-opcion[data-i="%d"]'%i); time.sleep(0.25)
@@ -42,10 +45,15 @@ def resolver(pg,lid,etapa,t):
     tipo=t.get('tipo','jugada')
     if tipo=='pregunta':
         malas=[i for i in range(len(t['opciones'])) if i!=t['correcta']]
-        if malas: opcion(pg,malas[0])
+        if malas:
+            opcion(pg,malas[0])
+            ok(pg.evaluate("document.querySelector('#aa-dice .aa-consigna')!==null"),'%s %s: tras una respuesta equivocada se perdió la pregunta'%(lid,etapa))
         opcion(pg,t['correcta'])
     elif tipo=='casilla':
-        for s in t['casillas']: tocar(pg,s); time.sleep(0.1)
+        for k,s in enumerate(t['casillas']):
+            tocar(pg,s); time.sleep(0.1)
+            if k<len(t['casillas'])-1:
+                ok(pg.evaluate("document.querySelector('#aa-dice .aa-consigna')!==null"),'%s %s: tras una casilla correcta se perdió la consigna'%(lid,etapa))
     else:
         linea=t['linea']
         for k in range(0,len(linea),2):
@@ -64,36 +72,56 @@ with sync_playwright() as p:
     pg.goto(URL); pg.wait_for_function("!!window.AAApp",timeout=15000)
     ids=pg.evaluate("Object.keys(window.AA_LECCIONES).sort()")
     if pedidas: ids=[i for i in ids if i in pedidas]
+    primera=True
     for lid in ids:
         n0=len(errs); L=pg.evaluate("id=>AA_LECCIONES[id]",lid)
         pg.evaluate("id=>AAApp.abrirLeccion(id,{etapa:'descubre'})",lid); time.sleep(0.3)
-        continuar(pg)                                            # Descubre -> Observa
-        ok(pg.evaluate("AAApp.estado.etapa")=='observa',lid+': Continuar no llevó a Observa')
-        for _ in range(len(L['observa'])+2):                   # «Siguiente paso» hasta terminar la demostración
-            if pg.evaluate("AAApp.estado.etapa")!='observa': break
-            continuar(pg)
+        ok(pg.evaluate("AAApp.estado.auto")==True,lid+': la lección no empezó reproduciéndose sola')
+        ok(pg.evaluate("document.getElementById('aa-continuar').hidden&&document.getElementById('aa-otra-vez').hidden"),lid+': siguen visibles «Continuar» o «Explícame otra vez»')
+        ok(deshabilitado(pg,'#aa-atras') and not deshabilitado(pg,'#aa-adelante'),lid+': en Teoría «‹» debe estar apagado y «›» encendido')
+        if primera:
+            # reproducción automática: Teoría -> demostración -> Preguntas sin tocar nada
+            ok(esperar(pg,"AAApp.estado.etapa==='observa'",14),lid+': la Teoría no pasó sola a la demostración')
+            ok(esperar(pg,"AAApp.estado.etapa==='observa'&&AAApp.estado.paso>=1",14),lid+': la demostración no avanzó sola')
+            ok(esperar(pg,"AAApp.estado.etapa==='comprende'",60),lid+': la demostración no terminó sola en Preguntas')
+        else:
+            pausar(pg)
+            ok(pg.evaluate("document.getElementById('aa-pausa-txt').textContent")=='Reproducir',lid+': el botón no cambió a «Reproducir»')
+            adelante(pg)                                          # Descubre -> demostración
+            ok(pg.evaluate("AAApp.estado.etapa")=='observa',lid+': «›» no llevó a la demostración')
+            ok(deshabilitado(pg,'#aa-atras'),lid+': en la demostración (Teoría) «‹» debe estar apagado')
+            adelante(pg)                                          # demostración -> Preguntas
         ok(pg.evaluate("AAApp.estado.etapa")=='comprende',lid+': no llegó a Comprende')
+        if primera: pausar(pg)
         q=L['comprende'].get('pregunta')
+        atras(pg)                                                 # desvío: «‹» vuelve a la Teoría
+        ok(pg.evaluate("AAApp.estado.etapa")=='descubre',lid+': «‹» no volvió a la Teoría')
+        etapa_nav(pg,'comprende')
         if q:
-            otra_vez(pg)                                         # desvío: «Explícame otra vez»
-            ok(pg.evaluate("AAApp.estado.etapa")=='observa',lid+': «Explícame otra vez» no volvió a la demostración')
-            etapa_nav(pg,'comprende')
             malas=[i for i in range(len(q['opciones'])) if i!=q['correcta']]
             if malas: opcion(pg,malas[0])
             opcion(pg,q['correcta'])
-            ok(esperar(pg,"document.querySelector('#aa-opciones .aa-opcion.bien')!==null",3),lid+': comprende: la opción correcta no respondió tras «Explícame otra vez»')
-        continuar(pg)                                            # Comprende -> Practica
+            ok(esperar(pg,"document.querySelector('#aa-opciones .aa-opcion.bien')!==null",3),lid+': comprende: la opción correcta no respondió tras volver con «‹»')
+        adelante(pg)                                              # Comprende -> Practica
         for etapa in ['practica','hazlo','comprueba']:
             ok(pg.evaluate("AAApp.estado.etapa")==etapa,'%s: se esperaba la etapa %s y está en %s'%(lid,etapa,pg.evaluate("AAApp.estado.etapa")))
             if etapa!=pg.evaluate("AAApp.estado.etapa"): etapa_nav(pg,etapa)
             if etapa=='hazlo':
-                otra_vez(pg); etapa_nav(pg,'hazlo')              # desvío a mitad de los ejercicios
+                atras(pg); ok(pg.evaluate("AAApp.estado.etapa")=='practica',lid+': «‹» en Práctica no volvió a Preguntas')
+                etapa_nav(pg,'hazlo')                             # desvío a mitad de los ejercicios
+            ok(pg.evaluate("document.getElementById('aa-continuar').hidden"),'%s %s: el botón negro aparece antes de terminar el Repaso'%(lid,etapa))
+            if primera and etapa=='practica': boton(pg,'#aa-pausa')   # vuelve a reproducir
             resolver(pg,lid,etapa,L[etapa])
-            if etapa!='comprueba': continuar(pg)
+            if primera and etapa=='practica':
+                ok(esperar(pg,"AAApp.estado.etapa==='hazlo'",12),lid+': tras resolver, la lección no avanzó sola')
+                pausar(pg)
+            elif etapa!='comprueba': adelante(pg)
+        ok(deshabilitado(pg,'#aa-adelante'),lid+': en Repaso «›» debe estar apagado')
+        ok(pg.evaluate("(()=>{const b=document.getElementById('aa-continuar');return !b.hidden&&b.textContent.trim()==='Siguiente lección'&&b.classList.contains('principal')})()"),lid+': al terminar el Repaso no apareció «Siguiente lección»')
+        primera=False
         ok(pg.evaluate("id=>JSON.parse(localStorage.aa_progreso_v1).lecciones[id].estado",lid)=='completada',lid+': la lección no quedó completada')
-        continuar(pg)                                            # Reforzar -> Repaso
-        ok(pg.evaluate("AAApp.estado.etapa")=='repasa' and pg.evaluate("document.querySelector('#aa-etapas .activa').dataset.grupo")=='repaso',lid+': Continuar no llevó a Repaso')
-        ok(pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa i')].map(i=>i.textContent).join('')")=='12345',lid+': los números de las etapas no se ven siempre')
+        ok(pg.evaluate("document.querySelector('#aa-etapas .activa').dataset.grupo")=='repaso',lid+': la última etapa no es Repaso')
+        ok(pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa i')].map(i=>i.textContent).join('')")=='1234',lid+': los números de las etapas no se ven siempre')
         ok(len(errs)==n0,lid+': errores JS '+' | '.join(errs[n0:n0+2]))
         print(('✓ ' if not any(f.startswith(lid) for f in fallos) else '✗ ')+lid)
     b.close()
