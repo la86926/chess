@@ -80,13 +80,13 @@ L['N1-004']={
     {flechas:[['c4','f1','ataque']],marcas:[['f1','clave']],di:'El alfil de c4 ataca **f1**. El rey no puede **pasar** por una casilla atacada: el enroque corto está prohibido.',sencillo:'El rey no puede cruzar por una casilla donde lo atacarían. El alfil vigila f1, así que no hay enroque corto.'},
     {flechas:[['e1','c1','mov']],di:'El enroque largo sí está permitido: ni d1 ni c1 están atacadas.',sencillo:'Por el otro lado el camino es seguro: ahí sí se puede enrocar.'},
     {jugada:'e1c1',marcas:[['c1','clave']],di:'Las blancas enrocan largo: **0-0-0**.',sencillo:'Listo: enroque largo.'},
-    {fen:'r3k2r/ppp2ppp/8/8/8/8/PPP2PPP/R2QK1NR w KQkq - 0 1',marcas:[['d1','clave'],['g1','clave']],di:'Tampoco se puede enrocar si hay piezas entre el rey y la torre (aquí la dama y el caballo), si el rey está en jaque o si el rey o esa torre ya se movieron.',sencillo:'Para enrocar, el camino entre rey y torre tiene que estar vacío.'}
+    {fen:'r3k2r/ppp2ppp/8/8/8/8/PPP2PPP/R2QK1NR w KQkq - 0 1',marcas:[['d1','clave'],['g1','clave']],di:'Tampoco se puede enrocar con piezas en medio (aquí la dama y el caballo), con el rey en jaque o si el rey o esa torre ya se movieron.',sencillo:'Para enrocar, el camino entre rey y torre tiene que estar vacío.'}
   ],
-  comprende:{di:'El rey no puede estar en jaque, ni cruzar ni llegar a casillas atacadas. Entre rey y torre no puede haber piezas. Y ninguno de los dos puede haberse movido antes.'},
+  comprende:{di:'Para enrocar: el rey no está en jaque ni pasa por casillas atacadas, no hay piezas en medio y ni el rey ni esa torre se movieron.'},
   practica:{tipo:'casilla',fen:'r3k2r/ppp2ppp/8/8/8/6n1/PPP2P1P/R3K2R w KQkq - 0 1',casillas:['f1'],di:'Las blancas no pueden enrocar corto. Toca la casilla atacada que lo impide.',pista:'Mira qué casillas ataca el caballo negro de g3.',bien:'¡Bien! El caballo ataca f1, la casilla por la que pasaría el rey.'},
   hazlo:{fen:'r3k2r/ppp2ppp/8/8/8/3R4/PPP2PPP/4K2R b Kkq - 0 1',linea:['e8g8'],regla:true,di:'Juegas con las negras. Uno de los enroques está prohibido. Haz el que sí está permitido.',pistas:['La torre blanca de d3 ataca d8: el enroque largo pasaría por ahí.','Enroca corto: el rey de e8 a g8.'],bien:'¡Correcto! El largo era imposible porque el rey cruzaría d8.'},
   comprueba:{fen:'r3k2r/ppp2ppp/8/1B6/8/8/PPP2PPP/R3K2R b KQkq - 0 1',linea:['c7c6'],regla:true,
-    di:'Juegas con negras. El alfil de b5 te da jaque: ahora **no puedes enrocar**. Sal del jaque **sin mover el rey**, así podrás enrocar más adelante.',pistas:['Pon un peón entre el alfil y tu rey.','El peón de c7 puede ir a c6.'],
+    di:'Juegas con negras. El alfil de b5 da jaque: **no puedes enrocar**. Sal del jaque **sin mover el rey** para enrocar después.',pistas:['Pon un peón entre el alfil y tu rey.','El peón de c7 puede ir a c6.'],
     mal:{'*':'Si mueves el rey pierdes para siempre el derecho a enrocar. Tapa el jaque.'},bien:'¡Muy bien! …c6 tapa el jaque y ataca al alfil. Tu rey sigue en e8 y todavía puede enrocar.'}
 };
 
@@ -118,9 +118,9 @@ L['N1-006']={
   ],
   comprende:{di:'La captura al paso solo la hace un peón contra otro peón que acaba de avanzar dos casillas, y solo en la jugada inmediatamente siguiente.'},
   practica:{fen:'k7/8/8/3pP3/8/8/8/K7 w - d6 0 1',linea:['e5d6'],regla:true,di:'El peón negro acaba de jugar d7-d5. Captúralo al paso.',pistas:['Tu peón de e5 se mueve en diagonal a la casilla que el peón negro saltó.','Lleva el peón de e5 a d6.'],bien:'¡Muy bien! exd6 a.p.'},
-  hazlo:{fen:'k7/8/8/8/5Pp1/8/8/K7 b - f3 0 1',linea:['g4f3'],regla:true,di:'Con negras: el peón blanco acaba de jugar f2-f4. Captúralo al paso.',pistas:['Para las negras, el peón captura hacia abajo en diagonal.'],bien:'¡Correcto! gxf3 a.p.'},
+  hazlo:{fen:'k7/8/8/8/5Pp1/8/8/K7 b - f3 0 1',linea:['g4f3'],regla:true,di:'El peón blanco acaba de jugar f2-f4. Captúralo al paso.',pistas:['Para las negras, el peón captura hacia abajo en diagonal.'],bien:'¡Correcto! gxf3 a.p.'},
   comprueba:{fen:'k7/3p4/8/8/4P3/8/8/K7 w - - 0 1',linea:['e4e5','d7d5','e5d6'],regla:true,
-    di:'Avanza tu peón a **e5**. Si el peón negro avanza dos casillas y queda a tu lado, captúralo al paso **en ese mismo momento**.',pistas:['Primero, el peón de e4 a e5.','El peón negro saltó la casilla d6: captura en diagonal hacia d6.'],bien:'¡Exacto! Lo capturaste al paso a tiempo: una jugada después ya no se puede.'}
+    di:'Avanza tu peón a **e5**. Si el peón negro salta dos casillas a tu lado, captúralo al paso **en ese momento**.',pistas:['Primero, el peón de e4 a e5.','El peón negro saltó la casilla d6: captura en diagonal hacia d6.'],bien:'¡Exacto! Lo capturaste al paso a tiempo: una jugada después ya no se puede.'}
 };
 
 /* N1-007 · Tres formas de salir del jaque */
@@ -139,7 +139,7 @@ L['N1-007']={
   comprende:{di:'Mover, capturar o interponer. Antes de elegir, pregúntate cuál de las tres conviene más: capturar suele ganar material.'},
   practica:{fen:'6k1/5ppp/8/8/8/5n2/3Q1PPP/6K1 w - - 0 1',linea:['g2f3'],di:'El caballo negro da jaque y además ataca a tu dama. ¿Cuál es la mejor salida?',
     pistas:['Si mueves el rey, el caballo se come tu dama.','Captura el caballo con un peón.'],bien:'¡Eso es! Capturar el caballo resuelve el jaque y salva la dama.'},
-  hazlo:{fen:'6k1/5ppp/8/8/2B5/8/5PPP/r5K1 w - - 0 1',linea:['c4f1'],objetivoEquilibrio:true,di:'La torre negra da jaque. Tu rey no puede moverse y no puedes capturar la torre. Encuentra la salida.',
+  hazlo:{fen:'6k1/5ppp/8/8/2B5/8/5PPP/r5K1 w - - 0 1',linea:['c4f1'],objetivoEquilibrio:true,di:'La torre negra da jaque. Tu rey no puede moverse ni capturarla. Encuentra la salida.',
     pistas:['Busca una pieza que pueda ponerse entre la torre y tu rey.','El alfil puede llegar a f1.'],bien:'¡Correcto! Af1 interpone el alfil y bloquea el jaque.'},
   comprueba:{fen:'6k1/8/8/8/8/8/6PP/r5K1 w - - 0 1',linea:['g1f2'],regla:true,di:'Aquí no puedes capturar ni interponer. Sal del jaque.',
     pistas:['Busca una casilla vecina del rey que la torre no ataque.'],bien:'¡Bien! Rf2 era la única casilla segura.'}
@@ -179,10 +179,10 @@ L['N1-009']={
   ],
   comprende:{di:'Para dar mate hace falta material suficiente: al menos una torre, una dama, o varias piezas menores.'},
   practica:{fen:'8/8/8/8/8/1Pk2N2/8/5K2 b - - 0 1',linea:['c3b3'],regla:true,
-    di:'Juegas con negras y solo te queda el rey. Captura el último peón blanco: con rey y caballo, las blancas ya no podrán darte mate.',pistas:['Tu rey puede capturar el peón de b3: nadie lo defiende.'],
+    di:'Juegas con negras. Solo te queda el rey: captura el último peón blanco y las blancas ya no podrán darte mate.',pistas:['Tu rey puede capturar el peón de b3: nadie lo defiende.'],
     mal:{'*':'Si el peón sigue vivo puede coronar. Captúralo ahora.'},bien:'¡Tablas! Rey y caballo contra rey: material insuficiente para dar mate.'},
   comprueba:{fen:'8/8/8/8/Pk6/3B4/8/4K3 w - - 0 1',linea:['d3b5'],acepta:{0:['d3c2']},concepto:true,
-    di:'Ahora juegas con blancas. Rey y alfil solos no pueden dar mate, y el rey negro ataca tu último peón: **protégelo**.',pistas:['Busca una casilla desde la que el alfil defienda el peón de a4.','El alfil puede ir a b5 o a c2.'],
+    di:'Rey y alfil solos no pueden dar mate, y el rey negro ataca tu último peón: **protégelo**.',pistas:['Busca una casilla desde la que el alfil defienda el peón de a4.','El alfil puede ir a b5 o a c2.'],
     mal:{'*':'Así el rey negro se come el peón y quedan rey y alfil contra rey: tablas.'},bien:'¡Bien! El peón sigue vivo: con él, las blancas pueden coronar y ganar.'}
 };
 
@@ -203,7 +203,7 @@ L['N1-010']={
   ],
   comprende:{di:'Triple repetición, regla de los cincuenta movimientos y acuerdo entre jugadores. Las tres terminan la partida en tablas.'},
   practica:{fen:'r4rk1/5p1p/8/8/8/8/q4PPP/2Q3K1 w - - 0 1',linea:['c1g5','g8h8','g5f6','h8g8','f6g5','g8h8','g5f6','h8g8','f6g5'],regla:true,
-    di:'Las negras tienen mucho más material. Sálvate dando **jaque una y otra vez** hasta que la misma posición se repita tres veces.',pistas:['Empieza con Dg5+: el rey solo puede ir a h8.','Después, Df6+ obliga al rey a volver a g8. Repite.'],
+    di:'Vas perdiendo en material. Sálvate dando **jaque una y otra vez** hasta repetir tres veces la posición.',pistas:['Empieza con Dg5+: el rey solo puede ir a h8.','Después, Df6+ obliga al rey a volver a g8. Repite.'],
     bien:'¡Tablas por triple repetición! La misma posición apareció tres veces.'}
 };
 
@@ -432,7 +432,7 @@ L['N1-023']={
   comprende:{di:'Para evitarlo, abre una «ventana» a tu rey moviendo un peón (por ejemplo h3 o h6) cuando la posición lo permita.'},
   practica:{fen:'3r2k1/8/8/8/8/8/5PPP/6K1 b - - 0 1',linea:['d8d1'],meta:'mate',di:'Juegas con negras. Da el mate del pasillo.',pistas:['El rey blanco está encerrado por sus peones.'],bien:'¡Mate del pasillo!'},
   hazlo:{fen:'6k1/5ppp/8/8/8/8/r4PPP/3R2K1 b - - 0 1',linea:['h7h6'],acepta:{0:['g7g6','h7h5','g7g5','f7f6','f7f5']},concepto:true,
-    objetivoEquilibrio:true,di:'Juegas con negras. La torre blanca amenaza **Td8#**, el mate del pasillo. Abre una «ventana» a tu rey moviendo un peón.',pistas:['Si uno de los peones que encierran al rey avanza, el rey tendrá por dónde escapar.','Por ejemplo, …h6.'],
+    objetivoEquilibrio:true,di:'Juegas con negras. Te amenazan **Td8#**, el mate del pasillo. Abre una «ventana» a tu rey moviendo un peón.',pistas:['Si uno de los peones que encierran al rey avanza, el rey tendrá por dónde escapar.','Por ejemplo, …h6.'],
     mal:{'*':'Aquí practica abrir una ventana: mueve uno de los peones que encierran a tu rey.'},bien:'¡Bien! Tu rey ya tiene una salida y Td8+ no sería mate.'},
   comprueba:{fen:'2rr2k1/5ppp/8/8/8/8/3R1PPP/3R2K1 w - - 0 1',linea:['d2d8','c8d8','d1d8'],meta:'mate',di:'Mate en dos jugadas. Usa tus dos torres.',pistas:['Captura en d8 con jaque.','Si recapturan, la otra torre llega a d8.'],bien:'¡Excelente! Dos torres en la misma columna: una se sacrifica y la otra da mate.'}
 };
@@ -545,7 +545,7 @@ L['N1-029']={
   practica:{fen:'rnb1kbnr/ppp1pppp/8/3q4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3',linea:['b1c3'],regla:true,di:'Desarrolla una pieza atacando a la dama negra.',pistas:['¿Qué caballo puede atacar la casilla d5?'],bien:'¡Bien! Desarrollo con ganancia de tiempo.'},
   hazlo:{fen:'rnbqkbnr/pppp1ppp/8/4p3/4P1Q1/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2',linea:['g8f6'],regla:true,di:'Juegas con negras. La dama blanca salió en la jugada 2. Castígala desarrollando con ataque.',pistas:['¿Qué caballo puede atacar la casilla g4?'],bien:'¡Correcto! Cf6 desarrolla y ataca a la dama.'},
   comprueba:{fen:'rnbqkbnr/pppp1ppp/8/8/3QP3/8/PPP2PPP/RNB1KBNR b KQkq - 0 3',linea:['b8c6'],concepto:true,
-    objetivoEquilibrio:true,di:'Juegas con negras tras 1.e4 e5 2.d4 exd4 3.Dxd4. La dama blanca salió muy pronto: desarrolla una pieza **atacándola**.',pistas:['¿Qué pieza tuya puede salir y atacar a la dama de d4?','El caballo de b8 a c6.'],
+    objetivoEquilibrio:true,di:'Juegas con negras. Tras 3.Dxd4 la dama blanca salió muy pronto: desarrolla una pieza **atacándola**.',pistas:['¿Qué pieza tuya puede salir y atacar a la dama de d4?','El caballo de b8 a c6.'],
     mal:{'*':'Esa jugada no ataca a la dama. Busca un desarrollo que la obligue a moverse.'},bien:'¡Exacto! …Cc6 saca una pieza y la dama tendrá que moverse otra vez.'}
 };
 
@@ -680,7 +680,7 @@ L['N1-036']={
   comprende:{di:'La regla del cuadrado te ahorra calcular: cuenta el cuadrado y mira si el rey entra.'},
   practica:{fen:'8/8/8/8/1P6/5k2/8/K7 b - - 0 1',linea:['f3e4'],objetivoEquilibrio:true,di:'Juegas con negras. Entra en el cuadrado para alcanzar al peón.',pistas:['El cuadrado del peón de b4 va de la columna b a la e, filas 4 a 8.'],bien:'¡Bien! Dentro del cuadrado, el peón no se escapa.'},
   comprueba:{fen:'8/8/8/8/1P6/5k2/8/K7 w - - 0 1',linea:['b4b5','f3e4','b5b6','e4d5','b6b7','d5c6','b7b8q'],concepto:true,
-    di:'La misma posición de antes, pero ahora **juegan las blancas**. Avanza el peón: tras b5, el rey negro queda fuera del cuadrado.',pistas:['Mueve el peón en cada jugada, sin detenerte.','Al llegar a b8, corónalo en dama.'],
+    di:'Misma posición, pero ahora **mueves tú**. Avanza el peón: tras b5 el rey negro queda fuera del cuadrado.',pistas:['Mueve el peón en cada jugada, sin detenerte.','Al llegar a b8, corónalo en dama.'],
     mal:{'*':'Si no avanzas el peón, el rey negro entra en el cuadrado y lo alcanza.'},bien:'¡Coronaste! Con el turno a tu favor, el rey negro no pudo entrar en el cuadrado.'}
 };
 

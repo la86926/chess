@@ -71,7 +71,7 @@ L['N2-003']={
     {jugada:'d3f5',di:'…Af5: las negras salvan el alfil…',sencillo:'Las negras salvan una pieza.'},
     {jugada:'d4d8',marcas:[['f8','jaque']],di:'…y la torre captura el caballo con jaque. El ataque doble ganó una pieza.',sencillo:'La otra pieza se pierde.'}
   ],
-  comprende:{di:'Cualquier pieza puede hacer un ataque doble: dama, torre, alfil, caballo, peón o rey. Busca piezas rivales sin defensa y casillas desde donde atacar dos a la vez.'},
+  comprende:{di:'Cualquier pieza puede atacar dos a la vez, incluso el peón o el rey. Busca piezas rivales sin defensa y una casilla que ataque a dos.'},
   practica:{fen:'7k/p4p1p/n5p1/3R4/b7/8/PP4PP/2K5 w - - 0 1',linea:['d5a5'],
     di:'Encuentra la casilla desde donde tu torre ataca dos piezas negras a la vez.',pistas:['Mira la columna a.','La torre puede ir a a5.'],
     bien:'¡Bien! Ta5 ataca al alfil de a4 y al caballo de a6.'},
@@ -333,7 +333,7 @@ L['N2-015']={
     {jugada:'e4b7',flechas:[['e1','e8','ataque']],marcas:[['e8','jaque']],di:'Axb7+: el alfil captura la dama y la torre da jaque. Es un **jaque descubierto**.',sencillo:'El alfil se come la dama y la torre da jaque.'},
     {jugada:'e8d8',di:'…Rd8: las negras atienden el jaque y no pueden recuperar nada.',sencillo:'El rey se aparta.'}
   ],
-  comprende:{di:'Busca tus piezas que tapen el jaque de otra. Al moverlas, el rival debe ocuparse del rey: la pieza que se mueve puede capturar o atacar sin miedo.'},
+  comprende:{di:'Busca una pieza tuya que tape el jaque de otra. Al moverla, el rival debe atender a su rey y tu pieza captura o ataca sin miedo.'},
   practica:{fen:'7k/5p1p/4q1p1/8/3N4/8/1B3PPP/6K1 w - - 0 1',linea:['d4e6'],
     di:'Jaque descubierto: mueve el caballo para que el alfil dé jaque… y gana algo grande.',pistas:['El alfil de b2 apunta al rey de h8.','El caballo puede capturar la dama.'],
     bien:'¡Muy bien! Cxe6+: el alfil da jaque y el caballo se lleva la dama.'},
@@ -457,7 +457,7 @@ L['N2-005']={
      di:'El caballo captura la torre. Las blancas ganaron una torre (5 puntos) sin entregar nada.',
      sencillo:'Resultado: el caballo se come la torre. ¡Ganaste material gracias al tenedor!'}
   ],
-  comprende:{di:'Un tenedor funciona cuando una pieza ataca dos objetivos y el rival solo puede salvar uno. El jaque lo hace todavía más fuerte, porque obliga a mover el rey.'},
+  comprende:{di:'El tenedor funciona porque el rival solo puede salvar una de las dos piezas. Con jaque es aún más fuerte: primero debe mover el rey.'},
   practica:{fen:'2q1k3/5ppp/8/8/4N3/8/1B3PPP/6K1 w - - 0 1', linea:['e4d6','e8d7','d6c8'],
     di:'Las blancas pueden dar un tenedor al rey y a la dama. ¿Desde qué casilla?',
     pistas:['Busca una casilla desde donde el caballo ataque a la vez e8 y c8.','Mueve el caballo de e4.'],

@@ -222,6 +222,9 @@ function tutor(texto,tono){
      se repite lo que hay que hacer, para no perder la consigna. */
   var recordar=(A.consigna&&A.tarea&&!A.resuelta&&plano(texto)!==plano(A.consigna))?'<span class="aa-consigna">'+rico(A.consigna)+'</span>':'';
   tutorTexto.innerHTML=rico(texto)+recordar;
+  /* el globo tiene siempre 4 renglones (los botones no se mueven): si el recordatorio no cabe, se omite */
+  if(recordar&&tutorTexto.scrollHeight>tutorTexto.clientHeight+2)tutorTexto.innerHTML=rico(texto);
+  tutorTexto.scrollTop=0;
   tutorCaja.dataset.tono=tono||'';
   tutorCaja.classList.remove('habla');void tutorCaja.offsetWidth;tutorCaja.classList.add('habla');
   var limpio=plano(texto);
@@ -410,7 +413,7 @@ function abrirLeccion(id,opc){
     modoControles('vacia');
     ejercicioActual=PUZZLES[0];
     renderHead();renderRef();pintarEtapas();
-    tutor('«'+catalogoDe(id).titulo+'» está en preparación. Ya puedes guardarla en tus favoritos con el corazón; cuando esté lista tendrá demostración, ejercicios y comprobación.');
+    tutor('«'+catalogoDe(id).titulo+'» está en preparación. Pronto tendrá demostración y ejercicios.');
     botonContinuar('Siguiente lección disponible');
     pintarControles();
     guardarUltimo();
@@ -464,7 +467,8 @@ function etapaDescubre(){
   mostrarPosicion(d.fen,{libre:true,orient:d.orient||ladoDe(d.fen),sinAnimar:true});
   fijarCapa(d.flechas,d.marcas,true);
   ejercicioActual=comoEjercicio({fen:d.fen,orient:d.orient},A.id);
-  tutor((A.lec.objetivo?A.lec.objetivo+' ':'')+d.di);
+  /* el globo cabe en 4 renglones: el título de la lección ya dice de qué trata */
+  tutor(d.di);
   botonContinuar('Ver la demostración');
   marcarEtapa('descubre');
 }
@@ -691,12 +695,13 @@ function iniciarTarea(etapa,t,opc){
     renderBoard();renderMoves();
   }
   /* «Juegas con negras.» ya lo dice la frase de arriba: no se repite */
-  var intro=String(t.di||'').replace(/^Juegas con (las )?(negras|blancas)[.:,]?\s*/i,'');
+  var intro=String(t.di||'').replace(/^Juegas con (las )?(negras|blancas)[.:,]\s*/i,'');
   if(intro)intro=intro.charAt(0).toUpperCase()+intro.slice(1);
   /* frase directa y con el bando: hay que mover en el tablero, y con qué color */
   var lado=ladoDe(t.fen);
   var pre=pedirMover(lado,etapa==='hazlo'?', ahora sin ayuda. ':'. ');
-  A.consigna=null;tutor(pre+intro);A.consigna=intro;
+  /* la consigna que se repite bajo cada aviso es corta (1 renglón): qué bando mueve */
+  A.consigna=null;tutor(pre+intro);A.consigna=pedirMover(lado);
   botonContinuar('Saltar ejercicio',true,true);
   renderHead();
 }
@@ -719,10 +724,9 @@ function tareaResuelta(){
   var bien=t.def.bien||'¡Exacto!';
   /* último ejercicio de la lección (normalmente el Repaso): se recuerda la idea clave */
   var ultimo=etapa===ultimaTarea(A.lec);
-  var faltan=tareasDe(A.lec).filter(function(k){return etapasHechas(A.id).indexOf(k)<0;});
-  var cierre=ultimo?(estadoLeccion(A.id)==='completada'?' ¡Lección completada!':' Completa también '+(faltan.some(function(k){return k!=='comprueba';})?'la Práctica':'el Repaso')+' para terminar la lección.'):'';
-  var idea=(ultimo&&A.lec&&A.lec.idea)?' **Idea clave:** '+A.lec.idea:'';
-  tutor(bien+cierre+idea,'bien');
+  /* mensaje breve (máximo 4 renglones): la idea clave ya se vio en el resumen de la Teoría */
+  var cierre=ultimo?(estadoLeccion(A.id)==='completada'?' **¡Lección completada!**':' Te faltan ejercicios para completar la lección.'):'';
+  tutor(bien+cierre,'bien');
   botonContinuar(ultimo?'Siguiente lección':'Continuar');
   planificarAuto();
 }

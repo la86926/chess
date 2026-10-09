@@ -666,14 +666,8 @@ const ICON_ENTRAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a
 const ICON_CREAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 const ICON_EDITAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="M13.5 6.5l4 4"/></svg>';
 const ICON_SALIR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M15 16l4-4-4-4M19 12H9"/></svg>';
-const ICON_CHEV='<svg class="ids-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
-const SECCIONES=[
-  {app:'3',t:'Aprende Ajedrez',n:r=>r.aa,u:'lecciones',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 12 3l8 3.5-8 3.5Z"/><path d="M7.5 8.3v4.4c0 1.6 2 2.8 4.5 2.8s4.5-1.2 4.5-2.8V8.3"/><path d="M20 6.5v5"/></svg>'},
-  {app:'1',t:'Método PC1',n:r=>r.pc1,u:'ejercicios',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20h8M9 16.5h6l1 3.5H8Z"/><path d="M9.5 16.5 10 9h4l.5 7.5"/><path d="M8.5 9h7M9 4.5h6V9H9Z"/></svg>'},
-  {app:'2',t:'Método PC2',n:r=>r.pc2,u:'ejercicios',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20h10M8 16.5h8l1 3.5H7Z"/><path d="M9 16.5c0-4 1-6.5 3-9.5 2 3 3 5.5 3 9.5"/><circle cx="12" cy="5" r="1.6"/></svg>'}
-];
 function pintarMiId(){
-  const cuenta=document.getElementById('mi-id-cuenta'),res=document.getElementById('mi-id-resumen');
+  const cuenta=document.getElementById('mi-id-cuenta');
   const sub=document.getElementById('mi-id-sub');
   if(sub)sub.textContent=currentCode?('Tu ID: '+currentCode):'Crea tu ID y sincroniza tus dispositivos';
   if(!cuenta)return;
@@ -686,11 +680,6 @@ function pintarMiId(){
       <input class="mi-id-input" id="mi-id-input" maxlength="32" placeholder="Tu ID" autocapitalize="off" autocomplete="off" spellcheck="false">
       <div class="mi-id-acciones"><button type="submit" class="mi-id-btn" data-modo="entrar">${ICON_ENTRAR}Entrar</button><button type="submit" class="mi-id-btn" data-modo="crear">${ICON_CREAR}Crear</button><button type="button" class="mi-id-btn" data-id-accion="cambiar">${ICON_EDITAR}Cambiar ID</button></div>
       <p class="mi-id-error" role="alert"></p></form>`;
-  }
-  if(res){
-    const r=resumenLocal();
-    res.innerHTML=`<p class="ids-head">${currentCode?'Se sincroniza con «'+escapeHtml(currentCode)+'»':'Guardado solo en este dispositivo'}</p>
-      <div class="ids-list">${SECCIONES.map(x=>`<button type="button" class="ids-row" data-id-abrir="${x.app}"><span class="ids-ic">${x.ic}</span><span class="ids-t">${x.t}</span><span class="ids-n">${x.n(r)}</span>${ICON_CHEV}</button>`).join('')}</div>`;
   }
 }
 function instalarMiId(){
@@ -709,8 +698,6 @@ function instalarMiId(){
     const a=e.target.closest('[data-id-accion]');
     if(a&&a.dataset.idAccion==='cambiar'){abrirCambiarId();return;}
     if(a&&a.dataset.idAccion==='salir'){salir();return;}
-    const s=e.target.closest('[data-id-abrir]');
-    if(s){const b=document.querySelector('.app-choice[data-app="'+s.dataset.idAbrir+'"]');if(b)b.click();}
   });
   // al abrir la página se actualizan los números
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.app-choice[data-app="id"]'))setTimeout(pintarMiId,0);},true);
