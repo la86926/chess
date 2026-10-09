@@ -556,3 +556,28 @@ html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:#FFD166}
 .aa-fav-volver:active{transform:scale(.97)}
 @media(hover:hover){.aa-fav-volver:hover{background:color-mix(in srgb,var(--acento-tema,#53707F) 16%,transparent)}}
 html[data-modo="oscuro"] .aa-fav-volver{color:var(--acento-txt-osc,#9fc0d2);border-color:color-mix(in srgb,var(--acento-txt-osc,#9fc0d2) 45%,transparent)}
+
+/* Ítem actual más visible: anillo dorado que respira + una onda de luz que sale cada pocos segundos */
+.aa-app .aa-etapas{padding:10px 10px}
+.aa-app .aa-etapa.activa{position:relative}
+.aa-app .aa-etapa.activa i{animation:aaLuciernaga2 2.6s ease-in-out infinite}
+.aa-app .aa-etapa.activa::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  border:2px solid rgba(242,193,78,.95);animation:aaOnda 2.6s ease-out infinite}
+@keyframes aaLuciernaga2{
+  0%,100%{box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 4px var(--acento-tema,#53707F),0 0 4px 2px rgba(255,200,80,.25)}
+  50%{box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 4px #F2C14E,0 0 12px 5px rgba(255,200,80,.85)}}
+@keyframes aaOnda{0%{transform:scale(1);opacity:.95}70%,100%{transform:scale(1.6);opacity:0}}
+html[data-modo="oscuro"] .aa-app .aa-etapa.activa i{--panel2:#1b1f1c}
+@media (prefers-reduced-motion:reduce){
+  .aa-app .aa-etapa.activa i{animation:none;box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 4px #F2C14E,0 0 10px 4px rgba(255,200,80,.6)}
+  .aa-app .aa-etapa.activa::after{animation:none;display:none}
+}
+
+/* Globo del tutor: siempre 4 renglones de alto, así ‹ · Pausar · › no suben ni bajan */
+.aa-tutor-texto{height:calc(1.5em * 4);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.aa-tutor-texto .aa-consigna{margin-top:.15rem;padding-top:.15rem}
+/* «Intentar de nuevo» solo con su icono, en la misma fila que los controles */
+#aa-reintentar{width:38px;min-width:38px;padding:0;justify-content:center;font-size:0;gap:0}
+#aa-reintentar svg{width:18px;height:18px}
+/* pantallas pequeñas: mascota y letra un poco más chicas para que entren más palabras por renglón */
+@media (max-width:360px){.aa-tutor{gap:.45rem}.aa-tutor-cara{width:40px;height:40px;flex-basis:40px}.aa-tutor-texto{font-size:.88rem}.aa-tutor-globo{padding:.65rem .7rem .6rem}}

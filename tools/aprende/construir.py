@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261009-aa20'
+VERSION = '20261009-aa21'
 
 
 class ErrorParche(Exception):
@@ -174,6 +174,17 @@ def construir():
               'wp_hist_log', 'wp_solved_at_backup', 'wp_solved_at', 'wp_solved', 'wp_sound', 'wp_ultimo'):
         logica = logica.replace("'" + k + "'", "'aa_" + k[3:] + "'")
     logica = parche(logica, "'pc_tab_ultimo_l1'", "'aa_tab_ultimo'", veces=2, nombre='pestaña')
+    # «Ocultar/Mostrar» del encabezado: en la Sección 1 empieza OCULTO (para no abrumar a quien
+    # empieza); si la persona elige «Mostrar», se respeta y viaja con su ID (clave aa_banner).
+    logica = parche(logica, "let bannerOculto=localStorage.getItem('aa_banner')==='1';",
+                    "let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* Sección 1: oculto por defecto */",
+                    nombre='encabezado oculto por defecto')
+    logica = parche(logica,
+                    "$('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};",
+                    "$('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};\n"
+                    "/* la elección llega desde otro dispositivo con el mismo ID */\n"
+                    "window.addEventListener('storage',e=>{if(e&&e.key==='aa_banner'){const o=e.newValue!=='0';if(o!==bannerOculto){bannerOculto=o;aplicarBanner(o,true);}}});",
+                    nombre='encabezado: seguir al ID')
     if re.search(r"['\"]wp_", logica):
         raise ErrorParche('Quedó alguna clave wp_ sin renombrar en la lógica copiada.')
     # Título de la imagen para compartir.

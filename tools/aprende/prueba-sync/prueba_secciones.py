@@ -49,7 +49,7 @@ try:
     pn.goto(URL); time.sleep(1.5)
     ok(activa(pn)=='app-frame-3','la sección abierta es Aprende Ajedrez')
     orden=pn.evaluate("[...document.querySelectorAll('.app-choice')].map(b=>b.textContent.trim())")
-    ok(orden[0].startswith('Aprende Ajedrez') and orden[1].startswith('Método PC1 (Avanzado)') and orden[2].startswith('Método PC2 (Muy avanzado)'),'orden del menú: '+' | '.join(orden))
+    ok(orden[0].startswith('Mi ID') and orden[1].startswith('Aprende Ajedrez') and orden[2].startswith('Método PC1 (Avanzado)') and orden[3].startswith('Método PC2 (Muy avanzado)'),'orden del menú: '+' | '.join(orden))
     cerrar_modal_codigo(pn)
     ok(esperar(lambda: pn.evaluate("document.getElementById('tuto').classList.contains('open')"),12),'aparece el tutorial de bienvenida')
     ok(pn.evaluate("document.getElementById('tuto-titulo')?document.getElementById('tuto-titulo').textContent:document.querySelector('#tuto h3,#tuto h2').textContent").startswith('Bienvenido a Aprende'),'el tutorial es el de Aprende Ajedrez')
