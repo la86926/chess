@@ -581,3 +581,15 @@ html[data-modo="oscuro"] .aa-app .aa-etapa.activa i{--panel2:#1b1f1c}
 #aa-reintentar svg{width:18px;height:18px}
 /* pantallas pequeñas: mascota y letra un poco más chicas para que entren más palabras por renglón */
 @media (max-width:360px){.aa-tutor{gap:.45rem}.aa-tutor-cara{width:40px;height:40px;flex-basis:40px}.aa-tutor-texto{font-size:.88rem}.aa-tutor-globo{padding:.65rem .7rem .6rem}}
+
+/* Ítem actual: el NÚMERO crece y se achica (el círculo no cambia de tamaño) y el anillo dorado brilla.
+   Con «Reducir movimiento» activado en el teléfono, el número no cambia de tamaño pero sí cambia
+   de color y el anillo sigue brillando (un cambio de luz, no de movimiento). */
+.aa-app .aa-etapa i b{display:inline-block;font-weight:inherit;line-height:1}
+.aa-app .aa-etapa.activa i b{animation:aaNumero 1.5s ease-in-out infinite}
+@keyframes aaNumero{0%,100%{transform:scale(1)}50%{transform:scale(1.38)}}
+@keyframes aaNumeroColor{0%,100%{color:inherit}50%{color:#E2A92B}}
+@media (prefers-reduced-motion:reduce){
+  .aa-app .aa-etapa.activa i{animation:aaLuciernaga2 2.6s ease-in-out infinite!important}
+  .aa-app .aa-etapa.activa i b{animation:aaNumeroColor 1.5s ease-in-out infinite}
+}
