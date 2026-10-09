@@ -36,24 +36,25 @@ L['N3-001']={
 L['N3-002']={
   tactica:true, motivo:'Desviación',
   objetivo:'Vas a aprender a ofrecer material para que un defensor abandone su tarea.',
-  idea:'En la **desviación** ofreces una pieza. Si el defensor rival la captura, **abandona** la casilla o la línea que protegía, y tú la aprovechas.',
-  descubre:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',di:'Tu peón de d7 quiere coronar, pero la torre de d8 lo frena. ¿Cómo la sacas de ahí?'},
+  idea:'En la **desviación** ofreces una pieza. Si el defensor rival la captura, **abandona** la pieza, la casilla o la línea que protegía, y tú la aprovechas.',
+  descubre:{fen:'rnbqkb1r/pp2pppp/5n2/8/2B1P3/2N5/PPP2PPP/R1BQK2R w - - 0 1',di:'Tu dama de d1 mira a la dama negra de d8. ¿Quién la defiende?'},
   observa:[
-    {marcas:[['d8','clave']],di:'La torre de d8 tiene un trabajo: frenar tu peón.',sencillo:'La torre tapa al peón.'},
-    {jugada:'c1c8',flechas:[['c8','d8','ataque']],di:'Tc8!: ofreces tu torre. Parece un regalo.',sencillo:'Tu torre se ofrece.'},
-    {jugada:'d8c8',di:'…Txc8: la torre negra acepta… y abandona d8.',sencillo:'La torre negra se la come y deja libre d8.'},
-    {jugada:'d7c8q',marcas:[['g8','jaque']],di:'dxc8=D#: el peón corona con mate. (Si las negras no aceptan, Txd8+ gana la torre).',sencillo:'¡Corona con mate!'}
+    {flechas:[['d1','d8','ataque']],marcas:[['d8','amenazada']],di:'Tu dama ataca a la dama negra por la columna d.',sencillo:'Tu dama mira a la dama negra.'},
+    {flechas:[['e8','d8','defensa']],marcas:[['e8','clave']],di:'Su único defensor es el **rey** de e8.',sencillo:'Solo el rey cuida a la dama.'},
+    {jugada:'c4f7',marcas:[['e8','jaque']],di:'Axf7+!: ofreces el alfil con jaque.',sencillo:'El alfil se entrega con jaque.'},
+    {jugada:'e8f7',di:'…Rxf7: es la única jugada legal. Al capturar, el rey abandona a su dama.',sencillo:'El rey se come el alfil y deja sola a la dama.'},
+    {jugada:'d1d8',di:'Dxd8: ganas la dama por un alfil.',sencillo:'¡Te comes la dama!'}
   ],
-  comprende:{di:'Pregúntate qué protege cada pieza rival. Ofrécele algo que la obligue a dejar su puesto.'},
-  practica:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',linea:['c1c8','d8c8','d7c8q'],meta:'mate',
-    di:'Desvía a la torre que frena tu peón.',pistas:['Ofrece tu torre en la octava fila.'],
-    bien:'¡Mate! Y si no aceptan el sacrificio, Txd8+ gana la torre.'},
-  hazlo:{fen:'5rk1/ppb1qppp/5n2/8/8/2NB3Q/PP3PPP/R5K1 w - - 0 1',linea:['c3d5','f6d5','h3h7'],meta:'mate',
-    di:'El caballo de f6 defiende h7. Desvíalo con un sacrificio.',pistas:['Pon una pieza donde el caballo pueda capturarla.','Busca una casilla que además ataque a la dama.'],
-    bien:'¡Mate! Si no capturan, Cxe7+ gana la dama.'},
-  comprueba:{fen:'r5k1/pp3ppp/2nb3q/8/8/5N2/PPB1QPPP/5RK1 b - - 0 1',linea:['c6d4','f3d4','h6h2'],meta:'mate',
-    di:'Juegas con negras. El caballo de f3 defiende h2. Desvíalo.',pistas:['Ofrece tu caballo donde también ataque a la dama.'],
-    bien:'¡Correcto! …Cd4: si Cxd4, …Dxh2#; si no, …Cxe2+.'}
+  comprende:{di:'Pregúntate qué protege cada pieza rival, incluso el rey. Ofrécele algo que la obligue a dejar su puesto.'},
+  practica:{fen:'rnbqkb1r/pp2pppp/5n2/8/2B1P3/2N5/PPP2PPP/R1BQK2R w - - 0 1',linea:['c4f7','e8f7','d1d8'],
+    di:'Desvía al único defensor de la dama negra.',pistas:['El rey de e8 defiende a su dama.','Ofrece una pieza con jaque.'],
+    bien:'¡Bien! El rey capturó y dejó sola a su dama.'},
+  hazlo:{fen:'8/3P4/8/k2r4/8/6R1/5K2/8 w - - 0 1',linea:['g3g5','d5g5','d7d8q','a5b5','d8g5'],
+    di:'La torre negra frena tu peón. Desvíala y corona.',pistas:['La torre negra está en la misma fila que su rey.','Ofrece tu torre en esa fila.'],
+    bien:'¡Correcto! Si …Txg5, d8=D+ y Dxg5. Si la torre deja la columna d, coronas igual.'},
+  comprueba:{fen:'4r1k1/1p1q1ppp/p2p1P2/1n1P4/1P1Q4/6P1/P4PKP/4R3 w - - 0 3',linea:['d4g4','d7g4','e1e8'],meta:'mate',
+    di:'La dama negra defiende la torre de e8. Desvíala.',pistas:['Ofrece tu dama donde la negra pueda capturarla.','Además amenazas Dxg7#.'],
+    bien:'¡Excelente! Si …Dxg4, Txe8#. Si …g6, Dxd7 gana la dama.'}
 };
 
 /* N3-003 · Atracción (Nivel IV, lección 3) */
