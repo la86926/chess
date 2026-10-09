@@ -88,15 +88,16 @@ try:
     frame3(pa).evaluate("document.dispatchEvent(new PointerEvent('pointerup'))")
     ok(esperar(lambda: activa(pb)=='app-frame-3'),'B pasa solo a Aprende Ajedrez')
     ok(esperar(lambda: frame3(pb) is not None and frame3(pb).evaluate("window.AAApp&&AAApp.estado.id")=='N2-010',12),'B abre la misma lección (N2-010)')
-    ok(esperar(lambda: frame3(pb).evaluate("AAApp.estado.etapa")=='practica'),'B queda en la misma etapa (Preguntas)')
+    ok(esperar(lambda: frame3(pb).evaluate("AAApp.estado.etapa")=='practica'),'B queda en la misma etapa (Práctica)')
     if frame3(pb) and frame3(pb).evaluate("AAApp.estado.id")!='N2-010':
         print('    depuración: B id',frame3(pb).evaluate("AAApp.estado.id+' '+AAApp.estado.etapa"),'| B ultimo',pb.evaluate("localStorage.getItem('aa_ultimo_v1')"),'| A ultimo',pa.evaluate("localStorage.getItem('aa_ultimo_v1')"))
     print('5. Con la sincronización activa, las etapas elegidas no «se corren» y no se salta de pestaña')
     fa,fb=frame3(pa),frame3(pb)
-    for g,e in [('teoria','descubre'),('repaso','comprueba'),('practica','hazlo'),('preguntas','comprende')]:
+    fa.evaluate("AAApp.estado.auto&&document.getElementById('aa-pausa').click()")   # sin reproducción automática: se prueba la elección manual
+    for g,e in [('teoria','descubre'),('repaso','comprueba'),('teoria','descubre'),('practica','practica')]:
         fa.evaluate("g=>document.querySelector('#aa-etapas [data-grupo=\"'+g+'\"]').click()",g); time.sleep(3)
         ok(fa.evaluate("AAApp.estado.etapa")==e,'A sigue en la etapa que eligió (%s)'%g)
-    ok(esperar(lambda: fb.evaluate("AAApp.estado.etapa")=='comprende',8),'B sigue a A hasta la última etapa elegida')
+    ok(esperar(lambda: fb.evaluate("AAApp.estado.etapa")=='practica',8),'B sigue a A hasta la última etapa elegida')
     fa.evaluate("document.querySelector('#tabs .tab[data-v=\"levels\"]').click()"); time.sleep(.5)
     fb.evaluate("document.querySelector('#aa-etapas [data-grupo=\"repaso\"]').click()"); time.sleep(3.5)
     ok(fa.evaluate("document.getElementById('v-levels').classList.contains('active')"),'A, mirando el Temario, no es devuelta a la lección cuando B avanza')
