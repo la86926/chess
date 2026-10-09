@@ -128,9 +128,13 @@ with sync_playwright() as p:
         ok(deshabilitado(pg,'#aa-adelante'),lid+': en el último ejercicio «›» debe estar apagado')
         ok(pg.evaluate("document.getElementById('aa-continuar').hidden"),lid+': al terminar no debe aparecer el botón negro')
         ok(pg.evaluate("(()=>{const b=document.getElementById('b-next-top');return b.hidden||b.classList.contains('aa-listo')})()"),lid+': al terminar, «Lección y» debe brillar')
-        primera=False
+        primera_leccion=primera; primera=False
         ok(pg.evaluate("id=>JSON.parse(localStorage.aa_progreso_v1).lecciones[id].estado",lid)=='completada',lid+': la lección no quedó completada')
-        ok(pg.evaluate("document.querySelectorAll('#aa-etapas .aa-etapa.hecha').length")==npasos,lid+': no todos los números quedaron en verde al terminar')
+        # los ejercicios resueltos quedan en verde; los pasos de Teoría solo si se miraron (no al pasar con «›»)
+        verdes=pg.evaluate("[...document.querySelectorAll('#aa-etapas .aa-etapa.hecha')].map(b=>+b.dataset.paso)")
+        ok(all(i in verdes for i in range(npasos-len(tareas),npasos)),lid+': los ejercicios resueltos no quedaron en verde')
+        if primera_leccion: ok(len(verdes)==npasos,lid+': con la reproducción automática, todos los pasos debían quedar en verde')
+        else: ok(not any(i in verdes for i in range(1,npasos-len(tareas))),lid+': pasos de Teoría en verde sin haberlos mirado (%s)'%verdes)
         ok(pg.evaluate("[document.getElementById('b-hint').disabled,document.getElementById('b-sol').disabled]")==[True,True],lid+': Pista y Solución deben apagarse al terminar')
         ok(len(errs)==n0,lid+': errores JS '+' | '.join(errs[n0:n0+2]))
         print(('✓ ' if not any(f.startswith(lid) for f in fallos) else '✗ ')+lid)

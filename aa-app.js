@@ -352,15 +352,26 @@ function irAPaso(i){
   if(p.etapa==='observa'&&A.etapa==='observa'&&A.demo){irPasoDemo(p.paso,p.paso===A.paso+1);guardarUltimo();pintarControles();return;}
   irAEtapa(p.etapa,p.etapa==='observa'?{paso:p.paso}:{});
 }
+/* Un paso de Teoría (exploración, demostración, resumen) queda en verde cuando se miró el tiempo
+   suficiente para leerlo; pasar por él con un clic no cuenta. Los ejercicios, solo al resolverlos. */
+function programarVisto(clave,ms){
+  clearTimeout(A.vistoT);
+  var id=A.id,etapa=A.etapa,paso=A.paso;
+  A.vistoT=setTimeout(function mirar(){
+    if(A.modo!=='leccion'||A.id!==id||A.etapa!==etapa||A.paso!==paso)return;
+    if(!leccionALaVista()){A.vistoT=setTimeout(mirar,700);return;}
+    marcarEtapa(clave);
+  },Math.round(Math.max(1500,ms*0.85)));
+}
 function pintarEtapas(){
   var nav=el('aa-etapas'),hechas=A.modo==='leccion'?etapasHechas(A.id):[];
   if(A.modo!=='leccion'||!tieneContenido(A.id)){nav.innerHTML='';nav.hidden=true;pintarRuta();return;}
   nav.hidden=false;
-  var ps=pasosDe(A.lec),actual=indicePaso(),obs=0,completa=estadoLeccion(A.id)==='completada';
+  var ps=pasosDe(A.lec),actual=indicePaso(),obs=0;
   nav.innerHTML=ps.map(function(p,i){
-    var h=completa||pasoHecho(p,hechas),act=i===actual;
+    var h=pasoHecho(p,hechas),act=i===actual;
     var nombre=p.etapa==='observa'?('Demostración '+(++obs)):NOMBRE_PASO[p.etapa];
-    return '<button type="button" class="aa-etapa'+(act?' activa':'')+(h?' hecha':'')+'" data-paso="'+i+'" aria-current="'+(act?'step':'false')+'" aria-label="Paso '+(i+1)+' de '+ps.length+': '+nombre+(h?' (hecho)':'')+'"><i>'+(i+1)+'</i></button>';
+    return '<button type="button" class="aa-etapa'+(act?' activa':'')+(h?' hecha':'')+'" data-paso="'+i+'" aria-current="'+(act?'step':'false')+'" aria-label="Paso '+(i+1)+' de '+ps.length+': '+nombre+(h?' (hecho)':'')+'"><i><b>'+(i+1)+'</b></i></button>';
   }).join('');
   ajustarPasos();
   pintarRuta();
@@ -470,7 +481,7 @@ function etapaDescubre(){
   /* el globo cabe en 4 renglones: el título de la lección ya dice de qué trata */
   tutor(d.di);
   botonContinuar('Ver la demostración');
-  marcarEtapa('descubre');
+  programarVisto('descubre',tiempoLectura(plano(tutorTexto.textContent)));
 }
 
 /* ---- 2. Observa (demostración paso a paso) ---- */
@@ -518,8 +529,8 @@ function mostrarPasoDemo(animarJugada){
   el('aa-paso-sig').disabled=A.paso>=A.demo.length-1;
   var ultimo=A.paso>=A.demo.length-1;
   botonContinuar(ultimo?'Continuar':'Siguiente paso');
-  marcarEtapa('observa:'+A.paso);
-  if(ultimo)marcarEtapa('observa');
+  programarVisto('observa:'+A.paso,duracionPaso());
+  pintarEtapas();
   renderHead();
   guardarUltimo();
   pintarControles();planificarAuto();
@@ -656,7 +667,7 @@ function etapaComprende(){
   /* cierre de la Teoría: tu tutor resume la idea sobre la última posición (sin preguntas) */
   tutor(c.di);
   botonContinuar('Ahora practica');
-  marcarEtapa('comprende');
+  programarVisto('comprende',tiempoLectura(plano(tutorTexto.textContent)));
 }
 
 /* ---- 4, 5, 6. Tareas ---- */
@@ -1013,7 +1024,7 @@ function revelarDescubre(resuelto,limpio){
   var acc=el('aa-tutor-acciones');
   if(cat&&!acc.querySelector('.aa-ir-leccion')){
     var b=document.createElement('button');b.type='button';b.className='aa-accion aa-ir-leccion';b.textContent='Ir a la lección';
-    b.onclick=function(){b.remove();abrirLeccion(it.leccion);};acc.insertBefore(b,el('aa-continuar'));
+    b.onclick=function(){b.remove();var ref=refActual();abrirLeccion(it.leccion,ref?opcionesItem(ref):{});};acc.insertBefore(b,el('aa-continuar'));
   }
   pintarStatsDescubre();
 }
@@ -1178,7 +1189,7 @@ function refFav(id,item){return item?id+'@'+item:id;}
 function partesFav(ref){var m=/^([^@]+)(?:@(\d+))?$/.exec(String(ref||''));return m?{id:m[1],item:m[2]?Number(m[2]):0}:{id:String(ref||''),item:0};}
 function refActual(){
   if(A.modo==='descubre'){
-    var it=A.descubreItem;if(!it||!it.revelado)return null;
+    var it=A.descubreItem;if(!it)return null;
     var k=String(it.clave||'').split(':'),l=LEC[it.leccion],i=(l&&k[0]===it.leccion)?pasosDe(l).map(function(p){return p.etapa;}).indexOf(k[1]):-1;
     return refFav(it.leccion,i>=0?i+1:1);
   }
@@ -1222,7 +1233,9 @@ function abrirModalFavorito(leccion){
   fv.sel=Object.assign({},fv.inicial);
   if(leccion.indexOf('@')<0&&leccion===A.id)leccion=fv.leccion=refActual()||leccion;
   var c=catalogoDe(partesFav(leccion).id);
-  el('aa-fv-leccion').innerHTML='<span>'+esc(etiquetaFav(leccion))+'</span>'+esc(c?c.titulo:leccion);
+  if(A.modo==='descubre'&&A.descubreItem&&!A.descubreItem.revelado)
+    el('aa-fv-leccion').innerHTML='<span>REPASO</span>Esta posición (su lección se revela al terminarla)';
+  else el('aa-fv-leccion').innerHTML='<span>'+esc(etiquetaFav(leccion))+'</span>'+esc(c?c.titulo:leccion);
   pintarListaFav();
   abrirFondo('aa-fav-modal');
   setTimeout(function(){var p=el('aa-fv-lista').querySelector('[role="checkbox"]');(p||el('aa-fv-guardar')).focus();},60);
