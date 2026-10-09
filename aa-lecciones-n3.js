@@ -3,99 +3,112 @@
 'use strict';
 var L=window.AA_LECCIONES=window.AA_LECCIONES||{};
 
-/* N3-001 · Rayos X */
+/* N3-001 · Rayos X (Nivel IV, lección 1) */
 L['N3-001']={
   tactica:true, motivo:'Rayos X',
-  objetivo:'Vas a aprender cómo una pieza ataca o defiende a través de una pieza rival: los rayos X.',
-  idea:'Con **rayos X**, una pieza actúa **a través de una pieza rival** que está en su misma línea. Cuando esa pieza rival se mueve o captura, la línea se abre y tu pieza entra en acción.',
-  descubre:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',di:'Tu torre de d1 mira la columna d, pero la torre negra de d5 está en medio. ¿Ve tu torre la casilla d8?'},
+  objetivo:'Vas a aprender que una pieza puede actuar a través de una pieza rival que está en medio.',
+  idea:'Hay **rayos X** cuando tu torre, alfil o dama actúa **a través de una pieza enemiga** interpuesta. Si esa pieza se mueve o captura, tu pieza de detrás entra en acción.',
+  descubre:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',di:'Tu torre de d1 mira hacia d8, pero la torre negra de d5 está en medio. ¿Sirve de algo tu torre?'},
   observa:[
-    {flechas:[['d1','d8','linea']],marcas:[['d5','clave'],['d8','clave']],di:'La torre de d1 apunta a d8 a través de la torre negra de d5: eso son los rayos X.',sencillo:'Tu torre mira a d8 aunque haya una pieza negra en medio.'},
-    {jugada:'a5d8',marcas:[['g8','jaque']],di:'Dd8+: parece que la dama se regala…',sencillo:'La dama da jaque en d8.'},
-    {jugada:'d5d8',di:'…Txd8: la torre negra captura y deja libre la columna d.',sencillo:'La torre negra se la come y abre la columna.'},
-    {jugada:'d1d8',marcas:[['g8','jaque']],di:'Txd8#: tu torre, que defendía d8 con rayos X, da mate.',sencillo:'¡Mate! Tu torre llega a d8.'}
+    {marcas:[['d5','clave']],di:'La torre negra de d5 está en medio de la columna d.',sencillo:'Hay una torre negra en medio.'},
+    {flechas:[['d1','d8','linea']],di:'Aun así, tu torre presiona d8 **a través** de la torre negra: son los rayos X.',sencillo:'Tu torre «ve» d8 a través de la torre negra.'},
+    {jugada:'a5d8',marcas:[['g8','jaque']],di:'Dd8+: la dama se ofrece en d8. El rey no tiene casillas.',sencillo:'La dama da jaque en d8.'},
+    {jugada:'d5d8',di:'…Txd8: es la única respuesta. Al capturar, la torre negra deja libre la columna d.',sencillo:'La torre negra captura y abre la columna.'},
+    {jugada:'d1d8',marcas:[['g8','jaque']],di:'Txd8#: tu torre, que defendía d8 con rayos X, da mate.',sencillo:'¡Mate!'}
   ],
-  comprende:{di:'Una pieza rival en medio de tu línea no siempre la corta: si se mueve, tu pieza de detrás entra en juego.'},
+  comprende:{di:'Una pieza rival en tu línea no siempre la corta: si captura o se mueve, tu pieza de detrás actúa.'},
   practica:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',linea:['a5d8','d5d8','d1d8'],meta:'mate',
-    di:'Mate en dos con rayos X.',pistas:['Tu torre de d1 defiende d8 a través de la torre negra.','Da jaque en d8 con la dama.'],
-    bien:'¡Mate! Dd8+, Txd8 y Txd8#.'},
+    di:'Mate en dos con rayos X.',pistas:['Tu torre defiende d8 a través de la torre negra.','Da jaque en d8.'],
+    bien:'¡Mate! La única defensa, …Txd8, abrió la columna a tu torre.'},
   hazlo:{fen:'3r2k1/1Q3pp1/7p/8/q2R4/4P3/P4PPP/6K1 b - - 0 1',linea:['a4d1','d4d1','d8d1'],meta:'mate',
-    di:'Juegas con negras. Mate en dos con rayos X.',pistas:['Tu torre de d8 defiende d1 a través de la torre blanca.'],
+    di:'Juegas con negras. Mate en dos con rayos X.',pistas:['Tu torre de d8 actúa a través de la torre blanca.'],
     bien:'¡Correcto! …Dd1+, Txd1 y …Txd1#.'},
   comprueba:{fen:'1k6/ppp4p/3p4/4r2Q/8/P7/1PP3q1/1K2R3 w - - 0 1',linea:['h5e8','e5e8','e1e8'],meta:'mate',
-    di:'Ahora en la columna e. Mate en dos.',pistas:['Tu torre de e1 ve e8 a través de la torre negra.'],
+    di:'Encuentra el mate en dos.',pistas:['¿Qué ve tu torre de e1 a través de la torre negra?'],
     bien:'¡Excelente! De8+, Txe8 y Txe8#.'}
 };
 
-/* N3-002 · Desviación */
+/* N3-002 · Desviación (Nivel IV, lección 2) */
 L['N3-002']={
   tactica:true, motivo:'Desviación',
-  objetivo:'Vas a aprender a apartar a un defensor de su tarea.',
-  idea:'La **desviación** obliga a una pieza rival a dejar la casilla o la línea que defendía. Muchas veces se consigue con un **sacrificio** o un ataque.',
-  descubre:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',di:'Tu peón de d7 quiere coronar, pero la torre negra de d8 le cierra el paso. ¿Puedes apartarla?'},
+  objetivo:'Vas a aprender a ofrecer material para que un defensor abandone su tarea.',
+  idea:'En la **desviación** ofreces una pieza. Si el defensor rival la captura, **abandona** la casilla o la línea que protegía, y tú la aprovechas.',
+  descubre:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',di:'Tu peón de d7 quiere coronar, pero la torre de d8 lo frena. ¿Cómo la sacas de ahí?'},
   observa:[
-    {marcas:[['d8','clave']],di:'La torre de d8 bloquea al peón.',sencillo:'La torre tapa al peón.'},
-    {jugada:'c1c8',flechas:[['c8','d8','ataque']],di:'Tc8!: la torre ataca a la de d8 y la desvía.',sencillo:'Tu torre ataca a la suya.'},
-    {jugada:'d8c8',di:'…Txc8: si la captura, deja libre d8.',sencillo:'Si se la come, se aparta.'},
-    {jugada:'d7c8q',marcas:[['g8','jaque']],di:'dxc8=D#: el peón corona con mate.',sencillo:'¡Corona con mate!'}
+    {marcas:[['d8','clave']],di:'La torre de d8 tiene un trabajo: frenar tu peón.',sencillo:'La torre tapa al peón.'},
+    {jugada:'c1c8',flechas:[['c8','d8','ataque']],di:'Tc8!: ofreces tu torre. Parece un regalo.',sencillo:'Tu torre se ofrece.'},
+    {jugada:'d8c8',di:'…Txc8: la torre negra acepta… y abandona d8.',sencillo:'La torre negra se la come y deja libre d8.'},
+    {jugada:'d7c8q',marcas:[['g8','jaque']],di:'dxc8=D#: el peón corona con mate. (Si las negras no aceptan, Txd8+ gana la torre).',sencillo:'¡Corona con mate!'}
   ],
-  comprende:{di:'Pregúntate qué hace cada pieza rival. Si defiende algo importante, ¿puedes obligarla a irse?'},
-  practica:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',linea:['c1c8'],
-    di:'Desvía a la torre que bloquea a tu peón.',pistas:['Ataca a la torre de d8 desde c8.'],
-    bien:'¡Bien! Si …Txc8, dxc8=D+; si no, Txd8+.'},
-  hazlo:{fen:'2r3k1/5ppp/8/8/8/8/3p1PPP/3R2K1 b - - 0 1',linea:['c8c1'],
-    di:'Juegas con negras. Desvía a la torre que bloquea a tu peón.',pistas:['Ataca a la torre de d1 desde c1.'],
-    bien:'¡Correcto! La torre blanca no puede seguir tapando d1.'},
-  comprueba:{fen:'r2q1rk1/pp3ppp/5n2/8/4P3/3B3Q/PP3PPP/R4RK1 w - - 0 1',linea:['e4e5'],
-    di:'El caballo de f6 defiende h7. Desvíalo.',pistas:['Tu dama y tu alfil apuntan a h7.','Ataca al caballo con un peón.'],
-    bien:'¡Excelente! e5: si el caballo se va, Dxh7+ llega con fuerza.'}
+  comprende:{di:'Pregúntate qué protege cada pieza rival. Ofrécele algo que la obligue a dejar su puesto.'},
+  practica:{fen:'3r2k1/3P1ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1',linea:['c1c8','d8c8','d7c8q'],meta:'mate',
+    di:'Desvía a la torre que frena tu peón.',pistas:['Ofrece tu torre en la octava fila.'],
+    bien:'¡Mate! Y si no aceptan el sacrificio, Txd8+ gana la torre.'},
+  hazlo:{fen:'5rk1/ppb1qppp/5n2/8/8/2NB3Q/PP3PPP/R5K1 w - - 0 1',linea:['c3d5','f6d5','h3h7'],meta:'mate',
+    di:'El caballo de f6 defiende h7. Desvíalo con un sacrificio.',pistas:['Pon una pieza donde el caballo pueda capturarla.','Busca una casilla que además ataque a la dama.'],
+    bien:'¡Mate! Si no capturan, Cxe7+ gana la dama.'},
+  comprueba:{fen:'r5k1/pp3ppp/2nb3q/8/8/5N2/PPB1QPPP/5RK1 b - - 0 1',linea:['c6d4','f3d4','h6h2'],meta:'mate',
+    di:'Juegas con negras. El caballo de f3 defiende h2. Desvíalo.',pistas:['Ofrece tu caballo donde también ataque a la dama.'],
+    bien:'¡Correcto! …Cd4: si Cxd4, …Dxh2#; si no, …Cxe2+.'}
 };
 
-/* N3-003 · Atracción */
+/* N3-003 · Atracción (Nivel IV, lección 3) */
 L['N3-003']={
   tactica:true, motivo:'Atracción',
-  objetivo:'Vas a aprender a atraer una pieza rival a una casilla mala para ella.',
-  idea:'La **atracción** obliga a una pieza rival a ir a una casilla concreta, casi siempre con un **sacrificio**. Allí la espera un tenedor, una clavada o un mate.',
-  descubre:{fen:'7k/4q1pp/8/6N1/8/8/5PPP/3R2K1 w - - 0 1',di:'Si la dama negra estuviera en d8, tu caballo le daría un tenedor desde f7. ¿Puedes llevarla allí?'},
+  objetivo:'Vas a aprender a atraer al rey rival, con sacrificios, hacia una red de mate.',
+  idea:'En la **atracción** ofreces material para **llevar al rey** a una casilla peligrosa. A veces, varios sacrificios seguidos lo sacan de su refugio hasta el mate.',
+  descubre:{fen:'rn3rk1/pbppq1pp/1p2pb2/4N2Q/3PN3/3B4/PPP2PPP/R3K2R w KQ - 6 11',di:'Lasker contra Thomas, Londres 1912. El rey negro parece seguro en su enroque. Mira lo que pasa.'},
   observa:[
-    {flechas:[['g5','f7','mov'],['e7','f7','defensa']],marcas:[['f7','clave']],di:'Ahora Cf7+ no sirve: la dama de e7 vigila f7.',sencillo:'Todavía no hay tenedor.'},
-    {jugada:'d1d8',marcas:[['h8','jaque']],di:'Td8+: un sacrificio con jaque.',sencillo:'La torre se ofrece con jaque.'},
-    {jugada:'e7d8',di:'…Dxd8: la dama fue atraída a d8.',sencillo:'La dama se come la torre.'},
-    {jugada:'g5f7',flechas:[['f7','d8','ataque']],marcas:[['h8','jaque'],['d8','amenazada']],di:'Cf7+: tenedor al rey y a la dama.',sencillo:'¡Tenedor! Rey y dama.'}
+    {jugada:'h5h7',marcas:[['g8','jaque']],di:'Dxh7+!!: la dama se sacrifica para sacar al rey.',sencillo:'¡La dama se entrega!'},
+    {jugada:'g8h7',di:'…Rxh7: única jugada. El rey sale de su refugio.',sencillo:'El rey se come la dama.'},
+    {jugada:'e4f6',marcas:[['h7','jaque']],di:'Cxf6+: jaque doble. El rey tiene que avanzar.',sencillo:'Jaque doble.'},
+    {jugada:'h7h6',di:'…Rh6',sencillo:'El rey baja.'},
+    {jugada:'e5g4',marcas:[['h6','jaque']],di:'Ceg4+',sencillo:'Otro jaque.'},
+    {jugada:'h6g5',di:'…Rg5',sencillo:'El rey sigue bajando.'},
+    {jugada:'h2h4',marcas:[['g5','jaque']],di:'h4+',sencillo:'Jaque de peón.'},
+    {jugada:'g5f4',di:'…Rf4',sencillo:'Más abajo.'},
+    {jugada:'g2g3',marcas:[['f4','jaque']],di:'g3+',sencillo:'Otro jaque de peón.'},
+    {jugada:'f4f3',di:'…Rf3: el rey ya está en el campo blanco.',sencillo:'El rey llegó al campo blanco.'},
+    {jugada:'d3e2',marcas:[['f3','jaque']],di:'Ae2+',sencillo:'Jaque de alfil.'},
+    {jugada:'f3g2',di:'…Rg2',sencillo:'El rey sigue huyendo.'},
+    {jugada:'h1h2',marcas:[['g2','jaque']],di:'Th2+',sencillo:'Jaque de torre.'},
+    {jugada:'g2g1',di:'…Rg1: el rey llegó a la primera fila.',sencillo:'El rey acaba en g1.'},
+    {jugada:'e1d2',marcas:[['g1','jaque']],di:'Rd2#: ¡mate! El rey negro recorrió todo el tablero.',sencillo:'¡Mate en el otro extremo del tablero!'}
   ],
-  comprende:{di:'¿En qué casilla quiero a la pieza rival? Busca un jaque o una captura que la obligue a ir allí.'},
-  practica:{fen:'7k/4q1pp/8/6N1/8/8/5PPP/3R2K1 w - - 0 1',linea:['d1d8','e7d8','g5f7'],
-    di:'Atrae la dama a d8 y gánala.',pistas:['Sacrifica la torre con jaque.','Después, el caballo da el tenedor.'],
-    bien:'¡Muy bien! Td8+, Dxd8 y Cf7+.'},
-  hazlo:{fen:'3r2k1/5ppp/8/8/6n1/8/4Q1PP/7K b - - 0 1',linea:['d8d1','e2d1','g4f2'],
-    di:'Juegas con negras. Atrae la dama blanca y gánala.',pistas:['Sacrifica la torre en d1 con jaque.'],
-    bien:'¡Correcto! …Td1+, Dxd1 y …Cf2+.'},
-  comprueba:{fen:'k7/pp1q4/8/1N6/8/8/5PPP/4R1K1 w - - 0 1',linea:['e1e8','d7e8','b5c7'],
-    di:'Atrae la dama negra a una casilla de tenedor.',pistas:['Da jaque en la octava fila.','El caballo puede saltar a c7.'],
-    bien:'¡Excelente! Te8+, Dxe8 y Cc7+.'}
+  comprende:{di:'Un sacrificio con jaque saca al rey de su refugio; los jaques siguientes lo arrastran hacia la red de mate.'},
+  practica:{fen:'rn3rk1/pbppq1pp/1p2pb2/4N2Q/3PN3/3B4/PPP2PPP/R3K2R w KQ - 6 11',linea:['h5h7','g8h7','e4f6'],
+    di:'Saca al rey negro de su refugio.',pistas:['Sacrifica la dama en h7.','Después, un jaque doble de caballo.'],
+    bien:'¡Bien! Dxh7+ y Cxf6+: el rey ya no tiene refugio.'},
+  hazlo:{fen:'rn3r2/pbppq1p1/1p2pN1k/4N3/3P4/3B4/PPP2PPP/R3K2R w KQ - 1 13',linea:['e5g4','h6g5','f2f4'],acepta:{2:['h2h4']},
+    di:'El rey negro está en h6. Sigue atrayéndolo con jaques.',pistas:['El caballo de e5 puede dar jaque.','Después, un peón da jaque.'],
+    bien:'¡Correcto! Cada jaque arrastra al rey hacia tu campo.'},
+  comprueba:{fen:'1k6/ppp5/4r3/8/q7/8/PPPn4/KR6 b - - 0 1',linea:['a4a2','a1a2','e6a6'],meta:'mate',
+    di:'Juegas con negras. Atrae al rey blanco y da mate en dos.',pistas:['Sacrifica la dama en a2.','Tu caballo vigila b1 y b3.'],
+    bien:'¡Excelente! …Dxa2+, Rxa2 y …Ta6#.'}
 };
 
-/* N3-004 · Sobrecarga */
+/* N3-004 · Sobrecarga (Nivel IV, lección 4) */
 L['N3-004']={
   tactica:true, motivo:'Sobrecarga',
-  objetivo:'Vas a aprender a aprovechar una pieza que tiene demasiadas tareas.',
-  idea:'Una pieza está **sobrecargada** cuando defiende dos cosas a la vez. Si la obligas a cumplir una tarea, abandona la otra.',
-  descubre:{fen:'3r2k1/5ppp/8/3q4/8/3Q4/5PPP/4R1K1 w - - 0 1',di:'La torre negra de d8 tiene dos trabajos. ¿Cuáles son?'},
+  objetivo:'Vas a aprender a aprovechar una pieza que tiene dos tareas a la vez.',
+  idea:'Una pieza está **sobrecargada** cuando defiende **dos cosas** a la vez. Si la obligas a cumplir una tarea, **abandona la otra**.',
+  descubre:{fen:'6k1/r3qppp/8/8/Q7/7P/5PP1/3R2K1 w - - 0 1',di:'La dama negra de e7 parece muy fuerte. ¿Cuántas cosas está defendiendo?'},
   observa:[
-    {flechas:[['d8','d5','defensa'],['d8','e8','defensa']],marcas:[['d8','clave']],di:'La torre de d8 defiende a su dama y, a la vez, la casilla e8.',sencillo:'La torre hace dos trabajos.'},
-    {jugada:'d3d5',flechas:[['d5','d8','ataque']],di:'Dxd5!: si la torre recaptura, deja de vigilar e8.',sencillo:'Captura la dama: ¿y ahora qué hace la torre?'},
-    {jugada:'d8d5',di:'…Txd5?',sencillo:'La torre se come la dama.'},
-    {jugada:'e1e8',marcas:[['g8','jaque']],di:'Te8#: la torre ya no defendía la última fila.',sencillo:'¡Mate! La torre no podía hacer las dos cosas.'}
+    {flechas:[['e7','a7','defensa']],di:'Primera tarea: la dama defiende la torre de a7.',sencillo:'La dama cuida la torre.'},
+    {flechas:[['e7','d8','defensa']],marcas:[['d8','clave']],di:'Segunda tarea: vigila d8, la casilla del mate de tu torre.',sencillo:'También cuida la última fila.'},
+    {jugada:'a4a7',di:'Dxa7!: la dama negra tiene que elegir.',sencillo:'Te comes la torre.'},
+    {jugada:'e7a7',di:'…Dxa7: cumple la primera tarea…',sencillo:'La dama negra recaptura.'},
+    {jugada:'d1d8',marcas:[['g8','jaque']],di:'…y abandona la segunda: Td8#. (Si no recaptura, te quedas con la torre).',sencillo:'¡Mate! No podía hacer las dos cosas.'}
   ],
-  comprende:{di:'Busca piezas que defiendan dos cosas. Ataca una de ellas y la otra quedará sin protección.'},
-  practica:{fen:'3r2k1/5ppp/8/3q4/8/3Q4/5PPP/4R1K1 w - - 0 1',linea:['d3d5'],
-    di:'Aprovecha la torre sobrecargada de d8.',pistas:['La torre defiende la dama y la última fila.'],
-    bien:'¡Bien! Si …Txd5, Te8#. Y si no, ganaste la dama.'},
-  hazlo:{fen:'4r1k1/5ppp/3q4/8/3Q4/8/5PPP/3R2K1 b - - 0 1',linea:['d6d4'],
-    di:'Juegas con negras. La torre de d1 está sobrecargada. Aprovéchalo.',pistas:['Captura la dama blanca.'],
-    bien:'¡Correcto! Si Txd4, …Te1#.'},
-  comprueba:{fen:'2r3k1/2q2ppp/8/8/8/2Q5/5PPP/3R2K1 w - - 0 1',linea:['c3c7'],
-    di:'La torre de c8 tiene dos tareas. Aprovéchalo.',pistas:['Defiende a la dama y también la casilla d8.'],
+  comprende:{di:'Busca piezas con dos tareas. Ataca una: al cumplirla, dejará la otra sin protección.'},
+  practica:{fen:'6k1/r3qppp/8/8/Q7/7P/5PP1/3R2K1 w - - 0 1',linea:['a4a7','e7a7','d1d8'],meta:'mate',
+    di:'Aprovecha la dama sobrecargada.',pistas:['La dama defiende la torre de a7 y la casilla d8.'],
+    bien:'¡Mate! Y si no recaptura, ganas una torre.'},
+  hazlo:{fen:'3r2k1/5ppp/8/3q4/8/3Q4/5PPP/4R1K1 w - - 0 1',linea:['d3d5','d8d5','e1e8'],meta:'mate',
+    di:'Ahora la sobrecargada es una torre. Aprovéchalo.',pistas:['La torre de d8 defiende su dama y la última fila.'],
+    bien:'¡Correcto! Si …Txd5, Te8#; si no, ganas la dama.'},
+  comprueba:{fen:'2r3k1/2q2ppp/8/8/8/2Q5/5PPP/3R2K1 w - - 0 1',linea:['c3c7','c8c7','d1d8'],meta:'mate',
+    di:'Encuentra la pieza sobrecargada y aprovéchala.',pistas:['¿Qué dos cosas defiende la torre de c8?'],
     bien:'¡Excelente! Si …Txc7, Td8#.'}
 };
 
@@ -333,16 +346,16 @@ L['N3-008']={
   tactica:false,
   objetivo:'Vas a reconocer una cadena de peones y su punto débil: la base.',
   idea:'En una **cadena**, cada peón defiende al de delante en diagonal. El de más atrás, la **base**, no tiene quien lo defienda: es el mejor punto de ataque.',
-  descubre:{fen:'rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3',di:'Mira los peones blancos de d4 y e5. ¿Quién defiende a quién?'},
+  descubre:{fen:'rn1qkbnr/pp3ppp/2p1p3/3pPb2/3P4/5N2/PPP1BPPP/RNBQK2R b KQkq - 1 5',di:'Caro-Kann, variante del avance. Mira los peones blancos de d4 y e5. ¿Quién defiende a quién?'},
   observa:[
     {flechas:[['d4','e5','defensa']],marcas:[['d4','clave']],di:'El peón de d4 defiende al de e5. d4 es la **base** de la cadena.',sencillo:'d4 sostiene a e5.'},
-    {jugada:'c7c5',flechas:[['c5','d4','ataque']],di:'…c5: las negras atacan la base. Si cae d4, e5 queda solo.',sencillo:'Las negras atacan la base.'}
+    {jugada:'c6c5',flechas:[['c5','d4','ataque']],di:'…c5: las negras atacan la base, el plan típico de la Caro-Kann contra el avance. Si cae d4, e5 queda solo.',sencillo:'Las negras atacan la base.'}
   ],
   comprende:{di:'No ataques la punta de la cadena: ataca su base.'},
-  practica:{tipo:'casilla',fen:'rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3',casillas:['d4'],
+  practica:{tipo:'casilla',fen:'rn1qkbnr/pp3ppp/2p1p3/3pPb2/3P4/5N2/PPP1BPPP/RNBQK2R b KQkq - 1 5',casillas:['d4'],
     di:'Toca la base de la cadena blanca.',pista:'Es el peón de más atrás de la cadena d4–e5.',
     bien:'¡Correcto! d4 es la base.'},
-  hazlo:{tipo:'casilla',fen:'rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3',casillas:['e6'],
+  hazlo:{tipo:'casilla',fen:'rn1qkbnr/pp3ppp/4p3/2ppPb2/3P4/5N2/PPP1BPPP/RNBQK2R w KQkq - 0 6',casillas:['e6'],
     di:'Toca la base de la cadena negra.',pista:'La cadena negra es e6–d5.',
     bien:'¡Bien! e6 es la base de la cadena negra.'},
   comprueba:{tipo:'casilla',fen:'6k1/pp3ppp/8/4P3/3P4/2P5/PP3PPP/6K1 w - - 0 1',casillas:['c3'],
@@ -603,27 +616,29 @@ L['N3-019']={
 L['N3-020']={
   tactica:false,
   objetivo:'Vas a aprender qué hacer cuando ya desarrollaste tus piezas.',
-  idea:'Tras el desarrollo: saca la **última pieza**, coloca las **torres** en columnas útiles y gana **espacio** con los peones en el flanco donde quieras jugar.',
-  descubre:{fen:'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQ1RK1 w - - 0 7',di:'Ya enrocaste y casi todo está fuera. ¿Qué pieza falta? ¿Qué harías después?'},
+  idea:'Tras el desarrollo: saca la **última pieza**, coloca las **torres** en columnas útiles y lleva tus piezas a **casillas fuertes** del centro.',
+  descubre:{fen:'r1bq1rk1/p4ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP3PPP/RN1Q1RK1 w - - 0 9',di:'Sistema Londres: ya enrocaste y casi todo está fuera. ¿Qué pieza falta? ¿Qué harías después?'},
   observa:[
     {marcas:[['b1','clave']],di:'El caballo de b1 todavía no salió.',sencillo:'Falta una pieza.'},
     {jugada:'b1d2',di:'Cbd2: ahora todas las piezas menores están en juego.',sencillo:'El caballo sale.'},
-    {jugada:'a7a6',di:'…a6',sencillo:'Las negras esperan.'},
-    {jugada:'f1e1',di:'Te1: la torre apoya el peón de e4 y el centro.',sencillo:'La torre se acerca al centro.'}
+    {jugada:'c8b7',di:'…Ab7: las negras completan su desarrollo.',sencillo:'Las negras también terminan.'},
+    {jugada:'f1e1',flechas:[['e3','e4','mov']],di:'Te1: la torre se coloca detrás del peón de e3 y prepara su avance a e4.',sencillo:'La torre se acerca al centro.'},
+    {jugada:'a8c8',di:'…Tc8',sencillo:'Las negras mueven su torre.'},
+    {jugada:'f3e5',marcas:[['e5','clave']],di:'Ce5: el caballo ocupa e5, una casilla central fuerte. Es un plan típico del Londres.',sencillo:'El caballo salta al centro.'}
   ],
-  comprende:{di:'Primero, todas las piezas fuera. Después, torres al centro y peones para ganar espacio.'},
-  practica:{fen:'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQ1RK1 w - - 0 7',linea:['b1d2'],concepto:true,objetivoEquilibrio:true,
+  comprende:{di:'Primero, todas las piezas fuera. Después, torres al centro y piezas a casillas fuertes, como e5 en el Londres.'},
+  practica:{fen:'r1bq1rk1/p4ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP3PPP/RN1Q1RK1 w - - 0 9',linea:['b1d2'],concepto:true,objetivoEquilibrio:true,
     di:'Saca la pieza que falta.',pistas:['Mira la esquina de la izquierda.'],
     mal:{'*':'Todavía falta una pieza por salir. Búscala.'},
     bien:'¡Bien! Todas tus piezas menores están en juego.'},
-  hazlo:{fen:'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQ1RK1 w - - 0 7',linea:['f1e1'],concepto:true,objetivoEquilibrio:true,
-    di:'Pon una torre en la columna e, detrás de tu peón central.',pistas:['La torre de f1 está cerca.'],
+  hazlo:{fen:'r2q1rk1/pb3ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP1N1PPP/R2Q1RK1 w - - 2 10',linea:['f1e1'],concepto:true,objetivoEquilibrio:true,
+    di:'Pon una torre en la columna e, detrás de tu peón de e3.',pistas:['La torre de f1 está cerca.'],
     mal:{'*':'Lleva una torre a e1.'},
     bien:'¡Correcto! La torre apoya el centro.'},
-  comprueba:{fen:'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQ1RK1 w - - 0 7',linea:['b2b4'],acepta:{0:['a2a4']},concepto:true,objetivoEquilibrio:true,
-    di:'Gana espacio con un peón en el flanco de dama.',pistas:['Un peón puede atacar al alfil de c5.'],
-    mal:{'*':'Busca un avance de peón en el flanco de dama.'},
-    bien:'¡Muy bien! Ganas espacio en el flanco de dama.'}
+  comprueba:{fen:'2rq1rk1/pb3ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP1N1PPP/R2QR1K1 w - - 4 11',linea:['f3e5'],concepto:true,objetivoEquilibrio:true,
+    di:'Lleva una pieza a la casilla central fuerte e5.',pistas:['Tu caballo de f3 llega en un salto.'],
+    mal:{'*':'Busca la jugada que ocupa e5 con una pieza.'},
+    bien:'¡Muy bien! El caballo en e5 domina el centro.'}
 };
 
 /* N3-021 · Mejorar la peor pieza */

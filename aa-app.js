@@ -415,7 +415,7 @@ function abrirLeccion(id,opc){
   pararDemo();
   /* cada lección empieza reproduciéndose sola; si solo se sigue a otro dispositivo, queda en pausa
      (así dos pantallas abiertas a la vez no avanzan cada una por su cuenta) */
-  A.auto=!opc.seguir;pintarPausa();
+  A.auto=opc.auto!=null?!!opc.auto:!opc.seguir;pintarPausa();
   quitarBotonIrLeccion();
   A.modo='leccion';A.id=id;A.lec=LEC[id]||null;A.descubreItem=null;A.tarea=null;
   A.volverA=opc.volverA||null;
@@ -673,7 +673,7 @@ el('aa-adelante').onclick=function(){
   }
   navegarEtapa(1);
 };
-el('aa-pausa').onclick=function(){A.auto=!A.auto;pintarPausa();if(A.auto)planificarAuto();else cancelarAuto();};
+el('aa-pausa').onclick=function(){A.auto=!A.auto;pintarPausa();if(A.auto)planificarAuto();else cancelarAuto();if(A.modo==='leccion')guardarUltimo();};
 /* En Teoría el tablero está libre: si el alumno mueve una pieza, la lección se pausa para que explore tranquilo */
 boardEl.addEventListener('pointerdown',function(){
   if(A.auto&&A.modo==='leccion'&&A.etapa==='descubre'&&A.autoT){A.auto=false;cancelarAuto();pintarPausa();}
@@ -1098,12 +1098,22 @@ function guardarUltimo(){
   A.ultimaAccionT=Date.now();A.vistaAuto=false;
   clearTimeout(guardarUltimoT);
   guardarUltimoT=setTimeout(function(){
+    var jug=(A.tarea&&A.tarea.tipo==='jugada'&&!state.freemode)?state.step:0;
     var u={modo:A.modo,leccion:A.modo==='leccion'?A.id:(A.descubreItem&&A.descubreItem.leccion)||'',etapa:A.etapa||'',paso:A.paso||0,
-      jugadas:(A.tarea&&A.tarea.tipo==='jugada'&&!state.freemode)?state.step:0,t:Date.now()};
+      jugadas:jug,auto:!!A.auto,t:Date.now()};
+    /* «Mi lección»: la lección en curso se guarda aparte, para no perderla al practicar en Repaso */
+    u.mia=A.modo==='leccion'&&A.id?{leccion:A.id,etapa:A.etapa||'',paso:A.paso||0,jugadas:jug,auto:!!A.auto}:miLeccionGuardada();
     if(A.modo==='leccion'||A.modo==='descubre')D.guardar(K.ultimo,u);
   },250);
 }
 document.addEventListener('pointerup',function(){if(A.tarea&&A.tarea.tipo==='jugada')guardarUltimo();},true);
+/* La lección en curso (la de «Mi lección»), aunque lo último que se hizo fuera una posición de Repaso */
+function miLeccionGuardada(){
+  var u=D.leer(K.ultimo)||{};
+  if(u.mia&&u.mia.leccion&&catalogoDe(u.mia.leccion))return u.mia;
+  if(u.modo==='leccion'&&u.leccion&&catalogoDe(u.leccion))return {leccion:u.leccion,etapa:u.etapa||'',paso:u.paso||0,jugadas:u.jugadas||0,auto:u.auto};
+  return null;
+}
 function continuarAprendiendo(){
   var u=D.leer(K.ultimo);
   if(u.modo==='leccion'&&u.leccion&&catalogoDe(u.leccion)){abrirLeccion(u.leccion,{etapa:u.etapa||undefined,paso:u.paso,jugadas:u.jugadas,restaurando:true});return;}
@@ -1550,15 +1560,17 @@ function pintarVolver(){}
 /* =====================================================================
    Pestañas
    ===================================================================== */
-/* Pestañas: Temario, Mis favoritos, Explorar y Ayuda. La lección (vista «train») no tiene pestaña
-   propia: se abre dentro del Temario (o de Explorar / Mis favoritos) y esa pestaña queda marcada. */
+/* Pestañas: Mi lección, Temario, Mis favoritos, Repaso y Ayuda. La lección (vista «train») queda
+   marcada como «Mi lección»; una posición de Repaso, como «Repaso». */
 function pestanaMarcada(v){
   if(v!=='train')return v;
   if(A.modo==='descubre')return 'discover';
-  return A.volverA?'favs':'levels';
+  return 'mia';
 }
 function pestana(v){
   var m=pestanaMarcada(v);
+  /* al salir de la lección se recuerda dónde estaba la página, para volver justo ahí */
+  if(v!=='train'&&el('v-train').classList.contains('active'))A.yLeccion=window.scrollY;
   document.querySelectorAll('#tabs .tab').forEach(function(t){t.classList.toggle('active',t.dataset.v===m);});
   document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('active',x.id==='v-'+v);});
   document.body.classList.toggle('aa-en-leccion',v==='train');
@@ -1568,6 +1580,21 @@ function pestana(v){
   if(v!=='train'){pararDemo();quitarMascota();}
 }
 function irAPestanaLeccion(){pestana('train');}
+/* «Mi lección»: acceso directo permanente a la lección en curso. Si sigue abierta, se muestra tal cual
+   (tablero, jugadas, paso y progreso intactos); si no (se recargó la página o se estuvo en Repaso),
+   se recupera el punto guardado. Sin ninguna lección empezada, invita a elegir una en el Temario. */
+function irAMiLeccion(){
+  A.vistaAuto=false;
+  if(A.modo==='leccion'&&A.id){
+    pestana('train');
+    if(A.yLeccion!=null)window.scrollTo(0,A.yLeccion);
+    pintarControles();planificarAuto();
+    return;
+  }
+  var m=miLeccionGuardada();
+  if(m){abrirLeccion(m.leccion,{etapa:m.etapa||undefined,paso:m.paso,jugadas:m.jugadas,restaurando:true,auto:m.auto});window.scrollTo(0,0);return;}
+  pestana('mia');window.scrollTo(0,0);
+}
 function volverAlTemario(){
   var fila=document.querySelector('#aa-niveles .aa-ultima'),t=A.temario;
   if(t&&fila&&fila.dataset.leccion===t.id){window.scrollTo(0,t.y);return;}
@@ -1618,12 +1645,14 @@ function pintarAyudas(){
   h.disabled=!activo;so.disabled=!activo&&!sonando;
 }
 document.querySelectorAll('#tabs .tab').forEach(function(t){
-  t.onclick=function(){A.vistaAuto=false;var desde=document.body.classList.contains('aa-en-leccion');if(t.dataset.v==='favs'&&A.volverA&&desde)vf.carpeta=A.volverA.carpeta;pestana(t.dataset.v);
+  t.onclick=function(){if(t.dataset.v==='mia'){irAMiLeccion();return;}
+    A.vistaAuto=false;var desde=document.body.classList.contains('aa-en-leccion');if(t.dataset.v==='favs'&&A.volverA&&desde)vf.carpeta=A.volverA.carpeta;pestana(t.dataset.v);
     /* Temario: vuelve justo adonde estabas al abrir la lección (o a la última lección, sombreada) */
     if(t.dataset.v==='levels'&&desde){volverAlTemario();return;}
     window.scrollTo({top:0,behavior:'smooth'});};
 });
 el('b-home').onclick=function(){A.vistaAuto=false;pestana('levels');};
+el('aa-mia-temario').onclick=function(){A.vistaAuto=false;pestana('levels');window.scrollTo(0,0);};
 
 /* El libro (Explicación): análisis automático de la posición actual, como en PC1,
    precedido de la idea de la lección. */
@@ -1677,7 +1706,7 @@ var TOUR=[
   {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio.',sel:'#aa-fila-nav-izq'},
   {t:'Otras lecciones',x:'Aquí pasas a la lección anterior o a la siguiente.',sel:'.aa-fila-nav-der'},
   {t:'Guarda tus favoritos',x:'El corazón guarda el ítem que estás viendo (nivel, lección y número) en una o varias carpetas. Desde Mis favoritos vuelves justo a ese ítem.',sel:'#aa-corazon'},
-  {t:'Siempre a mano',x:'Las pestañas quedan arriba aunque bajes por la página. Toca «Temario» para volver a la lista de lecciones.',sel:'#tabs'},
+  {t:'Siempre a mano',x:'Las pestañas quedan siempre arriba. «Mi lección» te devuelve a tu lección tal como la dejaste; «Temario», a la lista.',sel:'#tabs'},
   {t:'Tu tablero',x:'Aquí eliges el tablero. Tus tableros favoritos y personalizados son los mismos en el Método PC1 y el Método PC2.',sel:'#pc-tablero-btn'},
   {t:'¡A aprender!',x:'Tu avance se guarda solo y, con tu ID, se sincroniza en tus dispositivos. Puedes volver a ver este recorrido desde Ayuda.',sel:null,fin:true}
 ];
@@ -1745,7 +1774,7 @@ function arrancar(){
   var u=D.leer(K.ultimo);
   A.sinGuardarUltimo=true;
   try{
-    if(u.modo==='leccion'&&u.leccion&&catalogoDe(u.leccion))abrirLeccion(u.leccion,{etapa:u.etapa||undefined,paso:u.paso,jugadas:u.jugadas,restaurando:true});
+    if(u.modo==='leccion'&&u.leccion&&catalogoDe(u.leccion))abrirLeccion(u.leccion,{etapa:u.etapa||undefined,paso:u.paso,jugadas:u.jugadas,restaurando:true,auto:u.auto});
     else{A.vistaAuto=true;pestana('levels');}
   }finally{A.sinGuardarUltimo=false;}
   var visto=false;try{visto=localStorage.getItem('aa_tour_visto_v1')==='1';}catch(e){}
@@ -1763,6 +1792,6 @@ function arrancar(){
 var bGuia=document.createElement('button');bGuia.type='button';bGuia.className='btn';bGuia.textContent='Ver el recorrido de nuevo';bGuia.onclick=abrirTour;
 var guia=el('v-guide').querySelector('.reading');if(guia)guia.appendChild(bGuia);
 
-window.AAApp={pasos:function(){return pasosDe(A.lec);},paso:function(){return indicePaso();},abrirLeccion:abrirLeccion,continuar:continuarAprendiendo,pestana:pestana,estado:A,abrirModalFavorito:abrirModalFavorito,abrirTour:abrirTour};
+window.AAApp={miLeccion:irAMiLeccion,pasos:function(){return pasosDe(A.lec);},paso:function(){return indicePaso();},abrirLeccion:abrirLeccion,continuar:continuarAprendiendo,pestana:pestana,estado:A,abrirModalFavorito:abrirModalFavorito,abrirTour:abrirTour};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrancar,{once:true});else arrancar();
 })();

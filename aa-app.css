@@ -712,3 +712,35 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 /* Temario: la última lección abierta queda sombreada */
 .aa-fila-leccion.aa-ultima{background:color-mix(in srgb,var(--ink) 10%,transparent);box-shadow:inset 3px 0 0 var(--acento-tema,var(--gold))}
 .aa-fila-leccion.aa-ultima:hover{background:color-mix(in srgb,var(--ink) 14%,transparent)}
+/* Cinco pestañas (Mi lección, Temario, Mis favoritos, Repaso, Ayuda): en pantallas muy estrechas caben en una fila */
+@media (max-width:360px){.aa-barra-fija .tabs{gap:1px;padding:4px}.aa-barra-fija .tabs .tab{padding:8px 3px;font-size:.69rem;letter-spacing:-.015em}}
+/* Fila de abajo algo más pequeña: Historial, Pista, Solución, «Lección x» y «Lección y» con la misma altura;
+   las de lección, más estrechas y con letra más pequeña (triángulo arriba, nombre debajo) */
+.aa-app .aa-fila-nav{align-items:center}
+.aa-app .aa-fila-nav .btn.aa-btn-icono,.aa-app .aa-fila-nav .btn.aa-btn-historial{width:42px;min-width:42px;height:42px;min-height:42px}
+.aa-app .aa-fila-nav .btn.aa-btn-sol{height:42px;min-height:42px}
+.aa-app .aa-fila-nav .btn.aa-btn-icono svg,.aa-app .aa-fila-nav .btn.aa-btn-historial svg{width:18px;height:18px}
+.aa-app .aa-fila-nav .btn.aa-btn-sol svg{width:17px;height:17px}
+.aa-app .aa-fila-nav .btn.aa-nav-lec{height:42px;min-height:42px;min-width:0;padding:0 .7rem;gap:.15rem;justify-content:center}
+.aa-app .aa-nav-lec b svg{width:15px;height:15px}
+.aa-app .aa-nav-lec span{font-size:.7rem;line-height:1}
+@media (max-width:560px){.aa-app .aa-fila-nav .btn.aa-btn-sol{width:42px;min-width:42px}}
+@media (max-width:360px){
+  .aa-app .aa-fila-nav .btn.aa-btn-icono,.aa-app .aa-fila-nav .btn.aa-btn-historial,.aa-app .aa-fila-nav .btn.aa-btn-sol,.aa-app .aa-fila-nav .btn.aa-nav-lec{height:38px;min-height:38px}
+  .aa-app .aa-fila-nav .btn.aa-btn-icono,.aa-app .aa-fila-nav .btn.aa-btn-historial,.aa-app .aa-fila-nav .btn.aa-btn-sol{width:38px;min-width:38px}
+  .aa-app .aa-fila-nav .btn.aa-nav-lec{padding:0 .5rem}
+  .aa-app .aa-nav-lec span{font-size:.66rem}
+}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .aa-fila-nav .btn,.aa-app .aa-fila-nav .btn.aa-nav-lec{height:42px;min-height:42px}
+  .aa-app .aa-fila-nav-izq>.aa-btn-icono,.aa-app .aa-fila-nav-izq>.aa-btn-historial{flex:0 0 48px;width:48px}
+  .aa-app .aa-fila-nav .btn.aa-btn-sol{width:auto}
+  .aa-app .aa-fila-nav-der>.btn.aa-nav-lec{flex-direction:row;gap:.4rem}
+  .aa-app .aa-nav-lec span{font-size:.78rem}
+}
+/* Temario en horizontal: el estado (icono + texto) alineado en todas las filas; el corazón, a su izquierda */
+@media (orientation:landscape) and (min-width:521px){
+  .aa-fila-leccion{grid-template-columns:2.1em 1fr 1.1em 7.6rem}
+  .aa-fila-leccion .aa-fl-fav{grid-column:3;grid-row:1;justify-self:center}
+  .aa-fila-leccion .aa-fl-est{grid-column:4;grid-row:1;justify-self:start}
+}

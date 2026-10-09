@@ -49,28 +49,29 @@ L['N4-003']={
     bien:'¡Excelente! Ab6+, Rb8 y Da7#.'}
 };
 
-/* N4-004 · Bloqueo */
+/* N4-004 · Bloqueo (Nivel IV, lección 6) */
 L['N4-004']={
   tactica:true, motivo:'Bloqueo',
   objetivo:'Vas a aprender a obligar a una pieza rival a tapar la salida de su propio rey.',
-  idea:'Con un **jaque**, obligas a una pieza rival a interponerse en una casilla que su rey necesitaba. Ese **bloqueo** prepara el mate.',
-  descubre:{fen:'6k1/pp3p1p/6pB/8/1b6/8/5PPP/3Q2K1 w - - 0 1',di:'Tu alfil de h6 vigila f8 y g7. ¿Y si una pieza negra tuviera que ponerse en f8?'},
+  idea:'En el **bloqueo** ofreces una pieza para que el rival la **capture**. La pieza que captura queda junto a su rey y le **quita la última salida**: llega el mate.',
+  descubre:{fen:'k1r5/pp6/N7/8/5Q2/8/PPP5/1K6 w - - 0 1',di:'El rey negro está en a8, rodeado de sus peones. Solo le queda una casilla libre. ¿Cuál?'},
   observa:[
-    {flechas:[['h6','f8','linea']],marcas:[['f8','clave'],['g7','clave']],di:'El alfil de h6 vigila g7 y f8.',sencillo:'El alfil cuida dos casillas.'},
-    {jugada:'d1d8',marcas:[['g8','jaque']],di:'Dd8+: el único modo de tapar el jaque es …Af8.',sencillo:'Jaque en la última fila.'},
-    {jugada:'b4f8',di:'…Af8: el alfil negro bloquea la casilla.',sencillo:'El alfil negro se pone en f8.'},
-    {jugada:'d8f8',marcas:[['g8','jaque']],di:'Dxf8#: la dama, protegida por el alfil, da mate.',sencillo:'¡Mate!'}
+    {marcas:[['b8','escape']],di:'La única salida del rey es b8.',sencillo:'El rey solo puede ir a b8.'},
+    {flechas:[['a6','c7','amenaza']],marcas:[['c7','clave']],di:'Tu caballo quiere dar jaque en c7, pero el rey escaparía por b8.',sencillo:'El caballo prepara un jaque.'},
+    {jugada:'f4b8',marcas:[['a8','jaque']],di:'Db8+!!: entregas la dama justo en la salida del rey.',sencillo:'¡La dama se ofrece en b8!'},
+    {jugada:'c8b8',marcas:[['b8','bloqueada']],di:'…Txb8: el rey no puede capturar (el caballo protege b8). La torre captura y tapa b8.',sencillo:'La torre se la come y tapa b8.'},
+    {jugada:'a6c7',marcas:[['a8','jaque']],di:'Cc7#: el rey está encerrado por sus propias piezas. ¡Mate!',sencillo:'¡Mate! Su propia torre lo encerró.'}
   ],
-  comprende:{di:'Un jaque que solo se puede tapar en una casilla mala obliga al rival a encerrarse.'},
-  practica:{fen:'6k1/pp3p1p/6pB/8/1b6/8/5PPP/3Q2K1 w - - 0 1',linea:['d1d8','b4f8','d8f8'],meta:'mate',
-    di:'Mate en dos.',pistas:['Da jaque en la última fila.','Si una pieza tapa en f8, captúrala.'],
-    bien:'¡Mate! Dd8+, Af8 y Dxf8#.'},
-  hazlo:{fen:'3q2k1/5ppp/8/1B6/8/6Pb/PP3P1P/6K1 b - - 0 1',linea:['d8d1','b5f1','d1f1'],meta:'mate',
-    di:'Juegas con negras. Mate en dos.',pistas:['Da jaque en la primera fila.'],
-    bien:'¡Correcto! …Dd1+, Af1 y …Dxf1#.'},
-  comprueba:{fen:'1k6/p1p3pp/Bp6/8/6b1/8/PPP5/1K2Q3 w - - 0 1',linea:['e1e8','g4c8','e8c8'],meta:'mate',
-    di:'Ahora en el otro flanco. Mate en dos.',pistas:['Tu alfil de a6 vigila b7 y c8.'],
-    bien:'¡Excelente! De8+, Ac8 y Dxc8#.'}
+  comprende:{di:'Si el rey rival solo tiene una salida, ofrece una pieza en esa casilla: la pieza que captura se la tapa.'},
+  practica:{fen:'k1r5/pp6/N7/8/5Q2/8/PPP5/1K6 w - - 0 1',linea:['f4b8','c8b8','a6c7'],meta:'mate',
+    di:'Mate en dos.',pistas:['Ofrece la dama en la única salida del rey.','Después, jaque de caballo.'],
+    bien:'¡Mate! Db8+, Txb8 y Cc7#.'},
+  hazlo:{fen:'r6k/pp4pp/7N/3Q4/8/8/1q4PP/6K1 w - - 0 1',linea:['d5g8','a8g8','h6f7'],meta:'mate',
+    di:'Tienes menos material, pero hay mate en dos.',pistas:['Ofrece la dama en g8.','El caballo da el último jaque.'],
+    bien:'¡Correcto! Dg8+, Txg8 y Cf7#: el mate de la coz.'},
+  comprueba:{fen:'1k6/ppp5/8/5q2/8/n7/PP6/K1R5 b - - 0 1',linea:['f5b1','c1b1','a3c2'],meta:'mate',
+    di:'Juegas con negras. Mate en dos.',pistas:['¿Cuál es la única salida del rey blanco?'],
+    bien:'¡Excelente! …Db1+, Txb1 y …Cc2#.'}
 };
 
 /* N4-022 · Mate de Greco */
@@ -456,17 +457,17 @@ L['N4-009']={
   tactica:false,
   objetivo:'Vas a aprender a ganar espacio con los peones.',
   idea:'Un peón **avanzado** en el centro quita casillas al rival y le deja **menos sitio** para sus piezas. Tus piezas se mueven mejor detrás de él.',
-  descubre:{fen:'rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3',di:'¿Avanzarías el peón de e4? ¿Qué casillas le quitaría a las negras?'},
+  descubre:{fen:'rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3',di:'Caro-Kann: 1.e4 c6 2.d4 d5. ¿Avanzarías el peón de e4? ¿Qué casillas le quitaría a las negras?'},
   observa:[
-    {jugada:'e4e5',flechas:[['e5','f6','ataque'],['e5','d6','ataque']],di:'e5: el peón quita f6 al caballo negro y gana espacio en el flanco de rey.',sencillo:'El peón avanza y quita casillas.'}
+    {jugada:'e4e5',flechas:[['e5','f6','ataque'],['e5','d6','ataque']],di:'e5 (variante del avance): el peón quita f6 al caballo negro y gana espacio en el flanco de rey.',sencillo:'El peón avanza y quita casillas.'}
   ],
   comprende:{di:'Con más espacio, tus piezas se mueven mejor y las del rival se estorban.'},
-  practica:{fen:'rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3',linea:['e4e5'],concepto:true,objetivoEquilibrio:true,
+  practica:{fen:'rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3',linea:['e4e5'],concepto:true,objetivoEquilibrio:true,
     di:'Gana espacio con un peón.',pistas:['Avanza el peón de e4.'],
     mal:{'*':'Busca el avance de peón que gana espacio.'},
     bien:'¡Bien! El peón de e5 gana espacio.'},
-  hazlo:{tipo:'casilla',fen:'rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3',casillas:['d6','f6'],
-    di:'Toca las casillas que vigila tu peón de e5.',pista:'Un peón vigila las dos casillas en diagonal delante de él.',
+  hazlo:{tipo:'casilla',fen:'rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3',casillas:['d6','f6'],
+    di:'Toca las casillas que vigila el peón blanco de e5.',pista:'Un peón vigila las dos casillas en diagonal delante de él.',
     bien:'¡Correcto! d6 y f6.'}
 };
 
@@ -475,12 +476,12 @@ L['N4-010']={
   tactica:false,
   objetivo:'Vas a aprender a ocupar el centro con peones y a reconocer un centro cerrado.',
   idea:'Dos peones en el **centro** (d4 y e4) controlan casillas clave. Si los peones de ambos bandos se **bloquean**, el centro está **cerrado** y el juego va a los flancos.',
-  descubre:{fen:'rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',di:'Las negras jugaron …e6. ¿Con qué peón completarías tu centro?'},
+  descubre:{fen:'rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',di:'Las negras jugaron 1…c6 (Caro-Kann). ¿Con qué peón completarías tu centro?'},
   observa:[
     {jugada:'d2d4',marcas:[['d4','clave'],['e4','clave']],di:'d4: dos peones en el centro.',sencillo:'Dos peones en el centro.'}
   ],
   comprende:{di:'Ocupa el centro con peones. Si se cierra, busca juego en el flanco hacia donde apuntan tus peones.'},
-  practica:{fen:'rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',linea:['d2d4'],concepto:true,objetivoEquilibrio:true,
+  practica:{fen:'rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',linea:['d2d4'],concepto:true,objetivoEquilibrio:true,
     di:'Completa tu centro de peones.',pistas:['El peón de d2.'],
     mal:{'*':'Pon un segundo peón en el centro.'},
     bien:'¡Bien! Centro de peones.'},
@@ -488,8 +489,8 @@ L['N4-010']={
     di:'Juegas con negras. Disputa el centro.',pistas:['Pon un peón frente al de d4, o vigila e4 con una pieza.'],
     mal:{'*':'Disputa el centro con un peón o con el caballo.'},
     bien:'¡Correcto! Luchas por el centro.'},
-  comprueba:{tipo:'casilla',fen:'rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3',casillas:['d4','e5','d5','e6'],
-    di:'Este centro está cerrado. Toca los cuatro peones centrales bloqueados.',pista:'Dos blancos y dos negros.',
+  comprueba:{tipo:'casilla',fen:'rn1qkbnr/pp3ppp/2p1p3/3pPb2/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 5',casillas:['d4','e5','d5','e6'],
+    di:'Caro-Kann, variante del avance: el centro está cerrado. Toca los cuatro peones centrales bloqueados.',pista:'Dos blancos y dos negros.',
     bien:'¡Excelente! Ninguno de ellos puede avanzar.'}
 };
 
@@ -686,28 +687,30 @@ L['N4-034']={
     di:'Juegas con negras. Toca tu peón pasado protegido.',pista:'Lo defiende otro peón.',bien:'¡Bien! El peón de d4.'}
 };
 
-/* N4-001 · Interferencia */
+/* N4-001 · Interferencia (Nivel IV, lección 5) */
 L['N4-001']={
   tactica:true, motivo:'Interferencia',
-  objetivo:'Vas a aprender a cortar la línea de un defensor rival interponiendo una pieza.',
-  idea:'En la **interferencia** colocas una pieza tuya **en medio** de la línea por la que el rival defiende algo. Si además da jaque o está protegida, el defensor queda inútil.',
-  descubre:{fen:'5rk1/pp3p1p/6pQ/8/4N3/6P1/PP5P/q4RK1 w - - 0 1',di:'Amenazas Dg7#, pero la dama negra de a1 defiende g7 por la gran diagonal. ¿Puedes cortarla?'},
+  objetivo:'Vas a aprender a cortar la línea de un defensor rival interponiendo una pieza que ofreces.',
+  idea:'En la **interferencia** pones una pieza **en medio** de la línea por la que el rival defiende algo. Si la captura, pierde material; si no, su defensa queda **cortada**.',
+  descubre:{fen:'2r3k1/pp3p1p/6pQ/5NP1/6N1/2q5/P5PP/7K w - - 0 1',di:'Tu dama y tu caballo de f5 apuntan a g7. ¿Por qué no das mate ya?'},
   observa:[
-    {flechas:[['a1','g7','linea']],marcas:[['g7','clave']],di:'La dama de a1 vigila g7 desde lejos, por la gran diagonal.',sencillo:'La dama negra defiende g7.'},
-    {jugada:'e4f6',marcas:[['g8','jaque'],['f6','clave']],di:'Cf6+: el caballo se interpone en la diagonal y da jaque. Si …Dxf6, Txf6.',sencillo:'El caballo corta la diagonal con jaque.'},
-    {jugada:'g8h8',di:'…Rh8',sencillo:'El rey se aparta.'},
-    {jugada:'h6f8',marcas:[['h8','jaque']],di:'Dxf8#: el caballo cubre g8 y h7. ¡Mate!',sencillo:'¡Mate!'}
+    {flechas:[['h6','g7','amenaza'],['f5','g7','defensa']],marcas:[['g7','clave']],di:'Amenazas Dg7#: el caballo de f5 protege esa casilla.',sencillo:'Quieres dar mate en g7.'},
+    {flechas:[['c3','g7','linea']],marcas:[['g7','clave']],di:'Pero la dama negra de c3 defiende g7 por la diagonal. Si Dg7+, …Dxg7.',sencillo:'La dama negra cuida g7 desde lejos.'},
+    {jugada:'g4f6',flechas:[['c3','f6','linea']],marcas:[['f6','clave'],['g8','jaque']],di:'Cf6+!: el caballo se pone en medio de la diagonal, con jaque. Lo ofreces.',sencillo:'El caballo corta la diagonal.'},
+    {flechas:[['h6','g7','amenaza']],marcas:[['g7','clave']],di:'Si …Rh8, la dama negra ya no llega a g7: Dg7#.',sencillo:'Si el rey se aparta, Dg7#.'},
+    {jugada:'c3f6',di:'…Dxf6: única forma de evitar el mate. La dama negra acepta el caballo…',sencillo:'La dama negra se come el caballo.'},
+    {jugada:'g5f6',flechas:[['h6','g7','amenaza']],di:'…y gxf6: ganas la dama por un caballo, y Dg7# vuelve a amenazar.',sencillo:'¡Ganas la dama!'}
   ],
-  comprende:{di:'Busca la línea por la que el rival defiende. Si puedes taparla con jaque o con una pieza protegida, la defensa desaparece.'},
-  practica:{fen:'5rk1/pp3p1p/6pQ/8/4N3/6P1/PP5P/q4RK1 w - - 0 1',linea:['e4f6','g8h8','h6f8'],meta:'mate',
-    di:'Corta la defensa de la dama negra. Mate en dos.',pistas:['Interponte en la gran diagonal con jaque.','Tu torre protege f6.'],
-    bien:'¡Mate! Cf6+ cortó la diagonal.'},
-  hazlo:{fen:'Q4rk1/pp5p/6p1/4n3/8/6Pq/PP3P1P/5RK1 b - - 0 1',linea:['e5f3','g1h1','h3f1'],meta:'mate',
-    di:'Juegas con negras. Corta la defensa de la dama blanca. Mate en dos.',pistas:['Interponte en la gran diagonal con jaque.'],
-    bien:'¡Correcto! …Cf3+ y …Dxf1#.'},
-  comprueba:{fen:'1kr5/p1p3pp/Qp6/8/3N4/1P6/P5PP/1KR4q w - - 0 1',linea:['d4c6','b8a8','a6c8'],meta:'mate',
-    di:'Ahora en el otro flanco. Mate en dos.',pistas:['La dama negra de h1 defiende b7 por la diagonal.'],
-    bien:'¡Excelente! Cc6+ y Dxc8#.'}
+  comprende:{di:'Busca la línea por la que el rival defiende. Tápala con una pieza: si la captura, pierde material; si no, la defensa desaparece.'},
+  practica:{fen:'2r3k1/pp3p1p/6pQ/5NP1/6N1/2q5/P5PP/7K w - - 0 1',linea:['g4f6','c3f6','g5f6'],
+    di:'Corta la defensa de la dama negra.',pistas:['Interponte en la diagonal c3–g7 con jaque.','Tu peón de g5 protege f6.'],
+    bien:'¡Bien! Si el rey se aparta, Dg7#; si captura, ganas la dama.'},
+  hazlo:{fen:'k7/pp5p/5Q2/1n6/1pn5/qP6/P1P3PP/1K3R2 b - - 0 1',linea:['b5c3','f6c3','b4c3'],
+    di:'Juegas con negras. Amenazas …Db2#, pero la dama de f6 lo impide. Córtala.',pistas:['Interponte en la diagonal f6–b2 con jaque.','Tu peón de b4 protege c3.'],
+    bien:'¡Correcto! Si Ra1, …Db2#; si Dxc3, bxc3.'},
+  comprueba:{fen:'1k3r2/p1p3pp/Qp6/1PN5/1N6/5q2/PP5P/K7 w - - 0 1',linea:['b4c6','f3c6','b5c6'],
+    di:'Ahora en el otro flanco. Corta la defensa.',pistas:['¿Por dónde defiende b7 la dama negra?'],
+    bien:'¡Excelente! Cc6+: si …Ra8, Db7#; si …Dxc6, bxc6.'}
 };
 
 /* N4-011 · Coordinación de piezas */
