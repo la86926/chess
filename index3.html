@@ -1977,7 +1977,7 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
 header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
 .boardhead{transition:padding-left .34s cubic-bezier(.32,.72,0,1)}
 </style>
-<link rel="stylesheet" href="aa-app.css?v=20261009-aa16">
+<link rel="stylesheet" href="aa-app.css?v=20261009-aa17">
 </head>
 <body class="aa-app">
 <header class="topbar">
@@ -2006,9 +2006,6 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
     <button class="tab" data-v="discover">Explorar</button>
     <button class="tab" data-v="guide">Ayuda</button>
   </nav>
-  <div class="aa-barra-volver">
-    <button class="aa-volver" id="aa-volver" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span id="aa-volver-texto">Volver al Temario</span></button>
-  </div>
 </div>
 
 <section class="view active" id="v-train">
@@ -2054,11 +2051,11 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
         <p class="aa-tutor-texto" id="aa-dice">¡Hola! Elige una lección para empezar.</p>
         <div class="aa-opciones" id="aa-opciones" role="group" hidden></div>
         <div class="aa-tutor-acciones" id="aa-tutor-acciones">
-          <!-- Controles de la lección: etapa anterior · pausar/reproducir · etapa siguiente -->
+          <!-- Controles de la lección: paso anterior · pausar/reproducir · paso siguiente -->
           <div class="aa-controles" id="aa-controles" role="group" aria-label="Controles de la lección" hidden>
-            <button class="aa-ctrl" id="aa-atras" type="button" aria-label="Etapa anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="aa-ctrl" id="aa-atras" type="button" aria-label="Paso anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
             <button class="aa-ctrl aa-ctrl-play" id="aa-pausa" type="button" aria-label="Pausar"><svg class="i-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span id="aa-pausa-txt">Pausar</span><i class="aa-cuenta" id="aa-cuenta" aria-hidden="true"></i></button>
-            <button class="aa-ctrl" id="aa-adelante" type="button" aria-label="Etapa siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+            <button class="aa-ctrl" id="aa-adelante" type="button" aria-label="Paso siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
           </div>
           <button class="aa-accion" id="aa-otra-vez" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Explícame otra vez</button>
           <button class="aa-accion" id="aa-reintentar" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Intentar de nuevo</button>
@@ -2230,14 +2227,14 @@ header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
   <h1>Cómo aprender aquí</h1>
   <p class="lead">Aprende Ajedrez enseña con el tablero: primero observas, luego practicas con ayuda y al final lo haces tú solo.</p>
 
-  <h2><span class="k">01</span> Las etapas de cada lección</h2>
-  <p><strong>1 Teoría</strong>: una posición para explorar, la demostración animada con flechas y casillas resaltadas, y un resumen de la idea. <strong>2 Práctica</strong>: ejercicios en el tablero, primero con ayuda y luego sin ella. <strong>3 Repaso</strong>: un último ejercicio y la idea clave de la lección. Todo se hace moviendo o tocando en el tablero. Toca cualquier etapa para ir a ella, aunque no hayas hecho las anteriores.</p>
+  <h2><span class="k">01</span> Los pasos de cada lección</h2>
+  <p>Cada número junto al tablero es <strong>un paso</strong> de la lección: primero exploras la posición, luego ves la demostración paso a paso y un resumen de la idea, y al final resuelves los ejercicios en el tablero. Cada número se pone verde cuando lo terminas. Toca cualquiera para ir a él, aunque no hayas hecho los anteriores.</p>
 
   <h2><span class="k">02</span> Señales sobre el tablero</h2>
   <p>Las señales significan siempre lo mismo y no dependen solo del color: la <strong>flecha continua dorada</strong> es una jugada; la <strong>roja con trazo grueso</strong>, un ataque; la <strong>roja discontinua</strong>, una amenaza del rival; la <strong>verde punteada</strong>, una defensa; la <strong>azul a trazos largos</strong>, una línea de influencia. Un anillo con <strong>!</strong> marca una pieza amenazada; con <strong>✓</strong>, una pieza defendida; con <strong>?</strong>, una pieza indefensa; un rombo marca una casilla clave. Debajo del tablero siempre ves la leyenda de lo que aparece.</p>
 
   <h2><span class="k">03</span> La lección avanza sola</h2>
-  <p>Cada lección se reproduce sola y se detiene en los ejercicios hasta que muevas o toques en el tablero. Con <strong>Pausar</strong> la detienes; con <strong>‹</strong> vuelves a la etapa anterior y con <strong>›</strong> pasas a la siguiente. Al terminar el último ejercicio aparece <strong>Siguiente lección</strong>.</p>
+  <p>Cada lección se reproduce sola y se detiene en los ejercicios hasta que muevas o toques en el tablero. Con <strong>Pausar</strong> la detienes; con <strong>‹</strong> y <strong>›</strong> pasas al número anterior o al siguiente. Al terminar el último ejercicio aparece <strong>Siguiente lección</strong>.</p>
 
   <h2><span class="k">04</span> Explorar</h2>
   <p>En la pestaña <strong>Explorar</strong> recibes posiciones sin saber qué táctica esconden, como en una partida real. Las pistas son graduales: primero una idea general, luego la pieza y, por último, la jugada. Al terminar descubres el nombre del motivo y puedes ir a su lección.</p>
@@ -7938,11 +7935,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="aa-catalogo.js?v=20261009-aa16"></script>
-<script src="aa-datos.js?v=20261009-aa16"></script>
-<script src="aa-lecciones-n1.js?v=20261009-aa16"></script>
-<script src="aa-lecciones-n2.js?v=20261009-aa16"></script>
-<script src="aa-app.js?v=20261009-aa16"></script>
+<script src="aa-catalogo.js?v=20261009-aa17"></script>
+<script src="aa-datos.js?v=20261009-aa17"></script>
+<script src="aa-lecciones-n1.js?v=20261009-aa17"></script>
+<script src="aa-lecciones-n2.js?v=20261009-aa17"></script>
+<script src="aa-app.js?v=20261009-aa17"></script>
 <script src="pc-mascota.js?v=9"></script>
 </body>
 </html>

@@ -223,6 +223,7 @@ function tutor(texto,tono){
   var limpio=plano(texto);
   if(limpio&&dichos[0]!==limpio){dichos.unshift(limpio);if(dichos.length>12)dichos.length=12;}
   var full=el('ref-full');if(full)full.innerHTML=dichos.map(function(d){return '<p>'+esc(d)+'</p>';}).join('');
+  pintarAyudas();
 }
 /* secundario=true: el botón queda discreto (p. ej. «Saltar ejercicio») para que lo principal sea mover en el tablero */
 function botonContinuar(texto,visible,secundario){
@@ -310,25 +311,65 @@ function marcarEtapa(etapa){
   pintarEtapas();renderHead();renderProgress();
 }
 
+/* ---- Pasos numerados ----
+   Cada número de la columna junto al tablero es UN solo paso de la lección:
+   1 exploración, uno por cada paso de la demostración, el resumen y uno por cada ejercicio.
+   ‹ y › (y la reproducción automática) avanzan de número en número. */
+var NOMBRE_PASO={descubre:'Exploración',comprende:'Resumen',practica:'Ejercicio',hazlo:'Ejercicio',comprueba:'Repaso'};
+function pasosDe(l){
+  if(!l)return [];
+  var out=[{etapa:'descubre',clave:'descubre'}];
+  (l.observa||[]).forEach(function(_,i){out.push({etapa:'observa',paso:i,clave:'observa:'+i});});
+  out.push({etapa:'comprende',clave:'comprende'});
+  tareasDe(l).forEach(function(k){out.push({etapa:k,clave:k});});
+  return out;
+}
+function indicePaso(){
+  var ps=pasosDe(A.lec);
+  for(var i=0;i<ps.length;i++){if(ps[i].etapa===A.etapa&&(A.etapa!=='observa'||ps[i].paso===A.paso))return i;}
+  return -1;
+}
+function pasoHecho(p,hechas){
+  if(hechas.indexOf(p.clave)>=0)return true;
+  /* avance guardado antes de numerar cada paso: la demostración entera contaba como «observa» */
+  return p.etapa==='observa'&&hechas.indexOf('observa')>=0;
+}
+function irAPaso(i){
+  var ps=pasosDe(A.lec),p=ps[i];if(!p)return;
+  if(p.etapa==='observa'&&A.etapa==='observa'&&A.demo){irPasoDemo(p.paso,p.paso===A.paso+1);guardarUltimo();pintarControles();return;}
+  irAEtapa(p.etapa,p.etapa==='observa'?{paso:p.paso}:{});
+}
 function pintarEtapas(){
   var nav=el('aa-etapas'),hechas=A.modo==='leccion'?etapasHechas(A.id):[];
   if(A.modo!=='leccion'||!tieneContenido(A.id)){nav.innerHTML='';nav.hidden=true;pintarRuta();return;}
   nav.hidden=false;
-  var completada=estadoLeccion(A.id)==='completada',g=grupoDe(A.etapa);
-  nav.innerHTML=gruposDe(A.lec).map(function(e,i){
-    var h=hechas.indexOf(e.hecha)>=0,act=g.k===e.k;
-    return '<button type="button" class="aa-etapa'+(act?' activa':'')+(h?' hecha':'')+'" data-grupo="'+e.k+'" aria-current="'+(act?'step':'false')+'"'+(h?' title="'+e.n+' · hecha"':'')+'><i>'+(i+1)+'</i><span>'+e.n+'</span></button>';
+  var ps=pasosDe(A.lec),actual=indicePaso(),obs=0;
+  nav.innerHTML=ps.map(function(p,i){
+    var h=pasoHecho(p,hechas),act=i===actual;
+    var nombre=p.etapa==='observa'?('Demostración '+(++obs)):NOMBRE_PASO[p.etapa];
+    return '<button type="button" class="aa-etapa'+(act?' activa':'')+(h?' hecha':'')+'" data-paso="'+i+'" aria-current="'+(act?'step':'false')+'" aria-label="Paso '+(i+1)+' de '+ps.length+': '+nombre+(h?' (hecho)':'')+'"><i>'+(i+1)+'</i></button>';
   }).join('');
-  /* centra la etapa activa solo en horizontal (scrollIntoView movía toda la página hacia arriba) */
-  var act=nav.querySelector('.activa');
-  if(act&&nav.scrollWidth>nav.clientWidth){var x=act.offsetLeft-(nav.clientWidth-act.offsetWidth)/2;try{nav.scrollTo({left:Math.max(0,x),behavior:'smooth'});}catch(e){nav.scrollLeft=Math.max(0,x);}}
+  ajustarPasos();
   pintarRuta();
 }
+/* tamaño de los círculos: caben todos a la altura del tablero (si son muchos, la columna se desplaza) */
+function ajustarPasos(){
+  var nav=el('aa-etapas');if(!nav||nav.hidden)return;
+  var n=nav.children.length;if(!n)return;
+  var alto=boardEl.getBoundingClientRect().height;if(!alto)return;
+  var ancho=window.innerWidth||800,maxT=ancho<=600?32:36,minT=ancho<=600?24:28,sep=ancho<=600?4:6;
+  var t=Math.max(minT,Math.min(maxT,Math.floor((alto-6-(n-1)*sep)/n)));
+  nav.style.setProperty('--aa-paso',t+'px');nav.style.setProperty('--aa-sep',sep+'px');
+  nav.style.maxHeight=Math.round(alto)+'px';
+  /* el paso actual siempre a la vista (solo dentro de la columna: la página no se mueve) */
+  var act=nav.querySelector('.activa');
+  if(act&&nav.scrollHeight>nav.clientHeight){var y=act.offsetTop-(nav.clientHeight-act.offsetHeight)/2;try{nav.scrollTo({top:Math.max(0,y),behavior:'smooth'});}catch(e){nav.scrollTop=Math.max(0,y);}}
+}
+window.addEventListener('resize',function(){clearTimeout(ajustarPasos.t);ajustarPasos.t=setTimeout(ajustarPasos,120);});
 el('aa-etapas').addEventListener('click',function(e){
-  var b=e.target.closest('[data-grupo]');if(!b)return;
-  var g=gruposDe(A.lec).filter(function(x){return x.k===b.dataset.grupo;})[0];
-  /* se abre siempre la etapa elegida, aunque no se hayan hecho las anteriores */
-  if(g)irAEtapa(g.etapas[0]);
+  var b=e.target.closest('[data-paso]');if(!b)return;
+  /* se abre siempre el paso elegido, aunque no se hayan hecho los anteriores */
+  irAPaso(Number(b.dataset.paso));
 });
 
 function pintarRuta(){
@@ -463,10 +504,11 @@ function mostrarPasoDemo(animarJugada){
   el('aa-paso-sig').disabled=A.paso>=A.demo.length-1;
   var ultimo=A.paso>=A.demo.length-1;
   botonContinuar(ultimo?'Continuar':'Siguiente paso');
+  marcarEtapa('observa:'+A.paso);
   if(ultimo)marcarEtapa('observa');
   renderHead();
   guardarUltimo();
-  planificarAuto();
+  pintarControles();planificarAuto();
 }
 function irPasoDemo(n,animado){
   if(!A.demo)return;
@@ -497,15 +539,9 @@ function duracionPaso(){
    En los ejercicios espera a que el alumno mueva o toque en el tablero; al resolverlos, sigue sola.
    El último ejercicio no avanza solo: al terminarlo aparece «Siguiente lección».
    «Pausar» detiene el avance; «‹» y «›» van a la etapa anterior o siguiente. */
-/* ‹ y › recorren las etapas que tiene la lección. En Teoría, ‹ queda apagado;
-   desde un ejercicio, ‹ vuelve al ejercicio anterior o, si no hay, al inicio de la Teoría. */
-function etapaVecina(d){
-  var et=etapasDe(A.lec),i=et.indexOf(A.etapa);if(i<0)return null;
-  if(d>0)return et[i+1]||null;
-  if(grupoDe(A.etapa).k==='teoria')return null;
-  for(var j=i-1;j>=0;j--){if(TAREAS.indexOf(et[j])>=0)return et[j];}
-  return 'descubre';
-}
+/* ‹ y › van al número anterior o siguiente (‹ apagado en el 1; › apagado en el último). */
+function pasoVecino(d){var i=indicePaso(),ps=pasosDe(A.lec);if(i<0)return -1;var j=i+d;return (j>=0&&j<ps.length)?j:-1;}
+function etapaVecina(d){var j=pasoVecino(d);return j<0?null:pasosDe(A.lec)[j].etapa;}
 function tiempoLectura(txt){return Math.round(Math.max(2600,Math.min(9000,1800+String(txt||'').length*45))/A.velocidad);}
 /* solo avanza si la lección se está viendo (no en otra sección del menú, ni con una ventana o el recorrido abiertos) */
 function leccionALaVista(){
@@ -532,13 +568,11 @@ function planificarAuto(){
   cancelarAuto();
   if(!A.auto||!enLeccionConContenido())return;
   var e=A.etapa;
-  if(e==='descubre')programarAuto(tiempoLectura(plano(tutorTexto.textContent)),function(){irAEtapa('observa');});
-  else if(e==='observa'&&A.demo){
-    var fin=A.paso>=A.demo.length-1;
-    programarAuto(duracionPaso(),function(){if(fin)irAEtapa('comprende');else irPasoDemo(A.paso+1,true);});
-  }
-  else if(e==='comprende')programarAuto(tiempoLectura(plano(tutorTexto.textContent)),function(){var s=etapaVecina(1);if(s)irAEtapa(s);});
-  else if(A.resuelta&&etapaVecina(1))programarAuto(Math.max(2800,tiempoLectura(plano(tutorTexto.textContent))),function(){var s=etapaVecina(1);if(s)irAEtapa(s);});
+  var siguiente=function(){var j=pasoVecino(1);if(j>=0)irAPaso(j);};
+  if(pasoVecino(1)<0)return;
+  if(e==='descubre'||e==='comprende')programarAuto(tiempoLectura(plano(tutorTexto.textContent)),siguiente);
+  else if(e==='observa'&&A.demo)programarAuto(duracionPaso(),siguiente);
+  else if(A.resuelta)programarAuto(Math.max(2800,tiempoLectura(plano(tutorTexto.textContent))),siguiente);
 }
 /* línea fina bajo «Pausar» que se llena mientras falta poco para avanzar */
 function pintarCuenta(ms){
@@ -553,17 +587,18 @@ function pintarPausa(){
   b.setAttribute('aria-label',A.auto?'Pausar':'Reproducir');b.setAttribute('aria-pressed',String(!A.auto));
 }
 function pintarControles(){
+  pintarAyudas();
   var c=el('aa-controles');if(!c)return;
   var ver=enLeccionConContenido();
   c.hidden=!ver;if(!ver)return;
   var e=A.etapa;
-  el('aa-atras').disabled=!etapaVecina(-1);
-  el('aa-adelante').disabled=!etapaVecina(1);
+  el('aa-atras').disabled=pasoVecino(-1)<0;
+  el('aa-adelante').disabled=pasoVecino(1)<0;
   pintarPausa();
 }
 function navegarEtapa(d){
-  var dest=etapaVecina(d);
-  if(dest)irAEtapa(dest);
+  var j=pasoVecino(d);
+  if(j>=0)irAPaso(j);
 }
 el('aa-atras').onclick=function(){navegarEtapa(-1);};
 el('aa-adelante').onclick=function(){navegarEtapa(1);};
@@ -1353,18 +1388,9 @@ el('aa-fav-buscar').addEventListener('input',pintarFavoritos);
 el('aa-fav-orden').addEventListener('change',function(){guardarPref('ordenFavoritos',this.value);pintarFavoritos();});
 (function(){var o=prefs().ordenFavoritos;if(o&&/^(fecha|nombre|nivel)$/.test(o))el('aa-fav-orden').value=o;})();
 
-/* Volver a la carpeta desde la que se abrió la lección */
-/* Botón para volver de la lección a la lista desde la que se abrió: Temario, Mis favoritos o Explorar */
-function pintarVolver(){
-  var b=el('aa-volver');b.hidden=false;
-  el('aa-volver-texto').textContent=A.volverA?('Volver a «'+A.volverA.nombre+'»'):(A.modo==='descubre'?'Volver a Explorar':'Volver al Temario');
-}
-el('aa-volver').onclick=function(){
-  A.vistaAuto=false;
-  if(A.volverA){var v=A.volverA;A.volverA=null;vf.carpeta=v&&v.carpeta;pestana('favs');}
-  else pestana(A.modo==='descubre'?'discover':'levels');
-  window.scrollTo({top:0});
-};
+/* Sin botón «Volver»: la pestaña de arriba (Temario, Mis favoritos o Explorar) lleva de vuelta a la lista.
+   Si la lección se abrió desde una carpeta de favoritos, la pestaña Mis favoritos vuelve a esa carpeta. */
+function pintarVolver(){}
 
 /* =====================================================================
    Pestañas
@@ -1388,15 +1414,50 @@ function pestana(v){
 }
 function irAPestanaLeccion(){pestana('train');}
 
-/* «Historial» (icono + nombre) va a la izquierda, en la misma fila que «Lección x» y «Lección y» */
+/* Fila bajo el tutor: Historial · Pista · Solución a la izquierda; lección anterior y siguiente a la derecha.
+   Historial solo con su icono, del mismo tamaño que la bombilla. */
+var ICONO_SOL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+var ICONO_PAUSA_SOL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>';
+/* el botón Solución conserva su forma (icono + texto que se oculta en pantallas estrechas) */
+actualizarBotonSolucion=function(rep){
+  var b=el('b-sol');if(!b)return;
+  b.innerHTML=(rep?ICONO_PAUSA_SOL:ICONO_SOL)+'<span class="aa-sol-txt">'+(rep?'Pausar':'Solución')+'</span>';
+  b.title=rep?'Pausar la solución':'Solución';b.setAttribute('aria-label',b.title);
+};
 (function(){
-  var h=el('b-hist-open'),izq=el('aa-fila-nav-izq');if(!h||!izq)return;
-  h.className='btn aa-btn-historial';h.type='button';h.removeAttribute('title');h.setAttribute('aria-label','Historial');
-  h.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Historial</span>';
-  izq.appendChild(h);
+  var izq=el('aa-fila-nav-izq');if(!izq)return;
+  var h=el('b-hist-open');
+  if(h){
+    h.className='btn aa-btn-icono aa-btn-historial';h.type='button';h.title='Historial';h.setAttribute('aria-label','Historial');
+    h.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+    izq.appendChild(h);
+  }
+  var p=el('b-hint');if(p){p.className='btn aa-btn-icono';izq.appendChild(p);}
+  var so=el('b-sol');if(so){so.className='btn aa-btn-sol';so.type='button';izq.appendChild(so);actualizarBotonSolucion(false);}
 })();
+/* En los ejercicios de tocar casillas, «Solución» marca las casillas correctas */
+(function(){
+  var so=el('b-sol');if(!so)return;var base=so.onclick;
+  so.onclick=function(){
+    if(A.modo==='leccion'&&A.tarea&&A.tarea.tipo==='casilla'&&!A.resuelta){
+      contarPista();
+      A.capa.marcas=A.tarea.def.casillas.map(function(x){return [x,'clave'];});pintarCapa(false);
+      tutor('Son '+A.tarea.def.casillas.join(', ')+'. Ahora tócalas tú en el tablero.');
+      return;
+    }
+    if(base)return base.apply(this,arguments);
+  };
+})();
+/* Pista y Solución se encienden solo cuando hay un ejercicio sin resolver; si no, quedan apagadas */
+function pintarAyudas(){
+  var h=el('b-hint'),so=el('b-sol');if(!h||!so)return;
+  var activo=!!A.tarea&&!A.resuelta&&(A.modo==='leccion'||A.modo==='descubre');
+  if(A.modo==='descubre'&&A.descubreItem&&A.descubreItem.revelado)activo=false;
+  var sonando=false;try{sonando=!!reproduciendoSolucion;}catch(e){}
+  h.disabled=!activo;so.disabled=!activo&&!sonando;
+}
 document.querySelectorAll('#tabs .tab').forEach(function(t){
-  t.onclick=function(){A.vistaAuto=false;pestana(t.dataset.v);window.scrollTo({top:0,behavior:'smooth'});};
+  t.onclick=function(){A.vistaAuto=false;if(t.dataset.v==='favs'&&A.volverA&&document.body.classList.contains('aa-en-leccion'))vf.carpeta=A.volverA.carpeta;pestana(t.dataset.v);window.scrollTo({top:0,behavior:'smooth'});};
 });
 el('b-home').onclick=function(){A.vistaAuto=false;pestana('levels');};
 
@@ -1445,14 +1506,14 @@ window.addEventListener('storage',function(e){
    ===================================================================== */
 var TOUR=[
   {t:'Tu lección',x:'Así se ve una lección. Te muestro en un momento qué tocar.',sel:null},
-  {t:'Las etapas',x:'A la derecha del tablero: Teoría, Práctica y Repaso. Toca cualquiera para ir a ella, aunque no hayas hecho las anteriores.',sel:'#aa-etapas'},
+  {t:'Los pasos',x:'Cada número a la derecha del tablero es un paso de la lección. Se pone verde cuando lo terminas. Toca cualquiera para ir a él.',sel:'#aa-etapas'},
   {t:'Mueve en el tablero',x:'Cuando tu tutor diga «Mueve en el tablero», arrastra la pieza o tócala y luego toca la casilla.',sel:'#board',arrastre:true},
   {t:'Tu tutor',x:'La mascota te explica cada paso y la lección avanza sola.',sel:'#aa-tutor'},
-  {t:'Pausa y avanza',x:'«Pausar» detiene la lección. Con ‹ vuelves a la etapa anterior y con › pasas a la siguiente. Al terminar el último ejercicio aparece «Siguiente lección».',sel:'#aa-controles'},
-  {t:'Tus botones',x:'La bombilla te da pistas poco a poco y «Solución» te muestra la jugada.',sel:'#pc-fila-controles'},
-  {t:'Historial y otras lecciones',x:'«Historial» muestra lo que ya hiciste; a la derecha pasas a la lección anterior o a la siguiente.',sel:'#aa-fila-nav'},
+  {t:'Pausa y avanza',x:'«Pausar» detiene la lección. Con ‹ y › pasas al número anterior o al siguiente. Al terminar el último aparece «Siguiente lección».',sel:'#aa-controles'},
+  {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio.',sel:'#aa-fila-nav-izq'},
+  {t:'Otras lecciones',x:'Aquí pasas a la lección anterior o a la siguiente.',sel:'.aa-fila-nav-der'},
   {t:'Guarda tus favoritos',x:'El corazón guarda la lección en una o varias carpetas para repasarla cuando quieras.',sel:'#aa-corazon'},
-  {t:'Volver al Temario',x:'Con este botón regresas a la lista de lecciones. Siempre queda arriba, junto a las pestañas, aunque bajes por la página.',sel:'#aa-volver'},
+  {t:'Siempre a mano',x:'Las pestañas quedan arriba aunque bajes por la página. Toca «Temario» para volver a la lista de lecciones.',sel:'#tabs'},
   {t:'Tu tablero',x:'Aquí eliges el tablero. Tus tableros favoritos y personalizados son los mismos en el Método PC1 y el Método PC2.',sel:'#pc-tablero-btn'},
   {t:'¡A aprender!',x:'Tu avance se guarda solo y se sincroniza con tu código. Puedes volver a ver este recorrido desde Ayuda.',sel:null,fin:true}
 ];
@@ -1537,6 +1598,6 @@ function arrancar(){
 var bGuia=document.createElement('button');bGuia.type='button';bGuia.className='btn';bGuia.textContent='Ver el recorrido de nuevo';bGuia.onclick=abrirTour;
 var guia=el('v-guide').querySelector('.reading');if(guia)guia.appendChild(bGuia);
 
-window.AAApp={abrirLeccion:abrirLeccion,continuar:continuarAprendiendo,pestana:pestana,estado:A,abrirModalFavorito:abrirModalFavorito,abrirTour:abrirTour};
+window.AAApp={pasos:function(){return pasosDe(A.lec);},paso:function(){return indicePaso();},abrirLeccion:abrirLeccion,continuar:continuarAprendiendo,pestana:pestana,estado:A,abrirModalFavorito:abrirModalFavorito,abrirTour:abrirTour};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrancar,{once:true});else arrancar();
 })();

@@ -94,12 +94,13 @@ try:
     print('5. Con la sincronización activa, las etapas elegidas no «se corren» y no se salta de pestaña')
     fa,fb=frame3(pa),frame3(pb)
     fa.evaluate("AAApp.estado.auto&&document.getElementById('aa-pausa').click()")   # sin reproducción automática: se prueba la elección manual
-    for g,e in [('teoria','descubre'),('repaso','comprueba'),('teoria','descubre'),('practica','practica')]:
-        fa.evaluate("g=>document.querySelector('#aa-etapas [data-grupo=\"'+g+'\"]').click()",g); time.sleep(3)
-        ok(fa.evaluate("AAApp.estado.etapa")==e,'A sigue en la etapa que eligió (%s)'%g)
+    tocar_paso="e=>document.querySelector('#aa-etapas [data-paso=\"'+AAApp.pasos().findIndex(p=>p.etapa===e)+'\"]').click()"
+    for e in ['descubre','comprueba','descubre','practica']:
+        fa.evaluate(tocar_paso,e); time.sleep(3)
+        ok(fa.evaluate("AAApp.estado.etapa")==e,'A sigue en el paso que eligió (%s)'%e)
     ok(esperar(lambda: fb.evaluate("AAApp.estado.etapa")=='practica',8),'B sigue a A hasta la última etapa elegida')
     fa.evaluate("document.querySelector('#tabs .tab[data-v=\"levels\"]').click()"); time.sleep(.5)
-    fb.evaluate("document.querySelector('#aa-etapas [data-grupo=\"repaso\"]').click()"); time.sleep(3.5)
+    fb.evaluate(tocar_paso,'comprueba'); time.sleep(3.5)
     ok(fa.evaluate("document.getElementById('v-levels').classList.contains('active')"),'A, mirando el Temario, no es devuelta a la lección cuando B avanza')
     fb.evaluate("window.scrollTo(0,document.body.scrollHeight)"); y=fb.evaluate("scrollY")
     fa.evaluate("AADatos.fijarCarpetasDeLeccion('N2-010',['nivel-2'])"); time.sleep(3.5)
