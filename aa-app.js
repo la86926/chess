@@ -1235,6 +1235,39 @@ el('aa-niveles').addEventListener('click',function(e){
   if(ab)A.nivelesAbiertos[n]=true;else delete A.nivelesAbiertos[n];
 });
 
+/* Buscador del Temario: busca en todos los niveles por título (y por tema), sin importar acentos ni mayúsculas */
+function sinAcentos(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();}
+function buscarLecciones(){
+  var inp=el('aa-buscar'),res=el('aa-buscar-res'),txt=inp.value.trim(),q=sinAcentos(txt);
+  el('aa-buscar-x').hidden=!txt;
+  var buscando=!!q;
+  res.hidden=!buscando;el('aa-niveles').hidden=buscando;el('aa-continuar-bloque').hidden=buscando;
+  if(!buscando){res.innerHTML='';return;}
+  var palabras=q.split(/\s+/),favs=lecturaFavsPorLeccion(),u=D.leer(K.ultimo);
+  var hallados=CAT.lista.filter(function(c){
+    var l=LEC[c.id],donde=sinAcentos(c.titulo+' '+(l&&l.motivo||'')+' '+nombreNivel(c.nivel)+' nivel '+c.nivel);
+    return palabras.every(function(w){return donde.indexOf(w)>=0;});
+  });
+  if(!hallados.length){res.innerHTML='<p class="aa-buscar-nada">No hay lecciones con «'+esc(txt)+'».</p>';return;}
+  res.innerHTML='<p class="aa-buscar-cuenta">'+hallados.length+(hallados.length===1?' lección':' lecciones')+'</p>'+
+    '<section class="panel-card aa-buscar-panel"><ol class="aa-lista-lecciones aa-lista-buscar">'+hallados.map(function(c){
+      var e=estadoVisible(c.id),ult=c.id===u.leccion;
+      return '<li><button type="button" class="aa-fila-leccion e-'+e+(ult?' aa-ultima':'')+'" data-leccion="'+c.id+'"><span class="aa-fl-num">'+c.num+'</span><span class="aa-fl-tit">'+esc(c.titulo)+'<small class="aa-fl-nivel">'+esc(nombreNivel(c.nivel))+'</small></span>'+
+        (favs[c.id]?'<span class="aa-fl-fav" title="En favoritos" aria-label="En favoritos">♥</span>':'')+
+        '<span class="aa-fl-est" title="'+TEXTO_ESTADO[e]+'"><i aria-hidden="true">'+ICONO_ESTADO[e]+'</i>'+TEXTO_ESTADO[e]+'</span></button></li>';
+    }).join('')+'</ol></section>';
+}
+el('aa-buscar').addEventListener('input',buscarLecciones);
+el('aa-buscar').addEventListener('keydown',function(e){
+  if(e.key==='Escape'){this.value='';buscarLecciones();}
+  if(e.key==='Enter'){this.blur();}
+});
+el('aa-buscar-x').onclick=function(){var i=el('aa-buscar');i.value='';buscarLecciones();i.focus();};
+el('aa-buscar-res').addEventListener('click',function(e){
+  var b=e.target.closest('[data-leccion]');if(!b)return;
+  A.temario={y:window.scrollY,id:b.dataset.leccion};abrirLeccion(b.dataset.leccion);window.scrollTo({top:0});
+});
+
 /* =====================================================================
    8. Favoritos
    ===================================================================== */
@@ -1574,7 +1607,7 @@ function pestana(v){
   document.querySelectorAll('#tabs .tab').forEach(function(t){t.classList.toggle('active',t.dataset.v===m);});
   document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('active',x.id==='v-'+v);});
   document.body.classList.toggle('aa-en-leccion',v==='train');
-  if(v==='levels')pintarNiveles();
+  if(v==='levels'){pintarNiveles();buscarLecciones();}
   if(v==='favs')pintarFavoritos();
   if(v==='discover')pintarStatsDescubre();
   if(v!=='train'){pararDemo();quitarMascota();}
