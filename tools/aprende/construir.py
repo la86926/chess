@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261008-aa10'
+VERSION = '20261009-aa15'
 
 
 class ErrorParche(Exception):
@@ -152,6 +152,10 @@ def construir():
     _, atras = script_con(i1, 'function pcCloseOpenWindows(){')
     _, apariencia = script_con(i1, "var PC_ID='1';")
     _, movil = script_con(i1, "var mq=window.matchMedia('(max-width: 700px)');")
+    # La Sección 1 tiene su propia fila de navegación (Historial · Lección x · Lección y) en todas las pantallas:
+    # el reacomodo móvil de PC1 no debe mover esos botones.
+    movil = parche(movil, "var reiniciar=document.getElementById('b-reset');",
+                   "var reiniciar=null; /* Sección 1: fila de navegación propia */", nombre='navegación móvil')
     _, copias = script_con(i1, "const PENDING_KEY='__pc_backup_pending_v3';")
 
     # --- parches ---
