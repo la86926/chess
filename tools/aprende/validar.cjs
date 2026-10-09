@@ -16,7 +16,7 @@ const {Chess}=require('./chess.cjs');
 let SF=null;try{SF=require('./sf.cjs').SF;}catch(e){}
 
 const ctx={window:{},console};ctx.window.window=ctx.window;vm.createContext(ctx);
-for(const f of ['aa-catalogo.js','aa-lecciones-n1.js','aa-lecciones-n2.js','aa-lecciones-n3.js','aa-descubre-extra.js']){
+for(const f of ['aa-catalogo.js','aa-lecciones-n1.js','aa-lecciones-n2.js','aa-lecciones-n3.js','aa-lecciones-n4.js','aa-lecciones-n5.js','aa-lecciones-n6.js','aa-descubre-extra.js']){
   const p=path.join(RAIZ,f);if(fs.existsSync(p))vm.runInContext(fs.readFileSync(p,'utf8'),ctx,{filename:f});
 }
 const CAT=ctx.window.AA_CATALOGO,LEC=ctx.window.AA_LECCIONES||{},EXTRA=ctx.window.AA_DESCUBRE_EXTRA||[];

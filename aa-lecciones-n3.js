@@ -6,25 +6,25 @@ var L=window.AA_LECCIONES=window.AA_LECCIONES||{};
 /* N3-001 · Rayos X */
 L['N3-001']={
   tactica:true, motivo:'Rayos X',
-  objetivo:'Vas a aprender cómo una pieza actúa a través de otra: los rayos X.',
-  idea:'Con **rayos X**, una pieza ataca o defiende **a través** de otra que está en la misma línea. Si la de delante se cambia, la de detrás entra en acción.',
-  descubre:{fen:'q2r2k1/5ppp/8/8/8/8/3Q1PPP/3R2K1 w - - 0 1',di:'Tu dama y tu torre están en la columna d. ¿Qué pasa si la dama captura en d8?'},
+  objetivo:'Vas a aprender cómo una pieza ataca o defiende a través de una pieza rival: los rayos X.',
+  idea:'Con **rayos X**, una pieza actúa **a través de una pieza rival** que está en su misma línea. Cuando esa pieza rival se mueve o captura, la línea se abre y tu pieza entra en acción.',
+  descubre:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',di:'Tu torre de d1 mira la columna d, pero la torre negra de d5 está en medio. ¿Ve tu torre la casilla d8?'},
   observa:[
-    {flechas:[['d1','d8','linea']],marcas:[['d8','clave']],di:'La torre de d1 apunta a d8 a través de su propia dama: rayos X.',sencillo:'La torre mira a través de la dama.'},
-    {jugada:'d2d8',marcas:[['g8','jaque']],di:'Dxd8+: la dama captura la torre con jaque.',sencillo:'La dama captura con jaque.'},
-    {jugada:'a8d8',di:'…Dxd8: la dama negra recaptura…',sencillo:'La dama negra recaptura.'},
-    {jugada:'d1d8',marcas:[['g8','jaque']],di:'…y Txd8#: la torre de detrás termina el trabajo. ¡Mate!',sencillo:'¡Mate! La torre de atrás llega a d8.'}
+    {flechas:[['d1','d8','linea']],marcas:[['d5','clave'],['d8','clave']],di:'La torre de d1 apunta a d8 a través de la torre negra de d5: eso son los rayos X.',sencillo:'Tu torre mira a d8 aunque haya una pieza negra en medio.'},
+    {jugada:'a5d8',marcas:[['g8','jaque']],di:'Dd8+: parece que la dama se regala…',sencillo:'La dama da jaque en d8.'},
+    {jugada:'d5d8',di:'…Txd8: la torre negra captura y deja libre la columna d.',sencillo:'La torre negra se la come y abre la columna.'},
+    {jugada:'d1d8',marcas:[['g8','jaque']],di:'Txd8#: tu torre, que defendía d8 con rayos X, da mate.',sencillo:'¡Mate! Tu torre llega a d8.'}
   ],
-  comprende:{di:'Dos piezas en la misma línea suman fuerza: la de detrás «ve» a través de la de delante.'},
-  practica:{fen:'q2r2k1/5ppp/8/8/8/8/3Q1PPP/3R2K1 w - - 0 1',linea:['d2d8','a8d8','d1d8'],meta:'mate',
-    di:'Mate en dos con rayos X.',pistas:['La torre de d1 respalda a la dama.','Captura en d8.'],
-    bien:'¡Mate! Dxd8+ y Txd8#.'},
-  hazlo:{fen:'3r2k1/3q1ppp/8/8/8/8/5PPP/Q2R2K1 b - - 0 1',linea:['d7d1','a1d1','d8d1'],meta:'mate',
-    di:'Juegas con negras. Mate en dos con rayos X.',pistas:['Tu torre de d8 respalda a la dama.'],
-    bien:'¡Correcto! …Dxd1+ y …Txd1#.'},
-  comprueba:{fen:'1q2r1k1/5ppp/8/8/8/8/4RPPP/4R1K1 w - - 0 1',linea:['e2e8','b8e8','e1e8'],meta:'mate',
-    di:'Ahora con dos torres. Mate en dos.',pistas:['La torre de e1 respalda a la de e2.'],
-    bien:'¡Excelente! Txe8+ y Txe8#.'}
+  comprende:{di:'Una pieza rival en medio de tu línea no siempre la corta: si se mueve, tu pieza de detrás entra en juego.'},
+  practica:{fen:'6k1/p4ppp/4p3/Q2r4/8/7P/1q3PP1/3R2K1 w - - 0 1',linea:['a5d8','d5d8','d1d8'],meta:'mate',
+    di:'Mate en dos con rayos X.',pistas:['Tu torre de d1 defiende d8 a través de la torre negra.','Da jaque en d8 con la dama.'],
+    bien:'¡Mate! Dd8+, Txd8 y Txd8#.'},
+  hazlo:{fen:'3r2k1/1Q3pp1/7p/8/q2R4/4P3/P4PPP/6K1 b - - 0 1',linea:['a4d1','d4d1','d8d1'],meta:'mate',
+    di:'Juegas con negras. Mate en dos con rayos X.',pistas:['Tu torre de d8 defiende d1 a través de la torre blanca.'],
+    bien:'¡Correcto! …Dd1+, Txd1 y …Txd1#.'},
+  comprueba:{fen:'1k6/ppp4p/3p4/4r2Q/8/P7/1PP3q1/1K2R3 w - - 0 1',linea:['h5e8','e5e8','e1e8'],meta:'mate',
+    di:'Ahora en la columna e. Mate en dos.',pistas:['Tu torre de e1 ve e8 a través de la torre negra.'],
+    bien:'¡Excelente! De8+, Txe8 y Txe8#.'}
 };
 
 /* N3-002 · Desviación */
@@ -808,20 +808,20 @@ L['N3-033']={
 L['N3-036']={
   tactica:true, motivo:'Combinación',
   objetivo:'Vas a aprender a unir dos ideas tácticas en una combinación.',
-  idea:'Las combinaciones suelen **unir dos motivos**: por ejemplo, un cambio que **desvía** al rey seguido de un **tenedor**.',
+  idea:'Las combinaciones suelen **unir dos motivos**: por ejemplo, un cambio que **aleja al defensor** seguido de un **tenedor**.',
   descubre:{fen:'3qk2r/pp3ppp/8/6N1/8/8/PP3PPP/3Q2K1 w - - 0 1',di:'Tu caballo ataca f7, pero el rey lo defiende. ¿Y si el rey se moviera?'},
   observa:[
     {flechas:[['g5','f7','ataque']],marcas:[['f7','defendida']],di:'Ahora el rey de e8 defiende f7.',sencillo:'El rey cuida f7.'},
     {jugada:'d1d8',marcas:[['e8','jaque']],di:'Dxd8+: cambio de damas con jaque…',sencillo:'Cambias las damas.'},
-    {jugada:'e8d8',di:'…Rxd8: el rey se aleja de f7 (desviación).',sencillo:'El rey se aleja.'},
+    {jugada:'e8d8',di:'…Rxd8: el rey, que defendía f7, se aleja.',sencillo:'El rey se aleja.'},
     {jugada:'g5f7',flechas:[['f7','h8','ataque']],marcas:[['d8','jaque'],['h8','amenazada']],di:'Cxf7+: tenedor al rey y a la torre.',sencillo:'¡Tenedor!'}
   ],
   comprende:{di:'Busca la segunda idea: ¿qué pasa después de la primera captura o del primer jaque?'},
   practica:{fen:'3qk2r/pp3ppp/8/6N1/8/8/PP3PPP/3Q2K1 w - - 0 1',linea:['d1d8','e8d8','g5f7'],
-    di:'Desvía al rey y da un tenedor.',pistas:['Cambia las damas con jaque.','Después, el caballo entra en f7.'],
+    di:'Aleja al rey de f7 y da un tenedor.',pistas:['Cambia las damas con jaque.','Después, el caballo entra en f7.'],
     bien:'¡Bien! Dxd8+, Rxd8 y Cxf7+.'},
   hazlo:{fen:'2q1r1k1/5ppp/8/8/8/8/4QPPP/4R1K1 w - - 0 1',linea:['e2e8','c8e8','e1e8'],meta:'mate',
-    di:'Desvía a la dama negra y aprovecha los rayos X. Mate en dos.',pistas:['La dama de c8 defiende e8.','Tu torre de e1 está detrás de tu dama.'],
+    di:'Sacrifica tu dama en e8 y aprovecha tu torre de e1. Mate en dos.',pistas:['La dama de c8 defiende e8.','Tu torre de e1 está detrás de tu dama.'],
     bien:'¡Excelente! Dxe8+, Dxe8 y Txe8#.'}
 };
 
