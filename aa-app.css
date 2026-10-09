@@ -744,16 +744,3 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
   .aa-fila-leccion .aa-fl-fav{grid-column:3;grid-row:1;justify-self:center}
   .aa-fila-leccion .aa-fl-est{grid-column:4;grid-row:1;justify-self:start}
 }
-
-/* Ajuste fino de pestañas para móvil: fila única, sin aumentar su altura */
-@media (max-width:540px){
-  [data-enmarcado="si"] .aa-barra-fija{padding-right:6px}
-  .aa-barra-fija .tabs{display:flex;flex-wrap:nowrap}
-  .aa-barra-fija .tabs .tab{min-width:0;white-space:nowrap}
-}
-@media (min-width:361px) and (max-width:430px){
-  .aa-barra-fija .tabs .tab{font-size:.73rem;padding-left:3px;padding-right:3px}
-}
-@media (max-width:360px){
-  .aa-barra-fija .tabs .tab{padding-left:2px;padding-right:2px}
-}
