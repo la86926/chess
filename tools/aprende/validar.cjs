@@ -102,6 +102,7 @@ async function revisarTarea(id,t,donde,sf){
   if(!t){err(id,donde+': falta');return;}
   const tipo=t.tipo||'jugada';
   if(tipo==='pregunta'){
+    err(id,donde+': las preguntas de opción múltiple ya no se usan: el alumno debe mover o tocar en el tablero');
     if(!Array.isArray(t.opciones)||t.opciones.length<2)err(id,donde+': la pregunta necesita opciones');
     if(!(t.correcta>=0&&t.correcta<(t.opciones||[]).length))err(id,donde+': índice de respuesta correcta fuera de rango');
     if(t.fen){const g=fenLegal(id+' '+donde,t.fen);if(g)revisarSenales(id,g,t.flechas,t.marcas,donde);}
@@ -202,7 +203,9 @@ async function revisarTarea(id,t,donde,sf){
   for(const id of ids){
     if(!CAT.porId[id]){err(id,'no existe en el catálogo');continue;}
     const l=LEC[id];n++;
-    for(const k of ['descubre','observa','comprende','practica','hazlo','comprueba'])if(!l[k])err(id,'falta la etapa '+k);
+    for(const k of ['descubre','observa','comprende'])if(!l[k])err(id,'falta la etapa '+k);
+    // Práctica (practica, hazlo) y Repaso (comprueba) son opcionales, pero debe haber al menos un ejercicio en el tablero
+    if(!['practica','hazlo','comprueba'].some(k=>l[k]))err(id,'no tiene ningún ejercicio en el tablero');
     if(!l.descubre)continue;
     const g0=fenLegal(id+' descubre',l.descubre.fen);if(!g0)continue;
     revisarSenales(id,g0,l.descubre.flechas,l.descubre.marcas,'descubre');
@@ -219,9 +222,10 @@ async function revisarTarea(id,t,donde,sf){
     if(l.comprende){
       if(l.comprende.fen){const gc=fenLegal(id+' comprende',l.comprende.fen);if(gc)revisarSenales(id,gc,l.comprende.flechas,l.comprende.marcas,'comprende');}
       else revisarSenales(id,g,l.comprende.flechas,l.comprende.marcas,'comprende');
+      if(l.comprende.pregunta)err(id,'comprende: las preguntas de opción múltiple ya no se usan');
       if(l.comprende.pregunta){const q=l.comprende.pregunta;if(!(q.correcta>=0&&q.correcta<q.opciones.length))err(id,'comprende: respuesta correcta fuera de rango');}
     }
-    for(const k of ['practica','hazlo','comprueba'])await revisarTarea(id,l[k],k,sf);
+    for(const k of ['practica','hazlo','comprueba'])if(l[k])await revisarTarea(id,l[k],k,sf);
     for(const [i,x] of (l.extra||[]).entries())await revisarTarea(id,x,'extra '+(i+1),sf);
   }
   for(const x of EXTRA){if(filtro.length&&!filtro.includes('mix'))break;await revisarTarea('mezcla '+x.id,x,'posición',sf);(x.requiere||[]).forEach(r=>{if(!CAT.porId[r])err('mezcla '+x.id,'requiere una lección inexistente '+r);});}
