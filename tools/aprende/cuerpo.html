@@ -60,7 +60,11 @@
     <div class="aa-leyenda" id="aa-leyenda" aria-label="Significado de las señales"></div>
 
     <section class="aa-tutor" id="aa-tutor" aria-live="polite">
-      <img class="aa-tutor-cara" src="mascota.png" alt="" aria-hidden="true">
+      <!-- La mascota del tutor: quieta mientras explica; al resolver un ejercicio toca la guitarra y festeja -->
+      <div class="aa-tutor-cara" id="aa-tutor-cara" data-pose="0" aria-hidden="true">
+        <span class="aa-cara-baile"><img class="p0" src="mascota.png" alt=""><img class="p1" src="mascota-sube1.png" alt=""><img class="p2" src="mascota-sube2.png" alt=""><img class="p3" src="mascota-rock.png" alt=""></span>
+        <span class="aa-cara-notas"></span>
+      </div>
       <div class="aa-tutor-globo">
         <p class="aa-tutor-texto" id="aa-dice">¡Hola! Elige una lección para empezar.</p>
         <div class="aa-opciones" id="aa-opciones" role="group" hidden></div>

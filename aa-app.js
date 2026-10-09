@@ -163,7 +163,8 @@ function pintarLeyenda(){
   var h='';
   Object.keys(tipos).forEach(function(t){h+='<span class="aa-ley"><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="22" y2="5" stroke="'+SENAL[t].c+'" stroke-width="'+(SENAL[t].w*14)+'"'+(SENAL[t].d?' stroke-dasharray="'+SENAL[t].d.split(' ').map(function(x){return x*14;}).join(' ')+'" stroke-linecap="round"':'')+'/><polygon points="29,5 21,1 21,9" fill="'+SENAL[t].c+'"/></svg>'+SENAL[t].n+'</span>';});
   Object.keys(marcas).forEach(function(t){h+='<span class="aa-ley"><i class="aa-ley-marca t-'+t+'">'+esc(MARCA[t].g)+'</i>'+MARCA[t].n+'</span>';});
-  cont.innerHTML=h;cont.hidden=!h;
+  /* la fila de la leyenda siempre ocupa su lugar (vacía o no): así el globo del tutor no se mueve */
+  cont.innerHTML=h;cont.hidden=false;cont.classList.toggle('vacia',!h);
 }
 function fijarCapa(flechas,marcas,animar){A.capa={flechas:(flechas||[]).slice(),marcas:(marcas||[]).slice()};pintarCapa(animar);}
 function limpiarCapa(){fijarCapa([],[]);}
@@ -446,8 +447,41 @@ function registrarVisita(id){
   ultimaVisita[id]=t;D.registrarEvento('visita',id);
 }
 
+/* ---- Mascota en la Sección 1 ----
+   La mascota grande sobre el tablero no se usa aquí (se oculta por CSS). La del tutor, junto al globo,
+   cobra vida al resolver un ejercicio: baila con la guitarra, suben notas musicales y cada tanto
+   levanta la guitarra. Al pasar a otro ítem, lección o pestaña vuelve a quedarse quieta. */
+var cara=el('aa-tutor-cara'),festejo={t:[],activo:false};
+(function(){
+  function nota(c,doble){return doble
+    ?'<svg viewBox="0 0 40 40"><path d="M14 30V9l20-5v21" fill="none" stroke="'+c+'" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 13l20-5" stroke="'+c+'" stroke-width="5"/><ellipse cx="10" cy="30" rx="6" ry="5" fill="'+c+'"/><ellipse cx="30" cy="25" rx="6" ry="5" fill="'+c+'"/></svg>'
+    :'<svg viewBox="0 0 40 40"><path d="M22 30V6q8 2 10 9" fill="none" stroke="'+c+'" stroke-width="4" stroke-linecap="round"/><ellipse cx="17" cy="30" rx="7" ry="5.5" fill="'+c+'"/></svg>';}
+  var n=cara&&cara.querySelector('.aa-cara-notas');
+  if(n)n.innerHTML=[['#FF9FB0',0],['#B9A4F2',1],['#8CC4EC',0],['#F5C96A',1]].map(function(x,i){return '<i class="n'+(i+1)+'">'+nota(x[0],x[1])+'</i>';}).join('');
+})();
+function posarCara(p){if(cara)cara.dataset.pose=String(p);}
+function festejarTutor(){
+  if(!cara)return;
+  calmarTutor();
+  festejo.activo=true;tutorCaja.classList.add('festeja');
+  /* levanta la guitarra cuadro por cuadro, la tiene en alto 1 s y la baja; se repite */
+  (function ciclo(){
+    if(!festejo.activo)return;
+    var orden=[1,2,3],t=0;
+    orden.forEach(function(p){festejo.t.push(setTimeout(function(){posarCara(p);},t+=85));});
+    t+=1000;
+    [2,1,0].forEach(function(p){festejo.t.push(setTimeout(function(){posarCara(p);},t+=85));});
+    festejo.t.push(setTimeout(ciclo,t+1600));
+  })();
+}
+function calmarTutor(){
+  festejo.activo=false;festejo.t.forEach(clearTimeout);festejo.t=[];
+  if(tutorCaja)tutorCaja.classList.remove('festeja');posarCara(0);
+}
+function quitarMascota(){calmarTutor();try{if(window.pcMascota)pcMascota.quitar();}catch(e){}}
 function irAEtapa(etapa,opc){
   opc=opc||{};
+  quitarMascota();
   if(A.modo!=='leccion'||!A.lec)return;
   if(etapa==='repasa')etapa='comprueba'; /* «Reforzar» y «Repaso» ahora son una sola etapa: Repaso */
   if(!ETAPAS.some(function(e){return e.k===etapa;}))etapa='descubre';
@@ -537,6 +571,7 @@ function mostrarPasoDemo(animarJugada){
 }
 function irPasoDemo(n,animado){
   if(!A.demo)return;
+  quitarMascota();
   n=Math.max(0,Math.min(n,A.demo.length-1));
   if(n===A.paso&&!animado)return;
   var adelante=n===A.paso+1,p=A.demo[n];
@@ -738,6 +773,7 @@ function tareaResuelta(){
   /* mensaje breve (máximo 4 renglones): la idea clave ya se vio en el resumen de la Teoría */
   var cierre=ultimo?(estadoLeccion(A.id)==='completada'?' **¡Lección completada!**':' Te faltan ejercicios para completar la lección.'):'';
   tutor(bien+cierre,'bien');
+  festejarTutor();
   botonContinuar(ultimo?'Siguiente lección':'Continuar');
   planificarAuto();
 }
@@ -978,6 +1014,7 @@ function siguienteDescubre(){
 }
 function cargarDescubre(it,reinicio){
   if(!it)return;
+  quitarMascota();
   pararDemo();quitarBotonIrLeccion();
   A.modo='descubre';A.descubreItem={clave:it.clave,leccion:it.leccion,motivo:it.motivo,tarea:it.tarea,revelado:false,pistas:0};
   A.lec=null;A.etapa='';A.volverA=null;pintarVolver();
@@ -1002,6 +1039,7 @@ function pistaDescubre(otraVez){
   else{A.capa={flechas:[[from,u.slice(2,4),'mov']],marcas:[]};pintarCapa(true);tutor('Pista 3: juega '+sanEs(sanDe(state.game.fen(),u))+'.');}
 }
 function descubreResuelto(){
+  festejarTutor();
   var it=A.descubreItem;
   var d=D.leer(K.descubre),v=d.vistos[it.clave]||{intentos:0,aciertos:0,t:0};
   v.intentos++;var limpio=it.pistas===0&&A.errores===0;if(limpio)v.aciertos++;v.t=Date.now();d.vistos[it.clave]=v;d.t=v.t;D.guardar(K.descubre,d);
@@ -1514,7 +1552,7 @@ function pestana(v){
   if(v==='levels')pintarNiveles();
   if(v==='favs')pintarFavoritos();
   if(v==='discover')pintarStatsDescubre();
-  if(v!=='train')pararDemo();
+  if(v!=='train'){pararDemo();quitarMascota();}
 }
 function irAPestanaLeccion(){pestana('train');}
 
