@@ -485,3 +485,34 @@ body.aa-app{overflow-x:clip!important;overflow-y:visible!important}
   .aa-fila-nav .btn.aa-nav-lec{padding:.3rem .4rem}
   .aa-nav-lec span{font-size:.7rem}
 }
+
+/* Triángulos de «Lección x» y «Lección y»: grandes y nítidos */
+.aa-nav-lec b{display:block;line-height:0}
+.aa-nav-lec b svg{width:24px;height:24px;fill:currentColor;stroke:none}
+@media (max-width:340px){.aa-nav-lec b svg{width:21px;height:21px}}
+
+/* Lección terminada: «Lección y» se ilumina (sin moverse) para invitar a pasar a la siguiente */
+.aa-fila-nav .btn.aa-nav-lec.aa-listo{
+  --aa-luz:var(--acento-tema,#53707F);--aa-oro:#E2B65F;
+  color:#fff;border-color:transparent;text-shadow:0 1px 1px rgba(0,0,0,.18);
+  background:linear-gradient(115deg,var(--aa-luz) 0%,var(--aa-luz) 38%,color-mix(in srgb,var(--aa-luz) 55%,#fff) 50%,var(--aa-luz) 62%,var(--aa-luz) 100%);
+  background-size:250% 100%;
+  animation:aaBrilloFondo 3.4s linear infinite,aaBrilloHalo 2.6s ease-in-out infinite}
+.aa-fila-nav .btn.aa-nav-lec.aa-listo span{font-weight:700}
+@keyframes aaBrilloFondo{0%{background-position:100% 0}100%{background-position:-150% 0}}
+@keyframes aaBrilloHalo{
+  0%,100%{box-shadow:0 0 0 1px color-mix(in srgb,var(--aa-oro) 55%,transparent),0 4px 14px -4px color-mix(in srgb,var(--aa-luz) 70%,transparent)}
+  50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--aa-oro) 40%,transparent),0 0 22px 2px color-mix(in srgb,var(--aa-oro) 55%,transparent)}}
+@media (prefers-reduced-motion:reduce){
+  .aa-fila-nav .btn.aa-nav-lec.aa-listo{animation:none;background:var(--aa-luz);box-shadow:0 0 0 3px color-mix(in srgb,var(--aa-oro) 55%,transparent),0 0 18px color-mix(in srgb,var(--aa-oro) 45%,transparent)}
+}
+
+/* Ítem actual: brilla suave como una luciérnaga (esté hecho o no), sin distraer */
+.aa-app .aa-etapa.activa i{position:relative;animation:aaLuciernaga 2.8s ease-in-out infinite}
+@keyframes aaLuciernaga{
+  0%,100%{box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 3.5px var(--acento-tema,var(--gold)),0 0 5px 3px rgba(255,214,110,.22)}
+  50%{box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 3.5px var(--acento-tema,var(--gold)),0 0 14px 6px rgba(255,210,100,.62)}}
+@media (prefers-reduced-motion:reduce){
+  .aa-app .aa-etapa.activa i{animation:none;box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 3.5px var(--acento-tema,var(--gold)),0 0 10px 4px rgba(255,214,110,.5)}
+}
+.aa-app .aa-etapas{padding:8px 7px}
