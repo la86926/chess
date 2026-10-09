@@ -116,7 +116,7 @@ with sync_playwright() as p:
             if n>0:
                 atras(pg); ok(pg.evaluate("AAApp.estado.etapa")==tareas[n-1],lid+': «‹» no volvió al ejercicio anterior')
                 adelante(pg)                                      # desvío a mitad de los ejercicios
-            ok(pg.evaluate("document.getElementById('aa-continuar').hidden"),'%s %s: el botón negro aparece antes de terminar'%(lid,etapa))
+            ok(pg.evaluate("document.getElementById('aa-continuar').hidden"),'%s %s: el botón negro no debe aparecer'%(lid,etapa))
             ultima=n==len(tareas)-1
             ok(pg.evaluate("[document.getElementById('b-hint').disabled,document.getElementById('b-sol').disabled]")==[False,False],'%s %s: Pista y Solución deben estar encendidas en el ejercicio'%(lid,etapa))
             if primera and n==0: boton(pg,'#aa-pausa')        # vuelve a reproducir
@@ -126,7 +126,8 @@ with sync_playwright() as p:
                 pausar(pg)
             elif not ultima: adelante(pg)
         ok(deshabilitado(pg,'#aa-adelante'),lid+': en el último ejercicio «›» debe estar apagado')
-        ok(pg.evaluate("(()=>{const b=document.getElementById('aa-continuar');return !b.hidden&&b.textContent.trim()==='Siguiente lección'&&b.classList.contains('principal')})()"),lid+': al terminar no apareció «Siguiente lección»')
+        ok(pg.evaluate("document.getElementById('aa-continuar').hidden"),lid+': al terminar no debe aparecer el botón negro')
+        ok(pg.evaluate("(()=>{const b=document.getElementById('b-next-top');return b.hidden||b.classList.contains('aa-listo')})()"),lid+': al terminar, «Lección y» debe brillar')
         primera=False
         ok(pg.evaluate("id=>JSON.parse(localStorage.aa_progreso_v1).lecciones[id].estado",lid)=='completada',lid+': la lección no quedó completada')
         ok(pg.evaluate("document.querySelectorAll('#aa-etapas .aa-etapa.hecha').length")==npasos,lid+': no todos los números quedaron en verde al terminar')

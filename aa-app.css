@@ -491,21 +491,35 @@ body.aa-app{overflow-x:clip!important;overflow-y:visible!important}
 .aa-nav-lec b svg{width:24px;height:24px;fill:currentColor;stroke:none}
 @media (max-width:340px){.aa-nav-lec b svg{width:21px;height:21px}}
 
-/* Lección terminada: «Lección y» se ilumina (sin moverse) para invitar a pasar a la siguiente */
+/* Lección terminada (o posición de Repaso resuelta): «Lección y» / «Otra posición» se ilumina
+   sin moverse: fondo del color del tablero con brillo dorado, un borde de luz que recorre el
+   contorno, un destello que lo cruza y un halo que respira. Se ve bien en claro y en oscuro. */
+@property --aa-giro{syntax:'<angle>';inherits:false;initial-value:0deg}
 .aa-fila-nav .btn.aa-nav-lec.aa-listo{
-  --aa-luz:var(--acento-tema,#53707F);--aa-oro:#E2B65F;
-  color:#fff;border-color:transparent;text-shadow:0 1px 1px rgba(0,0,0,.18);
-  background:linear-gradient(115deg,var(--aa-luz) 0%,var(--aa-luz) 38%,color-mix(in srgb,var(--aa-luz) 55%,#fff) 50%,var(--aa-luz) 62%,var(--aa-luz) 100%);
-  background-size:250% 100%;
-  animation:aaBrilloFondo 3.4s linear infinite,aaBrilloHalo 2.6s ease-in-out infinite}
-.aa-fila-nav .btn.aa-nav-lec.aa-listo span{font-weight:700}
-@keyframes aaBrilloFondo{0%{background-position:100% 0}100%{background-position:-150% 0}}
-@keyframes aaBrilloHalo{
-  0%,100%{box-shadow:0 0 0 1px color-mix(in srgb,var(--aa-oro) 55%,transparent),0 4px 14px -4px color-mix(in srgb,var(--aa-luz) 70%,transparent)}
-  50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--aa-oro) 40%,transparent),0 0 22px 2px color-mix(in srgb,var(--aa-oro) 55%,transparent)}}
+  --aa-luz:var(--acento-tema,#53707F);--aa-oro:#F2C14E;--aa-oro2:#FFE7A3;
+  position:relative;overflow:hidden;isolation:isolate;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.28);
+  border:2.5px solid transparent;
+  background:
+    linear-gradient(140deg,color-mix(in srgb,var(--aa-luz) 82%,#fff) 0%,var(--aa-luz) 45%,color-mix(in srgb,var(--aa-luz) 70%,#000) 100%) padding-box,
+    conic-gradient(from var(--aa-giro),var(--aa-oro2),var(--aa-oro),color-mix(in srgb,var(--aa-luz) 40%,var(--aa-oro)),#fff,var(--aa-oro),var(--aa-oro2)) border-box;
+  animation:aaBordeLuz 3s linear infinite,aaHaloListo 2.2s ease-in-out infinite}
+.aa-fila-nav .btn.aa-nav-lec.aa-listo span{font-weight:800}
+.aa-fila-nav .btn.aa-nav-lec.aa-listo b svg{filter:drop-shadow(0 0 4px rgba(255,231,163,.9))}
+/* destello que cruza el botón de vez en cuando */
+.aa-fila-nav .btn.aa-nav-lec.aa-listo::after{content:"";position:absolute;inset:-2px;z-index:-1;pointer-events:none;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.55) 47%,rgba(255,241,200,.75) 50%,rgba(255,255,255,.4) 53%,transparent 70%);
+  background-size:260% 100%;background-position:130% 0;animation:aaDestello 2.8s ease-in-out infinite}
+@keyframes aaBordeLuz{to{--aa-giro:360deg}}
+@keyframes aaDestello{0%,35%{background-position:130% 0}75%,100%{background-position:-60% 0}}
+@keyframes aaHaloListo{
+  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--aa-oro) 0%,transparent),0 0 12px 1px color-mix(in srgb,var(--aa-oro) 40%,transparent),0 6px 16px -6px rgba(0,0,0,.35)}
+  50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--aa-oro) 30%,transparent),0 0 30px 8px color-mix(in srgb,var(--aa-oro) 62%,transparent),0 6px 16px -6px rgba(0,0,0,.35)}}
+html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:#FFD166}
 @media (prefers-reduced-motion:reduce){
-  .aa-fila-nav .btn.aa-nav-lec.aa-listo{animation:none;background:var(--aa-luz);box-shadow:0 0 0 3px color-mix(in srgb,var(--aa-oro) 55%,transparent),0 0 18px color-mix(in srgb,var(--aa-oro) 45%,transparent)}
+  .aa-fila-nav .btn.aa-nav-lec.aa-listo{animation:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--aa-oro) 40%,transparent),0 0 22px 4px color-mix(in srgb,var(--aa-oro) 50%,transparent)}
+  .aa-fila-nav .btn.aa-nav-lec.aa-listo::after{animation:none;display:none}
 }
+
 
 /* Ítem actual: brilla suave como una luciérnaga (esté hecho o no), sin distraer */
 .aa-app .aa-etapa.activa i{position:relative;animation:aaLuciernaga 2.8s ease-in-out infinite}
@@ -525,3 +539,20 @@ body.aa-app{overflow-x:clip!important;overflow-y:visible!important}
   50%{transform:scale(1);text-shadow:0 0 6px rgba(255,196,70,.55)}
   100%{transform:scale(1);text-shadow:0 0 0 rgba(255,200,80,0)}}
 @media (prefers-reduced-motion:reduce){.aa-llamado{animation:none;text-shadow:0 0 6px rgba(255,196,70,.5)}}
+
+/* Aviso de favoritos: abajo al centro; se descarta deslizándolo hacia cualquier lado y se desvanece */
+.aa-confirmado{top:auto!important;bottom:calc(18px + env(safe-area-inset-bottom));left:50%!important;right:auto!important;transform:translate(-50%,10px);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;transition:opacity .3s ease,transform .3s ease}
+.aa-confirmado.ver{pointer-events:auto;transform:translate(-50%,0)}
+.aa-confirmado.arrastrando{transition:none;cursor:grabbing}
+.aa-confirmado.yendo{transition:opacity .3s ease,transform .32s ease-out}
+
+/* «Volver a carpetas»: botón claro de retroceso, arriba del título */
+.aa-fav-volver{display:inline-flex;align-items:center;gap:.55rem;margin:0 0 .7rem -.1rem;padding:.3rem .9rem .3rem .3rem;min-height:42px;border-radius:999px;
+  border:1.5px solid color-mix(in srgb,var(--acento-tema,#53707F) 45%,transparent);background:color-mix(in srgb,var(--acento-tema,#53707F) 9%,transparent);
+  color:var(--acento-txt,var(--acento-tema,#53707F));font:700 .92rem var(--sans);cursor:pointer;touch-action:manipulation}
+.aa-fav-volver[hidden]{display:none!important}
+.aa-fav-volver-ic{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--acento-tema,#53707F);color:#fff}
+.aa-fav-volver-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.aa-fav-volver:active{transform:scale(.97)}
+@media(hover:hover){.aa-fav-volver:hover{background:color-mix(in srgb,var(--acento-tema,#53707F) 16%,transparent)}}
+html[data-modo="oscuro"] .aa-fav-volver{color:var(--acento-txt-osc,#9fc0d2);border-color:color-mix(in srgb,var(--acento-txt-osc,#9fc0d2) 45%,transparent)}

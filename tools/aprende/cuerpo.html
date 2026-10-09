@@ -17,7 +17,7 @@
   <nav class="tabs" id="tabs">
     <button class="tab active" data-v="levels">Temario</button>
     <button class="tab" data-v="favs">Mis favoritos</button>
-    <button class="tab" data-v="discover">Explorar</button>
+    <button class="tab" data-v="discover">Repaso</button>
     <button class="tab" data-v="guide">Ayuda</button>
   </nav>
 </div>
@@ -177,7 +177,7 @@
 
 <section class="view" id="v-discover">
  <div class="aa-pagina aa-pagina-estrecha">
-  <h1>Explorar</h1>
+  <h1>Repaso</h1>
   <p class="lead">Una posición, sin el nombre del tema. Encuentra la mejor jugada como en una partida real; si lo necesitas, pide pistas graduales. Al terminar te revelo qué táctica era.</p>
   <div class="aa-descubre-stats" id="aa-descubre-stats"></div>
   <label class="aa-campo"><span>Posiciones de</span>
@@ -200,12 +200,12 @@
  <div class="aa-pagina">
   <div class="aa-fav-cabecera" id="aa-fav-cabecera">
     <div>
+      <button class="aa-fav-volver" id="aa-fav-atras" type="button" hidden aria-label="Volver a todas las carpetas"><span class="aa-fav-volver-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg></span>Volver a carpetas</button>
       <h1 id="aa-fav-titulo">Mis favoritos</h1>
       <p class="lead" id="aa-fav-lead">Guarda cualquier ítem de una lección con el corazón y organízalo en carpetas para repasarlo cuando quieras.</p>
     </div>
   </div>
   <div class="aa-fav-barra">
-    <button class="aa-fv-boton" id="aa-fav-atras" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Carpetas</button>
     <label class="aa-fv-buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="aa-fav-buscar" type="search" placeholder="Buscar favoritos" autocomplete="off" aria-label="Buscar favoritos"></label>
     <select id="aa-fav-orden" class="aa-select aa-fv-orden" aria-label="Ordenar favoritos">
       <option value="fecha">Más recientes</option>
@@ -230,10 +230,10 @@
   <p>Las señales significan siempre lo mismo y no dependen solo del color: la <strong>flecha continua dorada</strong> es una jugada; la <strong>roja con trazo grueso</strong>, un ataque; la <strong>roja discontinua</strong>, una amenaza del rival; la <strong>verde punteada</strong>, una defensa; la <strong>azul a trazos largos</strong>, una línea de influencia. Un anillo con <strong>!</strong> marca una pieza amenazada; con <strong>✓</strong>, una pieza defendida; con <strong>?</strong>, una pieza indefensa; un rombo marca una casilla clave. Debajo del tablero siempre ves la leyenda de lo que aparece.</p>
 
   <h2><span class="k">03</span> La lección avanza sola</h2>
-  <p>Cada lección se reproduce sola y se detiene en los ejercicios hasta que muevas o toques en el tablero. Con <strong>Pausar</strong> la detienes; con <strong>‹</strong> y <strong>›</strong> pasas al número anterior o al siguiente. Al terminar el último ejercicio aparece <strong>Siguiente lección</strong>.</p>
+  <p>Cada lección se reproduce sola y se detiene en los ejercicios hasta que muevas o toques en el tablero. Con <strong>Pausar</strong> la detienes; con <strong>‹</strong> y <strong>›</strong> pasas al número anterior o al siguiente. Al terminar la lección, el botón de la <strong>lección siguiente</strong> (abajo, a la derecha) se ilumina: tócalo para seguir.</p>
 
-  <h2><span class="k">04</span> Explorar</h2>
-  <p>En la pestaña <strong>Explorar</strong> recibes posiciones sin saber qué táctica esconden, como en una partida real. Las pistas son graduales: primero una idea general, luego la pieza y, por último, la jugada. Al terminar descubres el nombre del motivo y puedes ir a su lección.</p>
+  <h2><span class="k">04</span> Repaso</h2>
+  <p>En la pestaña <strong>Repaso</strong> recibes posiciones sin saber qué táctica esconden, como en una partida real. Las pistas son graduales: primero una idea general, luego la pieza y, por último, la jugada. Al terminar descubres el nombre del motivo y puedes ir a su lección.</p>
 
   <h2><span class="k">05</span> Mis favoritos en carpetas</h2>
   <p>El <strong>corazón</strong> guarda el ítem que estás viendo: su nivel, su lección y su número. Elige una o varias carpetas y pulsa Guardar favorito. Empiezas con seis carpetas (Nivel I a Nivel VI) que puedes renombrar o eliminar, y puedes crear las tuyas. Al tocar un favorito vuelves exactamente a ese ítem.</p>
