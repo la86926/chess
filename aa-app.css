@@ -745,32 +745,15 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
   .aa-fila-leccion .aa-fl-est{grid-column:4;grid-row:1;justify-self:start}
 }
 
-/* Aprende Ajedrez · navegación móvil con pestañas legibles y pulsación cómoda */
+/* Ajuste fino de pestañas para móvil: fila única, sin aumentar su altura */
 @media (max-width:540px){
-  .aa-barra-fija .tabs{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:4px;
-    padding:5px;
-    min-height:0;
-  }
-  .aa-barra-fija .tabs .tab{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    grid-column:span 2;
-    min-width:0;
-    width:100%;
-    min-height:44px;
-    padding:8px 4px;
-    font-size:.875rem;
-    line-height:1.2;
-    letter-spacing:normal;
-    text-align:center;
-    white-space:normal;
-  }
-  /* Primera fila: Mi lección, Temario.
-     Segunda fila: Mis favoritos, Repaso, Ayuda. */
-  .aa-barra-fija .tabs .tab:nth-child(4),
-  .aa-barra-fija .tabs .tab:nth-child(5){grid-column:span 1}
+  [data-enmarcado="si"] .aa-barra-fija{padding-right:6px}
+  .aa-barra-fija .tabs{display:flex;flex-wrap:nowrap}
+  .aa-barra-fija .tabs .tab{min-width:0;white-space:nowrap}
+}
+@media (min-width:361px) and (max-width:430px){
+  .aa-barra-fija .tabs .tab{font-size:.73rem;padding-left:3px;padding-right:3px}
+}
+@media (max-width:360px){
+  .aa-barra-fija .tabs .tab{padding-left:2px;padding-right:2px}
 }
