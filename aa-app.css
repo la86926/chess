@@ -361,7 +361,7 @@ html[data-modo="oscuro"] .aa-fv-mini.peligro{color:#ff8a7a}
 .aa-volver[hidden]{display:none!important}
 
 /* Sin «Girar» ni «Compartir» en la Sección 1 */
-#b-flip,#b-share{display:none!important}
+#b-flip{display:none!important}
 
 /* =====================================================================
    Tablero con las etapas a su derecha (alineadas con el borde superior)
@@ -746,8 +746,8 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 }
 /* Pestañas: letra algo más pequeña y botón algo más alto, para que el texto respire dentro de la píldora */
 .aa-barra-fija .tabs .tab{padding:9px 12px}
-@media (max-width:430px){.aa-barra-fija .tabs{gap:2px;padding:5px}.aa-barra-fija .tabs .tab{padding:10px 5px;font-size:.71rem;letter-spacing:-.005em}}
-@media (max-width:360px){.aa-barra-fija .tabs{gap:1px;padding:4px}.aa-barra-fija .tabs .tab{padding:10px 3px;font-size:.65rem;letter-spacing:-.015em}}
+@media (max-width:430px){.aa-barra-fija .tabs{gap:2px;padding:5px}.aa-barra-fija .tabs .tab{padding:10px 5px;font-size:.68rem;letter-spacing:-.005em}}
+@media (max-width:360px){.aa-barra-fija .tabs{gap:1px;padding:4px}.aa-barra-fija .tabs .tab{padding:10px 3px;font-size:.62rem;letter-spacing:-.015em}}
 /* Buscador del Temario */
 .aa-buscador{position:relative;display:flex;align-items:center;margin:.2rem 0 1rem}
 .aa-buscador svg{position:absolute;left:14px;width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none}
@@ -761,3 +761,9 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-buscar-panel{padding:0}.aa-buscar-panel .aa-lista-lecciones{padding:.45rem .6rem}
 .aa-lista-buscar li{opacity:1!important;transform:none!important}
 .aa-fl-nivel{display:block;font-size:.72rem;color:var(--muted);font-weight:500;margin-top:1px}
+
+/* Compartir, junto a Solución (mismo tamaño que el historial y la pista) */
+.aa-app .aa-fila-nav .btn.aa-btn-compartir{width:42px;min-width:42px;height:42px;min-height:42px;padding:0;display:inline-grid;place-items:center}
+.aa-app .aa-fila-nav .btn.aa-btn-compartir svg{width:18px;height:18px;margin:0}
+@media (max-width:360px){.aa-app .aa-fila-nav .btn.aa-btn-compartir{width:38px;min-width:38px;height:38px;min-height:38px}}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){.aa-app .aa-fila-nav-izq>.aa-btn-compartir{flex:0 0 48px;width:48px}}

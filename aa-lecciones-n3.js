@@ -7,7 +7,7 @@ var L=window.AA_LECCIONES=window.AA_LECCIONES||{};
 L['N3-001']={
   tactica:true, motivo:'Rayos X',
   objetivo:'Vas a aprender que una pieza puede actuar a través de una pieza enemiga y alcanzar a la dama o al rey de detrás.',
-  idea:'Hay **rayos X** cuando tu torre, alfil o dama actúa **a través de una pieza enemiga** que está en su línea. Si esa pieza enemiga captura o se mueve, tu línea se abre y alcanza lo que hay detrás.',
+  idea:'Hay **rayos X** cuando tu torre, alfil o dama actúa **a través de una pieza enemiga**. También en la **enfilada**: atacas la pieza valiosa y, cuando se aparta, capturas la que estaba **detrás**.',
   descubre:{fen:'3q2k1/5ppp/pQ6/3r4/8/8/P4PPP/3R2K1 w - - 0 1',di:'La dama negra de d8 está defendida por su torre de d5. Tu torre de d1 también mira hacia d8… ¿a través de qué pieza?'},
   observa:[
     {flechas:[['d5','d8','defensa']],marcas:[['d8','defendida']],di:'La torre negra de d5 defiende a su dama.',sencillo:'La torre cuida a la dama.'},
@@ -18,7 +18,11 @@ L['N3-001']={
     {fen:'rq6/1R6/8/4P2k/5P2/6PP/8/2Q3K1 w - - 0 1',marcas:[['h5','clave']],di:'Los rayos X también atraviesan al **rey**. Mira el rey negro de h5.',sencillo:'Ahora, a través del rey.'},
     {jugada:'b7h7',marcas:[['h5','jaque']],di:'Th7+: el rey solo puede ir a g6, al lado de tu torre.',sencillo:'Jaque de torre.'},
     {jugada:'h5g6',di:'…Rg6: el rey amenaza comerse la torre.',sencillo:'El rey ataca a tu torre.'},
-    {jugada:'c1c2',flechas:[['c2','h7','linea']],marcas:[['g6','jaque']],di:'Dc2#: la dama da jaque y, a través del rey, protege h7. El rey no puede capturar la torre.',sencillo:'¡Mate! La dama protege la torre a través del rey.'}
+    {jugada:'c1c2',flechas:[['c2','h7','linea']],marcas:[['g6','jaque']],di:'Dc2#: la dama da jaque y, a través del rey, protege h7. El rey no puede capturar la torre.',sencillo:'¡Mate! La dama protege la torre a través del rey.'},
+    {fen:'8/8/1r3k2/8/8/8/8/6KR w - - 0 1',marcas:[['f6','clave'],['b6','clave']],di:'Rayos X en **enfilada** (o pincho): el rey negro y su torre están en la misma fila.',sencillo:'Rey y torre en la misma fila.'},
+    {jugada:'h1h6',flechas:[['h6','b6','linea']],marcas:[['f6','jaque']],di:'Th6+: el jaque atraviesa la fila hasta la torre de b6.',sencillo:'Jaque que apunta a la torre.'},
+    {jugada:'f6e5',di:'…Re5: el rey tiene que apartarse…',sencillo:'El rey se aparta.'},
+    {jugada:'h6b6',marcas:[['b6','clave']],di:'…y Txb6: capturas la pieza que estaba detrás.',sencillo:'Te comes la torre.'}
   ],
   comprende:{di:'Si tu pieza actúa a través de una pieza enemiga, piensa qué pasa cuando esa pieza captura o se mueve: tu línea se abre y alcanza a la dama o al rey.'},
   practica:{fen:'3q2k1/5ppp/pQ6/3r4/8/8/P4PPP/3R2K1 w - - 0 1',linea:['b6d8','d5d8','d1d8'],meta:'mate',
@@ -29,7 +33,18 @@ L['N3-001']={
     bien:'¡Correcto! Ta7+, Rb6 y Df2#: la dama protege a7 a través del rey.'},
   comprueba:{fen:'1k2r3/ppp4p/8/8/4R3/6qP/PPP5/1K2Q3 b - - 0 1',linea:['g3e1','e4e1','e8e1'],meta:'mate',
     di:'Juegas con negras. Encuentra la combinación de rayos X.',pistas:['Tu torre de e8 ve e1 a través de la torre blanca.'],
-    bien:'¡Excelente! …Dxe1+, Txe1 y …Txe1#.'}
+    bien:'¡Excelente! …Dxe1+, Txe1 y …Txe1#.'},
+  extra:[
+    {fen:'r7/6p1/8/3k4/8/6PP/7K/5B2 w - - 0 1',linea:['f1g2','d5e6','g2a8'],
+      di:'Rayos X en enfilada: gana la torre con el alfil.',pistas:['Busca un jaque por la gran diagonal que termina en a8.'],
+      bien:'¡Bien! Ag2+ y, cuando el rey se aparta, Axa8.'},
+    {fen:'r5k1/5pp1/7p/8/8/8/2K2Q2/8 b - - 0 1',linea:['a8a2','c2d3','a2f2'],
+      di:'Juegas con negras. Gana la dama con una enfilada.',pistas:['El rey y la dama blancos están en la segunda fila.'],
+      bien:'¡Excelente! …Ta2+ y …Txf2.'},
+    {fen:'8/8/8/8/2k3q1/8/6PP/R6K w - - 0 1',linea:['a1a4','c4b5','a4g4'],
+      di:'El rey y la dama negros están en la misma fila. ¡Aprovéchalo!',pistas:['Da jaque por la cuarta fila.'],
+      bien:'¡Correcto! Ta4+ y Txg4.'}
+  ]
 };
 
 /* N3-002 · Desviación (Nivel IV, lección 2) */

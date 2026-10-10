@@ -275,29 +275,6 @@ L['N2-012']={
     bien:'¡Excelente! …d4 ataca al caballo clavado, que no puede escapar.'}
 };
 
-/* N2-013 · Enfilada (pincho) */
-L['N2-013']={
-  tactica:true, motivo:'Enfilada',
-  objetivo:'Vas a aprender a atacar una pieza valiosa para ganar la que tiene detrás.',
-  idea:'En la **enfilada** (o pincho) atacas primero la pieza **más valiosa**; cuando se aparta, capturas la que estaba **detrás**. Es lo contrario de la clavada.',
-  descubre:{fen:'8/8/1r3k2/8/8/8/8/6KR w - - 0 1',di:'¿Puedes atacar al rey negro de forma que, al apartarse, deje sin protección la torre que tiene detrás?'},
-  observa:[
-    {jugada:'h1h6',flechas:[['h6','f6','ataque'],['h6','b6','linea']],marcas:[['f6','jaque'],['b6','clave']],di:'Th6+: jaque por la sexta fila. Detrás del rey está la torre de b6.',sencillo:'La torre da jaque y apunta también a lo que hay detrás.'},
-    {jugada:'f6e5',di:'…Re5: el rey tiene que apartarse…',sencillo:'El rey se aparta.'},
-    {jugada:'h6b6',marcas:[['b6','clave']],di:'…y Txb6 captura la torre. Eso es una **enfilada**.',sencillo:'La torre se come la torre de atrás.'}
-  ],
-  comprende:{di:'Busca líneas donde el rey o la dama rival tengan otra pieza detrás. Ataca primero la más valiosa.'},
-  practica:{fen:'r7/6p1/8/3k4/8/6PP/7K/5B2 w - - 0 1',linea:['f1g2'],
-    di:'Encuentra la enfilada de alfil.',pistas:['Busca un jaque por la gran diagonal que termina en a8.'],
-    bien:'¡Bien! Ag2+ y, cuando el rey se aparte, el alfil captura la torre de a8.'},
-  hazlo:{fen:'r5k1/5pp1/7p/8/8/8/2K2Q2/8 b - - 0 1',linea:['a8a2'],
-    di:'Juegas con negras. Busca la enfilada que gana la dama.',pistas:['El rey y la dama blancos están en la segunda fila.'],
-    bien:'¡Excelente! …Ta2+ y, tras el jaque, la torre captura la dama de f2.'},
-  comprueba:{fen:'8/8/8/8/2k3q1/8/6PP/R6K w - - 0 1',linea:['a1a4'],
-    di:'El rey y la dama negros están en la misma fila. ¡Aprovéchalo!',pistas:['Da jaque por la cuarta fila.'],
-    bien:'¡Correcto! Ta4+ y, cuando el rey se aparte, Txg4.'}
-};
-
 /* N2-014 · Ataque descubierto */
 L['N2-014']={
   tactica:true, motivo:'Ataque descubierto',
