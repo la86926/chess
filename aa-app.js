@@ -1375,7 +1375,8 @@ function pintarListaFav(){
     var on=!!fv.sel[c.id];
     return '<li><div class="aa-fv-fila'+(on?' on':'')+'" role="checkbox" tabindex="0" aria-checked="'+on+'" data-carpeta="'+esc(c.id)+'">'+
       '<span class="aa-fv-ico">'+SVG_CARPETA+'</span><span class="aa-fv-nombre">'+esc(c.nombre)+'</span>'+
-      '<span class="aa-fv-check" aria-hidden="true">'+SVG_CHECK+'</span></div></li>';
+      '<span class="aa-fv-check" aria-hidden="true">'+SVG_CHECK+'</span></div>'+
+      '<button type="button" class="aa-icono aa-fv-editar" data-renombrar="'+esc(c.id)+'" aria-label="Renombrar '+esc(c.nombre)+'" title="Renombrar">'+SVG_LAPIZ+'</button></li>';
   }).join(''):'<li class="aa-fv-vacio">No tienes carpetas. Crea una con «Nueva carpeta».</li>';
   avisoFav();
 }
@@ -1389,7 +1390,13 @@ function alternarCarpeta(fila){
   var id=fila.dataset.carpeta;fv.sel[id]=!fv.sel[id];
   fila.classList.toggle('on',fv.sel[id]);fila.setAttribute('aria-checked',String(!!fv.sel[id]));avisoFav();
 }
-el('aa-fv-lista').addEventListener('click',function(e){var f=e.target.closest('[role="checkbox"]');if(f)alternarCarpeta(f);});
+el('aa-fv-lista').addEventListener('click',function(e){
+  /* el lápiz renombra la carpeta sin salir de «Guardar favorito» */
+  var r=e.target.closest('[data-renombrar]');
+  if(r){e.stopPropagation();var cid=r.dataset.renombrar,c=D.carpetasVivas().filter(function(x){return x.id===cid;})[0];if(!c)return;
+    pedirNombreCarpeta({titulo:'Renombrar carpeta',boton:'Guardar',valor:c.nombre,excepto:cid},function(n){D.renombrarCarpeta(cid,n);pintarListaFav();});return;}
+  var f=e.target.closest('[role="checkbox"]');if(f)alternarCarpeta(f);
+});
 el('aa-fv-lista').addEventListener('keydown',function(e){
   var f=e.target.closest('[role="checkbox"]');if(!f)return;
   if(e.key===' '||e.key==='Enter'){e.preventDefault();alternarCarpeta(f);}

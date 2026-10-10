@@ -218,25 +218,33 @@ L['N4-005']={
     bien:'¡Excelente! Rf6 y Dh1#.'}
 };
 
-/* N4-021 · Sacrificio griego */
+/* N4-021 · Regalo envenenado (Nivel II) */
 L['N4-021']={
-  tactica:true, motivo:'Sacrificio griego',
-  objetivo:'Vas a aprender el sacrificio del alfil en h7.',
-  idea:'En el **sacrificio griego** el alfil se entrega en **h7** con jaque. Si el rey captura, llegan el **caballo** a g5 y la **dama** a la columna h.',
-  descubre:{fen:'rnbq1rk1/pppnbppp/4p3/3pP3/3P3P/2NB1N2/PPP2PP1/R1BQK2R w KQ - 1 8',di:'Tu alfil apunta a h7 y el caballo de f6 ya no defiende. ¿Te atreves?'},
+  tactica:true, motivo:'Regalo envenenado',
+  objetivo:'Vas a aprender el regalo envenenado: el sacrificio del alfil en h7.',
+  idea:'En el **regalo envenenado** (o sacrificio griego) el alfil se entrega en **h7** con jaque. Si el rey lo acepta, llegan el **caballo** a g5 y la **dama** a la columna h, y el regalo se vuelve mortal.',
+  descubre:{fen:'rnbq1rk1/pppnbppp/4p3/3pP3/3P3P/2NB1N2/PPP2PP1/R1BQK2R w KQ - 1 8',di:'Tu alfil apunta a h7 y el caballo negro ya no está en f6. ¿Le haces un regalo al rey?'},
   observa:[
-    {flechas:[['d3','h7','ataque']],marcas:[['h7','clave']],di:'Solo el rey defiende h7. El caballo negro está en d7, lejos.',sencillo:'h7 está casi sin defensa.'},
-    {jugada:'d3h7',marcas:[['g8','jaque']],di:'Axh7+!: el sacrificio.',sencillo:'¡El alfil se sacrifica!'},
-    {jugada:'g8h7',di:'…Rxh7',sencillo:'El rey lo captura.'},
-    {jugada:'f3g5',marcas:[['h7','jaque']],di:'Cg5+: el caballo da jaque y prepara Dh5 o Dd3. El ataque es muy fuerte.',sencillo:'El caballo salta con jaque.'}
+    {flechas:[['d3','h7','ataque']],marcas:[['h7','clave']],di:'Solo el rey defiende h7: el caballo negro está en d7, lejos.',sencillo:'h7 está casi sin defensa.'},
+    {flechas:[['f3','g5','mov'],['d1','h5','linea']],di:'Tu caballo puede llegar a g5 y tu dama a h5: esas son las piezas del ataque.',sencillo:'Caballo y dama listos.'},
+    {jugada:'d3h7',marcas:[['g8','jaque']],di:'Axh7+!: el regalo.',sencillo:'¡El alfil se entrega!'},
+    {jugada:'g8h7',di:'…Rxh7: el rey acepta (si …Rh8, el alfil sigue vivo y gana).',sencillo:'El rey se lo come.'},
+    {jugada:'f3g5',marcas:[['h7','jaque']],di:'Cg5+: el caballo da jaque. Si …Rg6 o …Rh6, el ataque sigue con h5 o Dd3.',sencillo:'El caballo salta con jaque.'},
+    {jugada:'h7g8',di:'…Rg8',sencillo:'El rey vuelve.'},
+    {jugada:'d1h5',flechas:[['h5','h7','amenaza']],di:'Dh5: amenaza Dh7#. El regalo era veneno.',sencillo:'Amenaza mate en h7.'}
   ],
-  comprende:{di:'Condiciones: alfil hacia h7, caballo que llegue a g5, dama que llegue a la columna h y sin defensores negros cerca.'},
-  practica:{fen:'rnbq1rk1/pppnbppp/4p3/3pP3/3P3P/2NB1N2/PPP2PP1/R1BQK2R w KQ - 1 8',linea:['d3h7'],
-    di:'Haz el sacrificio griego.',pistas:['El alfil captura en h7 con jaque.'],
-    bien:'¡Bien! Axh7+ y el ataque es ganador.'},
-  hazlo:{fen:'r1bqk2r/ppp2pp1/2nb1n2/3p3p/3Pp3/4P3/PPPNBPPP/RNBQ1RK1 b kq - 0 1',linea:['d6h2'],
-    di:'Juegas con negras. Haz el sacrificio griego.',pistas:['Tu alfil de d6 apunta a h2.'],
-    bien:'¡Correcto! …Axh2+.'}
+  comprende:{di:'Condiciones del regalo envenenado: alfil hacia h7, caballo que llegue a g5, dama que llegue a la columna h y sin defensores negros cerca.'},
+  practica:{fen:'rnbq1rk1/pppnbppp/4p3/3pP3/3P3P/2NB1N2/PPP2PP1/R1BQK2R w KQ - 1 8',linea:['d3h7','g8h7','f3g5','h7g8','d1h5'],
+    di:'Haz el regalo envenenado.',pistas:['El alfil captura en h7 con jaque.','Después, caballo a g5 y dama a h5.'],
+    bien:'¡Bien! Axh7+, Cg5+ y Dh5: el mate en h7 no se puede parar.'},
+  hazlo:{fen:'r1bqk2r/ppp2pp1/2nb1n2/3p3p/3Pp3/4P3/PPPNBPPP/RNBQ1RK1 b kq - 0 1',linea:['d6h2','g1h2','f6g4','h2g1','d8h4'],
+    di:'Juegas con negras. Haz el regalo envenenado.',pistas:['Tu alfil de d6 apunta a h2.','Después, caballo a g4 y dama a h4.'],
+    bien:'¡Correcto! …Axh2+, …Cg4+ y …Dh4.'},
+  extra:[
+    {fen:'rnbq1r2/pppnbpp1/4p1k1/3pP1N1/3P3P/2N5/PPP2PP1/R1BQK2R w KQ - 2 10',linea:['d1d3'],acepta:{0:['d1g4']},concepto:true,mal:{'*':'Busca un jaque o un ataque de dama contra el rey de g6.'},
+      di:'Tras el regalo, el rey negro salió a g6. Sigue el ataque.',pistas:['Un jaque de dama por la diagonal b1–h7.'],
+      bien:'¡Bien! Dd3+: el rey queda a la intemperie y el mate llega pronto.'}
+  ]
 };
 
 /* N4-027 · Redes de mate */
