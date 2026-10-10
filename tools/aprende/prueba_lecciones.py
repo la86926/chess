@@ -93,7 +93,7 @@ with sync_playwright() as p:
             # reproducción automática: Teoría -> demostración -> resumen -> primer ejercicio, sin tocar nada
             ok(esperar(pg,"AAApp.estado.etapa==='observa'",14),lid+': la Teoría no pasó sola a la demostración')
             ok(esperar(pg,"AAApp.estado.etapa==='observa'&&AAApp.estado.paso>=1",14),lid+': la demostración no avanzó sola')
-            ok(esperar(pg,"AAApp.estado.etapa==='comprende'",60),lid+': la demostración no terminó sola en el resumen')
+            ok(esperar(pg,"AAApp.estado.etapa==='comprende'",max(60,7*len(L['observa']))),lid+': la demostración no terminó sola en el resumen')
             ok(esperar(pg,"e=>AAApp.estado.etapa===e",20,tareas[0]),lid+': el resumen no pasó solo al primer ejercicio')
             pausar(pg)
         else:
