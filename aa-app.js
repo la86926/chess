@@ -1307,9 +1307,11 @@ function opcionesItem(ref){
 }
 /* Lecciones fusionadas (p. ej. Enfilada, ahora dentro de Rayos X): los favoritos y el último punto
    guardados con el identificador antiguo pasan a la lección nueva, al ítem equivalente */
-var MAPA_ITEMS={'N2-013':{1:11,2:12,3:13,4:14,5:15,6:19,7:20,8:21}};
+var MAPA_ITEMS={'N2-013':{1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8}};
+/* Rayos X se reorganizó (solo los rayos X que antes estaban en la Enfilada): los ítems antiguos 9–21 pasan a su equivalente */
+var MAPA_RAYOS={9:1,10:1,11:1,12:2,13:3,14:4,15:5,16:6,17:7,18:8,19:6,20:7,21:8};
 function migrarAlias(){
-  var al=CAT.alias||{};if(!Object.keys(al).length)return;
+  var al=CAT.alias||{};
   try{
     var f=D.favoritos(),porRef={};
     D.itemsVivos(f).forEach(function(it){var p=partesFav(it.leccion);if(al[p.id])(porRef[it.leccion]=porRef[it.leccion]||[]).push(it.carpeta);});
@@ -1317,6 +1319,15 @@ function migrarAlias(){
       var p=partesFav(ref),dest=al[p.id],item=(MAPA_ITEMS[p.id]||{})[p.item]||1,nuevo=refFav(dest,item);
       var ya=D.itemsVivos(D.favoritos()).filter(function(it){return it.leccion===nuevo;}).map(function(it){return it.carpeta;});
       D.fijarCarpetasDeLeccion(nuevo,ya.concat(porRef[ref]));D.fijarCarpetasDeLeccion(ref,[]);
+    });
+  }catch(e){}
+  try{
+    var f2=D.favoritos(),viejos={};
+    D.itemsVivos(f2).forEach(function(it){var p=partesFav(it.leccion);if(p.id==='N3-001'&&MAPA_RAYOS[p.item])(viejos[it.leccion]=viejos[it.leccion]||[]).push(it.carpeta);});
+    Object.keys(viejos).forEach(function(ref){
+      var nuevo=refFav('N3-001',MAPA_RAYOS[partesFav(ref).item]);
+      var ya=D.itemsVivos(D.favoritos()).filter(function(it){return it.leccion===nuevo;}).map(function(it){return it.carpeta;});
+      D.fijarCarpetasDeLeccion(nuevo,ya.concat(viejos[ref]));D.fijarCarpetasDeLeccion(ref,[]);
     });
   }catch(e){}
   try{var u=D.leer(K.ultimo);if(u&&al[u.leccion]){u.leccion=al[u.leccion];u.etapa='descubre';u.paso=0;u.jugadas=0;D.guardar(K.ultimo,u);}}catch(e){}
