@@ -76,9 +76,10 @@ with sync_playwright() as p:
     primera=True
     for lid in ids:
         n0=len(errs); L=pg.evaluate("id=>AA_LECCIONES[id]",lid)
-        tareas=[k for k in ['practica','hazlo','comprueba'] if L.get(k)]
+        tareas=[k for k in ['practica','hazlo','comprueba'] if L.get(k)]+['extra%d'%i for i in range(len(L.get('extra') or []))]
+        def tarea(k): return L['extra'][int(k[5:])] if k.startswith('extra') else L[k]
         ok(len(tareas)>0,lid+': no tiene ejercicios')
-        ok(not (L['comprende'].get('pregunta')) and all((L[k].get('tipo') or 'jugada')!='pregunta' for k in tareas),lid+': todavía tiene preguntas de opción múltiple')
+        ok(not (L['comprende'].get('pregunta')) and all((tarea(k).get('tipo') or 'jugada')!='pregunta' for k in tareas),lid+': todavía tiene preguntas de opción múltiple')
         pg.evaluate("id=>AAApp.abrirLeccion(id,{etapa:'descubre'})",lid); time.sleep(0.3)
         ok(pg.evaluate("AAApp.estado.auto")==True,lid+': la lección no empezó reproduciéndose sola')
         ok(pg.evaluate("document.getElementById('aa-continuar').hidden&&document.getElementById('aa-otra-vez').hidden"),lid+': siguen visibles «Continuar» o «Explícame otra vez»')
@@ -120,7 +121,7 @@ with sync_playwright() as p:
             ultima=n==len(tareas)-1
             ok(pg.evaluate("[document.getElementById('b-hint').disabled,document.getElementById('b-sol').disabled]")==[False,False],'%s %s: Pista y Solución deben estar encendidas en el ejercicio'%(lid,etapa))
             if primera and n==0: boton(pg,'#aa-pausa')        # vuelve a reproducir
-            resolver(pg,lid,etapa,L[etapa])
+            resolver(pg,lid,etapa,tarea(etapa))
             if primera and n==0 and not ultima:
                 ok(esperar(pg,"e=>AAApp.estado.etapa===e",12,tareas[1]),lid+': tras resolver, la lección no avanzó sola')
                 pausar(pg)
