@@ -176,7 +176,7 @@ function limpiarCapa(){A.capaPista=false;fijarCapa([],[]);}
 
 /* Cada vez que el entrenador vuelve a dibujar el tablero, se repinta la capa. */
 var renderBoardBase=renderBoard;
-renderBoard=function(){var r=renderBoardBase.apply(this,arguments);try{pintarCapa(false);if(A.tarea&&A.tarea.tipo==='casilla')pintarCasillasElegidas();}catch(e){}return r;};
+renderBoard=function(){var r=renderBoardBase.apply(this,arguments);try{pintarCapa(false);if(A.tarea&&A.tarea.tipo==='casilla')pintarCasillasElegidas();pintarMenciones();}catch(e){}return r;};
 
 /* En la demostración, la lista de jugadas muestra lo que ya ocurrió en el tablero. */
 var renderMovesBase=renderMoves;
@@ -223,7 +223,28 @@ boardEl.addEventListener('pointerdown',function(e){
    ===================================================================== */
 var tutorTexto=el('aa-dice'),tutorCaja=el('aa-tutor');
 var dichos=[];
+/* Casillas que nombra el tutor (b2, Dxh7+, Cf6…): se resaltan en el tablero con un tono suave,
+   para que el alumno vea enseguida de qué casillas se habla. En los ejercicios de tocar casillas
+   no se resaltan hasta resolverlos, para no dar la respuesta. */
+function casillasDelTexto(texto){
+  var s=plano(texto),re=/[a-h][1-8](?![0-9])/g,m,out=[];
+  while((m=re.exec(s))){
+    var i=m.index,prev=i>0?s.charAt(i-1):'';
+    var ok=!prev||!/[A-Za-z0-9áéíóúñÁÉÍÓÚÑ]/.test(prev)||/[KQRBNDTAC]/.test(prev)||(prev==='x'&&i>1&&/[KQRBNDTACa-h]/.test(s.charAt(i-2)));
+    if(ok&&out.indexOf(m[0])<0)out.push(m[0]);
+  }
+  return out;
+}
+function pintarMenciones(){
+  try{
+    boardEl.querySelectorAll('.sq.aa-mencion').forEach(function(c){c.classList.remove('aa-mencion');});
+    if(!(A.modo==='leccion'||A.modo==='descubre'))return;
+    if(A.tarea&&A.tarea.tipo==='casilla'&&!A.resuelta)return;
+    (A.menciones||[]).forEach(function(sq){var c=boardEl.querySelector('.sq[data-sq="'+sq+'"]');if(c)c.classList.add('aa-mencion');});
+  }catch(e){}
+}
 function tutor(texto,tono){
+  A.menciones=casillasDelTexto(texto);pintarMenciones();
   /* Mientras el ejercicio no esté resuelto, debajo de cada mensaje (acierto parcial, error o pista)
      se repite lo que hay que hacer, para no perder la consigna. */
   var recordar=(A.consigna&&A.tarea&&!A.resuelta&&plano(texto)!==plano(A.consigna))?'<span class="aa-consigna">'+rico(A.consigna)+'</span>':'';
@@ -1243,6 +1264,16 @@ function pintarNiveles(){
       '</ol></div></div></section>';
   }).join('');
 }
+/* Altura de la barra de pestañas (para que la cabecera del nivel quede justo debajo) y sombra al quedar fija */
+function medirBarra(){try{var h=el('aa-barra-fija').getBoundingClientRect().height;document.documentElement.style.setProperty('--aa-barra-alto',Math.round(h)+'px');}catch(e){}}
+window.addEventListener('resize',medirBarra);setTimeout(medirBarra,0);
+window.addEventListener('scroll',function(){
+  var top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aa-barra-alto'))||58;
+  document.querySelectorAll('#aa-niveles .aa-nivel.abierto>.aa-nivel-cab').forEach(function(c){
+    var r=c.getBoundingClientRect(),sec=c.parentNode.getBoundingClientRect();
+    c.classList.toggle('fija',Math.abs(r.top-top)<1&&sec.top<top-1);
+  });
+},{passive:true});
 el('aa-niveles').addEventListener('click',function(e){
   var b=e.target.closest('[data-leccion]');if(b){A.temario={y:window.scrollY,id:b.dataset.leccion};abrirLeccion(b.dataset.leccion);window.scrollTo({top:0});return;}
   var cab=e.target.closest('.aa-nivel-cab');if(!cab)return;
@@ -1250,6 +1281,9 @@ el('aa-niveles').addEventListener('click',function(e){
   var sec=cab.parentNode,n=sec.dataset.nivel,ab=!sec.classList.contains('abierto');
   sec.classList.toggle('abierto',ab);cab.setAttribute('aria-expanded',String(ab));
   if(ab)A.nivelesAbiertos[n]=true;else delete A.nivelesAbiertos[n];
+  /* al cerrar un nivel desde su cabecera fija, la página vuelve a mostrar esa cabecera */
+  if(!ab){var top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aa-barra-alto'))||58,rs=sec.getBoundingClientRect();
+    cab.classList.remove('fija');if(rs.top<top)window.scrollBy(0,rs.top-top-8);}
 });
 
 /* Buscador del Temario: busca en todos los niveles por título (y por tema), sin importar acentos ni mayúsculas */
