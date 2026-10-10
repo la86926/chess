@@ -772,3 +772,7 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-fv-lista>li>.aa-fv-fila{flex:1 1 auto;min-width:0}
 .aa-fv-lista .aa-fv-nombre{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .aa-fv-editar{flex:0 0 40px}
+/* Flechas de jugada: se dibujan de la cola a la cabeza; la punta aparece cuando el trazo llega */
+.aa-flecha.anim:not(.t-amenaza):not(.t-defensa):not(.t-linea) polygon{opacity:0;animation:aaPunta .14s ease-out .5s forwards}
+@keyframes aaPunta{to{opacity:.92}}
+@media (prefers-reduced-motion:reduce){.aa-flecha.anim polygon{animation:none!important;opacity:.92!important}}
