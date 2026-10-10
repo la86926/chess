@@ -796,8 +796,10 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
   border-bottom:1px solid transparent;transition:border-color .2s ease}
 .aa-nivel.abierto>.aa-nivel-cab.fija{border-bottom-color:var(--line);box-shadow:0 6px 12px -10px rgba(0,0,0,.25)}
 /* Temario: buscador flotante. Botón circular abajo a la derecha; al tocarlo se abre una caja horizontal
-   bajo las pestañas, con sus propios resultados, sin mover la página. */
-.aa-buscar-flotante{position:fixed;right:calc(16px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));z-index:20;
+   bajo las pestañas, con sus propios resultados, sin mover la página.
+   Va a 88px del borde: en iPhone, con la barra de Safari recogida, un toque en la franja inferior
+   (unos 44–72px) solo vuelve a mostrar la barra y no llega al botón. */
+.aa-buscar-flotante{position:fixed;right:calc(16px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom));z-index:20;
   width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);
   display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;
   box-shadow:0 8px 22px rgba(0,0,0,.16);opacity:0;transform:scale(.6) translateY(10px);pointer-events:none;
