@@ -172,7 +172,7 @@ function pintarLeyenda(){
   cont.innerHTML=h;cont.hidden=false;cont.classList.toggle('vacia',!h);
 }
 function fijarCapa(flechas,marcas,animar){A.capa={flechas:(flechas||[]).slice(),marcas:(marcas||[]).slice()};pintarCapa(animar);}
-function limpiarCapa(){fijarCapa([],[]);}
+function limpiarCapa(){A.capaPista=false;fijarCapa([],[]);}
 
 /* Cada vez que el entrenador vuelve a dibujar el tablero, se repinta la capa. */
 var renderBoardBase=renderBoard;
@@ -873,6 +873,7 @@ function frasesError(){
 }
 /* Al terminar la línea (incluye la mascota, que envuelve esta función al cargar) */
 onSolved=function(){
+  try{if(A.capaPista)quitarPista();}catch(e){}
   sndSolved();marcarReyMate();
   lanzarConfeti(A.modo==='leccion'&&A.tarea&&A.tarea.etapa===ultimaTarea(A.lec)?70:40);
   state.freemode=true;state.sel=null;state.anaMoves=state.game.history({verbose:true});state.anaPtr=state.anaMoves.length;
@@ -881,9 +882,17 @@ onSolved=function(){
 };
 
 /* El cuadro de estado de PC1 está oculto: el tutor da la retroalimentación. */
+/* La flecha de la pista (y la casilla marcada) desaparece en cuanto el alumno hace la jugada:
+   la siguiente jugada vuelve a empezar las pistas desde la primera */
+function quitarPista(){
+  if(A.capaPista){A.capaPista=false;limpiarCapa();}
+  try{boardEl.querySelectorAll('.sq.sel').forEach(function(c){c.classList.remove('sel');});}catch(e){}
+  if(A.modo==='leccion')A.pistas=0;
+}
 var setStatusBase=setStatus;
 setStatus=function(kind,msg){
   var r=setStatusBase.apply(this,arguments);
+  try{if((kind==='ok'||kind==='idle'||kind==='done')&&A.tarea&&A.tarea.tipo==='jugada')quitarPista();}catch(e){}
   try{
     if(!A.tarea||A.tarea.tipo!=='jugada'||A.resuelta)return r;
     if(kind==='ok'&&/rival responde/i.test(msg||''))tutor('¡Correcto! Tu rival responde…','bien');
@@ -911,7 +920,7 @@ el('b-hint').onclick=function(){
   var u=state.uci[state.step],from=u.slice(0,2),pc=state.game.get(from);
   if(A.pistas===1){tutor((t.pistas&&t.pistas[0])||'Busca primero jaques, capturas y amenazas.');}
   else if(A.pistas===2){clearMarks();var c2=cellOf(from);if(c2)c2.classList.add('sel');tutor((t.pistas&&t.pistas[1])||('Mueve el '+(pc?NOMBRE_PIEZA[pc.type]:'')+' de '+from+'.'));}
-  else{A.capa={flechas:[[from,u.slice(2,4),'mov']],marcas:[]};pintarCapa(true);tutor('La jugada es '+sanEs(sanDe(state.game.fen(),u))+'. Hazla tú en el tablero.');}
+  else{A.capa={flechas:[[from,u.slice(2,4),'mov']],marcas:[]};pintarCapa(true);A.capaPista=true;tutor('La jugada es '+sanEs(sanDe(state.game.fen(),u))+'. Hazla tú en el tablero.');}
 };
 function contarPista(){
   A.pistas++;
@@ -1055,7 +1064,7 @@ function pistaDescubre(otraVez){
   var u=state.uci[state.step]||state.uci[0],from=u.slice(0,2),pc=state.game.get(from);
   if(it.pistas===1)tutor(otraVez?'Otra forma de verlo: haz una lista de todas tus jugadas que dan jaque, que capturan o que amenazan algo. Una de ellas funciona.':'Pista 1: busca jaques, capturas y amenazas. ¿Qué pieza rival está mal defendida o qué casilla es débil?');
   else if(it.pistas===2){clearMarks();var c=cellOf(from);if(c)c.classList.add('sel');tutor('Pista 2: la jugada empieza con el '+(pc?NOMBRE_PIEZA[pc.type]:'')+' de '+from+'.');}
-  else{A.capa={flechas:[[from,u.slice(2,4),'mov']],marcas:[]};pintarCapa(true);tutor('Pista 3: juega '+sanEs(sanDe(state.game.fen(),u))+'.');}
+  else{A.capa={flechas:[[from,u.slice(2,4),'mov']],marcas:[]};pintarCapa(true);A.capaPista=true;tutor('Pista 3: juega '+sanEs(sanDe(state.game.fen(),u))+'.');}
 }
 function descubreResuelto(){
   festejarTutor();
