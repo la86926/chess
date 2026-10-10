@@ -1315,6 +1315,25 @@ function buscarLecciones(){
     }).join('')+'</ol></section>';
 }
 el('aa-buscar').addEventListener('input',buscarLecciones);
+/* Botón flotante del buscador: aparece solo en el Temario cuando el buscador ya salió de la pantalla */
+function verBuscarFlotante(){
+  try{
+    var b=el('aa-buscar-flotante'),enTemario=el('v-levels').classList.contains('active');
+    var top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aa-barra-alto'))||58;
+    var r=document.querySelector('#v-levels .aa-buscador').getBoundingClientRect();
+    var ver=enTemario&&r.height>0&&r.bottom<top;
+    b.classList.toggle('visible',ver);b.tabIndex=ver?0:-1;
+  }catch(e){}
+}
+window.addEventListener('scroll',verBuscarFlotante,{passive:true});
+window.addEventListener('resize',verBuscarFlotante);
+el('aa-buscar-flotante').onclick=function(){
+  var inp=el('aa-buscar'),caja=document.querySelector('#v-levels .aa-buscador');
+  var top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aa-barra-alto'))||58;
+  try{inp.focus({preventScroll:true});}catch(e){inp.focus();}
+  window.scrollTo({top:Math.max(0,window.scrollY+caja.getBoundingClientRect().top-top-12),behavior:'smooth'});
+  this.classList.remove('visible');
+};
 el('aa-buscar').addEventListener('keydown',function(e){
   if(e.key==='Escape'){this.value='';buscarLecciones();}
   if(e.key==='Enter'){this.blur();}
@@ -1699,6 +1718,7 @@ function pestana(v){
   document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('active',x.id==='v-'+v);});
   document.body.classList.toggle('aa-en-leccion',v==='train');
   if(v==='levels'){pintarNiveles();buscarLecciones();}
+  verBuscarFlotante();
   if(v==='favs')pintarFavoritos();
   if(v==='discover')pintarStatsDescubre();
   if(v!=='train'){pararDemo();quitarMascota();}

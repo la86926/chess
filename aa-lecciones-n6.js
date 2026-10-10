@@ -21,21 +21,71 @@ L['N6-001']={
     bien:'¡Bien! c5 y d5 son peones colgantes.'}
 };
 
-/* N6-002 · Ataque de minorías */
+/* N6-002 · Ataque de minorías (estructura Carlsbad; material del estudio de Lichess
+   «Carlsbad: estructura y las 4 etapas típicas de un ataque de minorías», partida Abramovich–Mark) */
 L['N6-002']={
   tactica:false, motivo:'Ataque de minorías',
-  objetivo:'Vas a aprender el ataque de minorías: menos peones atacando a más.',
-  idea:'En el **ataque de minorías**, avanzas **dos peones contra tres** en un flanco para crear una **debilidad** en la cadena rival. En la Caro-Kann del cambio lo hacen las negras con …b5-b4.',
-  descubre:{fen:'r4rk1/pp3ppp/2nqpn2/3p4/3P2b1/1QPB1N2/PP1N1PPP/4RRK1 b - - 3 12',di:'Caro-Kann, variante del cambio. Tienes dos peones (a, b) contra tres blancos (a, b, c) en el flanco de dama.'},
+  objetivo:'Vas a aprender el ataque de minorías: atacar con menos peones para dejarle al rival un peón débil.',
+  idea:'En el **ataque de minorías** atacas con **menos peones** una **cadena más grande**. El objetivo es **cambiar la estructura** rival y dejarle una **debilidad**: un peón **retrasado** o **aislado**.',
+  descubre:{fen:'6k1/pp3ppp/2p5/3p4/3P4/4P3/PP3PPP/6K1 w - - 0 1',di:'Estructura **Carlsbad**. En el flanco de dama tienes 2 peones (a y b) y las negras 3 (a, b y c). ¿Se puede atacar con menos?'},
   observa:[
-    {marcas:[['a7','clave'],['b7','clave'],['a2','clave'],['b2','clave'],['c3','clave']],di:'Dos contra tres: la minoría avanzará para romper la cadena blanca.',sencillo:'Pocos peones contra más.'},
-    {jugada:'a8b8',marcas:[['b5','clave']],di:'…Tab8: la torre prepara …b5 y …b4.',sencillo:'La torre apoya el avance.'}
+    {marcas:[['a2','clave'],['b2','clave'],['a7','clave'],['b7','clave'],['c6','clave']],di:'Sí: eso es el **ataque de minorías**. Tus 2 peones (la **minoría**) atacan a los 3 negros (la **mayoría**).',sencillo:'2 peones contra 3.'},
+    {flechas:[['a2','a4','mov'],['b2','b4','mov']],di:'El plan: avanzar **a4** y **b4-b5** para chocar con el peón de **c6**.',sencillo:'Avanza a y b hasta b5.'},
+    {fen:'6k1/pp3ppp/2p5/1P1p4/P2P4/4P3/5PPP/6K1 b - - 0 1',flechas:[['b5','c6','ataque']],marcas:[['c6','amenazada']],di:'El **objetivo** no es ganar un peón: es que las negras queden con un peón **débil**. Mira qué pasa según cómo respondan.',sencillo:'Buscas un peón débil.'},
+    {fen:'6k1/p4ppp/2p5/3p4/3P4/4P3/P4PPP/2R3K1 w - - 0 1',flechas:[['c1','c6','ataque']],marcas:[['c6','clave'],['a7','clave']],di:'Si dejan el cambio (**bxc6 bxc6**): c6 queda **retrasado** en la columna c, a tiro de tu torre. Y a7 también es débil: dos debilidades.',sencillo:'c6 y a7 quedan débiles.'},
+    {fen:'6k1/p4ppp/1pp5/3p4/1P1P4/4P3/P4PPP/2R3K1 w - - 0 1',flechas:[['c1','c6','ataque']],marcas:[['c6','clave']],di:'Si responden **…b6**: ese peón ya no protege c6, que queda **retrasado** en la columna c.',sencillo:'c6 queda sin apoyo.'},
+    {fen:'6k1/p4ppp/2p5/1p1p4/1P1P4/3NP3/P4PPP/2R3K1 w - - 0 1',flechas:[['d3','c5','mov']],marcas:[['c6','clave'],['c5','clave']],di:'Si frenan con **…b5**: c6 sigue retrasado y **c5** ya no la defiende ningún peón: un puesto ideal para tu caballo.',sencillo:'c5 es para tu caballo.'},
+    {fen:'6k1/pp3ppp/8/1p1p4/3P4/4P3/P4PPP/2R3K1 w - - 0 1',flechas:[['c1','c7','linea']],marcas:[['d5','clave']],di:'Si capturan **…cxb5**: el peón de **d5** queda **aislado** y tu torre entra por la columna c abierta.',sencillo:'d5 queda aislado.'},
+    {fen:'6k1/pp3ppp/8/1Ppp4/3P4/4P3/P4PPP/2R3K1 w - - 0 1',flechas:[['d4','c5','mov']],di:'Si liberan con **…c5**, tú cambias con **dxc5**…',sencillo:'Cambias en c5.'},
+    {jugada:'d4c5',marcas:[['d5','clave']],di:'…y **d5** se queda sin vecinos: otra vez un peón **aislado**.',sencillo:'d5 queda aislado.'},
+    {fen:'r1bqkb1r/pp3ppp/2p2nn1/3p3N/1P1P4/P1N1P3/5PPP/R1BQKB1R w KQkq - 0 11',flechas:[['g2','g3','mov']],di:'Partida modelo: Abramovich–Mark. **Fase 1, prevenir:** 11.g3 frena el contraataque negro en el flanco de rey.',sencillo:'Fase 1: g3 previene.'},
+    {fen:'r1bq1rk1/pp4pp/2pb2n1/3p1p1Q/1P1P4/P1N1P1P1/5PBP/R1B2RK1 w - - 0 15',flechas:[['b4','b5','mov']],marcas:[['c6','clave']],di:'**Fase 2, provocar:** 15.b5 choca con c6. Las negras deben elegir qué debilidad aceptar.',sencillo:'Fase 2: b5.'},
+    {fen:'r2q1rkn/p5pp/2pbb3/3p1p2/3P4/P1N1P1P1/5PBP/R1BQ1RK1 w - - 0 18',flechas:[['c3','a4','mov']],marcas:[['c6','clave'],['c5','clave']],di:'Tras bxc6 bxc6, c6 es un peón **retrasado**. **Fase 3, fijarlo:** el caballo va a a4 y luego a c5.',sencillo:'Fase 3: el caballo a c5.'},
+    {fen:'1rr3k1/p3qnpp/2pbb3/3p1p2/N2P4/P1B1P1P1/2Q2PBP/R4RK1 w - - 8 22',flechas:[['c3','b4','mov'],['d6','c5','defensa']],di:'El alfil va a **b4** para cambiarse por el alfil negro que defiende **c5**.',sencillo:'Cambia el defensor de c5.'},
+    {fen:'2r3k1/p5pp/2pnq3/3p1p2/1r1P4/4P1P1/2Q2PBP/R4RK1 w - - 0 26',flechas:[['a1','a7','mov']],marcas:[['c6','clave']],di:'**Fase 4, atacar:** tus torres entran (26.Txa7) y c6 sigue débil hasta el final. Ganaron las blancas.',sencillo:'Fase 4: atacar con las torres.'}
   ],
-  comprende:{di:'Con la minoría, avanza para cambiar peones y dejar al rival con un peón débil (normalmente en c3 o c6).'},
-  practica:{fen:'r4rk1/pp3ppp/2nqpn2/3p4/3P2b1/1QPB1N2/PP1N1PPP/4RRK1 b - - 3 12',linea:['a8b8'],acepta:{0:['f8b8']},concepto:true,objetivoEquilibrio:true,
-    di:'Juegas con negras. Prepara el ataque de minorías.',pistas:['Una torre en la columna b apoya el avance del peón.'],
-    mal:{'*':'Prepara …b5 llevando una torre a b8.'},
-    bien:'¡Bien! Ahora …b5 y …b4.'}
+  comprende:{di:'Ataque de minorías: avanza tu minoría contra la cadena rival, deja un peón **retrasado** o **aislado**, **fíjalo** con tus piezas y **atácalo** con las torres.'},
+  practica:{fen:'r1bq1rk1/pp4pp/2pb2n1/3p1p1Q/1P1P4/P1N1P1P1/5PBP/R1B2RK1 w - - 0 15',linea:['b4b5'],concepto:true,objetivoEquilibrio:true,
+    di:'Abramovich–Mark. Ya jugaste g3. Empieza el ataque de minorías.',pistas:['El peón de b4 avanza contra c6.'],
+    mal:{'*':'El plan es b5, contra el peón de c6.'},
+    bien:'¡Bien! 15.b5: las negras tendrán que aceptar una debilidad.'},
+  hazlo:{fen:'r2q1rkn/p5pp/2pbb3/3p1p2/3P4/P1N1P1P1/5PBP/R1BQ1RK1 w - - 0 18',linea:['c3a4'],concepto:true,objetivoEquilibrio:true,
+    di:'Ya hay un peón retrasado en c6. Lleva el caballo camino de c5.',pistas:['Desde c3, el caballo pasa por a4.'],
+    mal:{'*':'El caballo de c3 va a a4 para llegar a c5.'},
+    bien:'¡Correcto! 18.Ca4 y luego Cc5.'},
+  comprueba:{fen:'r2r2k1/pp2qpbp/2p3p1/3p4/PP1P4/2RNP1P1/1Q3P1P/2R3K1 w - - 0 1',linea:['b4b5'],concepto:true,objetivoEquilibrio:true,
+    di:'Torres en la columna c y peones en a4 y b4. Todo está listo: haz la ruptura.',pistas:['Un peón choca con c6.'],
+    mal:{'*':'La ruptura del ataque de minorías es b5.'},
+    bien:'¡Bien! b5: c6 quedará débil en la columna c.'},
+  extra:[
+    {tipo:'casilla',fen:'6k1/p4ppp/2p5/3p4/3P4/4P3/P4PPP/2R3K1 w - - 0 1',casillas:['c6','a7'],
+      di:'Tras bxc6 bxc6, toca las dos debilidades negras.',pista:'Una está en la columna c y otra en la columna a.',
+      bien:'¡Bien! c6 retrasado y a7 aislado.'},
+    {fen:'1rr3k1/p3qnpp/2pbb3/3p1p2/N2P4/P1B1P1P1/2Q2PBP/R4RK1 w - - 8 22',linea:['c3b4'],concepto:true,objetivoEquilibrio:true,
+      di:'Cambia el alfil negro que defiende la casilla c5.',pistas:['Tu alfil de c3 puede ofrecer el cambio.'],
+      mal:{'*':'Ab4: cambia el defensor de c5.'},
+      bien:'¡Bien! Sin ese alfil, c5 será de tu caballo.'},
+    {fen:'2r3k1/p3qnpp/2p1b3/3p1p2/Nr1P4/4P1P1/2Q2PBP/R4RK1 w - - 0 24',linea:['a4c5'],concepto:true,
+      di:'Instala el caballo en el puesto fuerte.',pistas:['La casilla c5 ya no la defiende ningún peón ni alfil negro.'],
+      mal:{'*':'El caballo de a4 va a c5.'},
+      bien:'¡Bien! El caballo en c5 domina el flanco de dama.'},
+    {fen:'2r3k1/p3q1pp/2pnb3/2Np1p2/1r1P4/4P1P1/2Q2PBP/R4RK1 w - - 2 25',linea:['c5e6'],concepto:true,
+      di:'Cambia el caballo para abrir paso a tus torres. c6 seguirá débil.',pistas:['El caballo de c5 puede capturar un alfil.'],
+      mal:{'*':'Cxe6: tras el cambio, tus torres se activan.'},
+      bien:'¡Bien! Ahora tus torres entran por la columna a.'},
+    {fen:'2r3k1/p5pp/2pnq3/3p1p2/1r1P4/4P1P1/2Q2PBP/R4RK1 w - - 0 26',linea:['a1a7'],concepto:true,
+      di:'Tu torre puede entrar. Gana material.',pistas:['La columna a está abierta.'],
+      mal:{'*':'Txa7: la torre entra y gana un peón.'},
+      bien:'¡Bien! 26.Txa7.'},
+    {fen:'r1r3k1/p3qnpp/2p1b3/3p1p2/N2P4/b1B1P1P1/2Q2PBP/R4RK1 w - - 0 22',linea:['a1a3','e7a3','a4c5'],concepto:true,
+      di:'Las negras capturaron en a3. Castiga ese error.',pistas:['Txa3 y, si la dama captura, tu caballo la encierra.'],
+      mal:{'*':'Txa3 Dxa3 y Cc5: la dama queda atrapada.'},
+      bien:'¡Bien! Tras Cc5, Ta1 atrapa a la dama.'},
+    {fen:'r4rk1/pp3ppp/2nqpn2/3p4/3P2b1/1QPB1N2/PP1N1PPP/4RRK1 b - - 3 12',linea:['a8b8'],acepta:{0:['f8b8']},concepto:true,objetivoEquilibrio:true,
+      di:'Caro-Kann del cambio: aquí las **negras** hacen el ataque de minorías. Prepara …b5.',pistas:['Una torre en la columna b apoya el avance del peón.'],
+      mal:{'*':'Prepara …b5 llevando una torre a b8.'},
+      bien:'¡Bien! Luego …b5-b4 contra c3.'}
+  ]
 };
 
 /* N6-003 · Base de la cadena */
