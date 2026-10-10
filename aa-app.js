@@ -1348,14 +1348,29 @@ function cerrarBuscarFlotante(){
 }
 window.addEventListener('scroll',verBuscarFlotante,{passive:true});
 window.addEventListener('resize',verBuscarFlotante);
-el('aa-buscar-flotante').onclick=function(){bflotAbierto()?cerrarBuscarFlotante():abrirBuscarFlotante();};
+/* En iPhone/iPad, si la página aún se desliza por inercia, el primer toque solo la frena y el navegador
+   no envía el «click». Por eso estos botones responden también al soltar el dedo (touchend), si el dedo
+   apenas se movió; y el «click» que llegue justo después se ignora para no actuar dos veces. */
+function alTocar(b,fn){
+  var ini=null,ultimo=0;
+  b.addEventListener('touchstart',function(e){var t=e.changedTouches[0];ini={x:t.clientX,y:t.clientY};},{passive:true});
+  b.addEventListener('touchend',function(e){
+    var t=e.changedTouches[0];if(!ini)return;
+    var mov=Math.abs(t.clientX-ini.x)+Math.abs(t.clientY-ini.y);ini=null;
+    if(mov>12)return;
+    e.preventDefault();ultimo=Date.now();fn.call(b,e);
+  },{passive:false});
+  b.addEventListener('touchcancel',function(){ini=null;},{passive:true});
+  b.addEventListener('click',function(e){if(Date.now()-ultimo<700)return;fn.call(b,e);});
+}
+alTocar(el('aa-buscar-flotante'),function(){bflotAbierto()?cerrarBuscarFlotante():abrirBuscarFlotante();});
 el('aa-bflot-input').addEventListener('input',buscarFlotante);
 el('aa-bflot-input').addEventListener('keydown',function(e){
   if(e.key==='Escape')cerrarBuscarFlotante();
   if(e.key==='Enter')this.blur();
 });
 el('aa-bflot-x').onclick=function(){var i=el('aa-bflot-input');i.value='';buscarFlotante();try{i.focus({preventScroll:true});}catch(e){i.focus();}};
-el('aa-bflot-cerrar').onclick=cerrarBuscarFlotante;
+alTocar(el('aa-bflot-cerrar'),cerrarBuscarFlotante);
 el('aa-bflot-res').addEventListener('click',function(e){
   var b=e.target.closest('[data-leccion]');if(!b)return;
   A.temario={y:window.scrollY,id:b.dataset.leccion};cerrarBuscarFlotante();abrirLeccion(b.dataset.leccion);window.scrollTo({top:0});
