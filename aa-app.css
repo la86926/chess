@@ -795,13 +795,33 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-nivel.abierto>.aa-nivel-cab{position:sticky;top:var(--aa-barra-alto,58px);z-index:6;background:var(--panel);
   border-bottom:1px solid transparent;transition:border-color .2s ease}
 .aa-nivel.abierto>.aa-nivel-cab.fija{border-bottom-color:var(--line);box-shadow:0 6px 12px -10px rgba(0,0,0,.25)}
-/* Temario: botón circular del buscador cuando el buscador queda fuera de la pantalla */
+/* Temario: buscador flotante. Botón circular abajo a la derecha; al tocarlo se abre una caja horizontal
+   bajo las pestañas, con sus propios resultados, sin mover la página. */
 .aa-buscar-flotante{position:fixed;right:calc(16px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));z-index:20;
   width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);
   display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;
   box-shadow:0 8px 22px rgba(0,0,0,.16);opacity:0;transform:scale(.6) translateY(10px);pointer-events:none;
   transition:opacity .2s ease,transform .25s cubic-bezier(.2,.9,.3,1.25)}
-.aa-buscar-flotante.visible{opacity:1;transform:none;pointer-events:auto}
-.aa-buscar-flotante svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.aa-bflot.visible:not(.abierto) .aa-buscar-flotante{opacity:1;transform:none;pointer-events:auto}
+.aa-buscar-flotante svg,.aa-bflot-lupa{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .aa-buscar-flotante:active{transform:scale(.92)}
-@media (prefers-reduced-motion:reduce){.aa-buscar-flotante{transition:opacity .15s}}
+.aa-bflot-barra{position:fixed;z-index:21;top:calc(var(--aa-barra-alto,58px) + 8px);left:50%;width:min(560px,calc(100% - 32px));
+  display:flex;align-items:center;gap:6px;height:50px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:14px;
+  background:var(--panel);box-shadow:0 10px 28px rgba(0,0,0,.16);
+  opacity:0;transform:translate(-50%,-8px) scaleX(.2);transform-origin:right center;pointer-events:none;
+  transition:opacity .18s ease,transform .28s cubic-bezier(.2,.9,.3,1.1)}
+.aa-bflot.abierto .aa-bflot-barra{opacity:1;transform:translate(-50%,0) scaleX(1);pointer-events:auto}
+.aa-bflot-lupa{flex:none;width:18px;height:18px;color:var(--muted);stroke-width:2}
+.aa-bflot-barra input{flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--ink);font:400 16px var(--sans);outline:none;-webkit-appearance:none;appearance:none;padding:0}
+.aa-bflot-barra input::placeholder{color:var(--muted)}
+.aa-bflot-barra input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.aa-bflot-barra .aa-buscar-x{position:static;flex:none}
+.aa-bflot-barra .aa-buscar-x[hidden]{display:none}
+.aa-bflot-cerrar{flex:none;height:36px;padding:0 12px;border:0;border-radius:10px;background:var(--tinte-neutro,rgba(0,0,0,.05));color:var(--ink);font:500 .85rem var(--sans);cursor:pointer}
+.aa-bflot-res{position:fixed;z-index:21;top:calc(var(--aa-barra-alto,58px) + 66px);left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 32px));
+  max-height:min(60vh,calc(100vh - var(--aa-barra-alto,58px) - 90px));overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  padding:.7rem;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:0 14px 34px rgba(0,0,0,.18)}
+.aa-bflot-res[hidden],.aa-bflot:not(.abierto) .aa-bflot-res{display:none}
+.aa-bflot-res .aa-buscar-panel{box-shadow:none;border:0;margin:0}
+.aa-bflot-res .aa-buscar-panel .aa-lista-lecciones{padding:0}
+@media (prefers-reduced-motion:reduce){.aa-buscar-flotante,.aa-bflot-barra{transition:opacity .15s}}

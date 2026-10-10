@@ -1295,18 +1295,22 @@ el('aa-niveles').addEventListener('click',function(e){
 /* Buscador del Temario: busca en todos los niveles por título (y por tema), sin importar acentos ni mayúsculas */
 function sinAcentos(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();}
 function buscarLecciones(){
-  var inp=el('aa-buscar'),res=el('aa-buscar-res'),txt=inp.value.trim(),q=sinAcentos(txt);
+  var inp=el('aa-buscar'),res=el('aa-buscar-res'),txt=inp.value.trim();
   el('aa-buscar-x').hidden=!txt;
-  var buscando=!!q;
+  var buscando=!!sinAcentos(txt);
   res.hidden=!buscando;el('aa-niveles').hidden=buscando;el('aa-continuar-bloque').hidden=buscando;
-  if(!buscando){res.innerHTML='';return;}
+  res.innerHTML=buscando?resultadosBusqueda(txt):'';
+}
+/* Lista de lecciones que coinciden con el texto (la usan el buscador de arriba y el flotante) */
+function resultadosBusqueda(txt){
+  var q=sinAcentos(txt);if(!q)return '';
   var palabras=q.split(/\s+/),favs=lecturaFavsPorLeccion(),u=D.leer(K.ultimo);
   var hallados=CAT.lista.filter(function(c){
     var l=LEC[c.id],donde=sinAcentos(c.titulo+' '+(l&&l.motivo||'')+' '+nombreNivel(c.nivel)+' nivel '+c.nivel);
     return palabras.every(function(w){return donde.indexOf(w)>=0;});
   });
-  if(!hallados.length){res.innerHTML='<p class="aa-buscar-nada">No hay lecciones con «'+esc(txt)+'».</p>';return;}
-  res.innerHTML='<p class="aa-buscar-cuenta">'+hallados.length+(hallados.length===1?' lección':' lecciones')+'</p>'+
+  if(!hallados.length)return '<p class="aa-buscar-nada">No hay lecciones con «'+esc(txt)+'».</p>';
+  return '<p class="aa-buscar-cuenta">'+hallados.length+(hallados.length===1?' lección':' lecciones')+'</p>'+
     '<section class="panel-card aa-buscar-panel"><ol class="aa-lista-lecciones aa-lista-buscar">'+hallados.map(function(c){
       var e=estadoVisible(c.id),ult=c.id===u.leccion;
       return '<li><button type="button" class="aa-fila-leccion e-'+e+(ult?' aa-ultima':'')+'" data-leccion="'+c.id+'"><span class="aa-fl-num">'+c.num+'</span><span class="aa-fl-tit">'+esc(c.titulo)+'<small class="aa-fl-nivel">'+esc(nombreNivel(c.nivel))+'</small></span>'+
@@ -1315,25 +1319,52 @@ function buscarLecciones(){
     }).join('')+'</ol></section>';
 }
 el('aa-buscar').addEventListener('input',buscarLecciones);
-/* Botón flotante del buscador: aparece solo en el Temario cuando el buscador ya salió de la pantalla */
+/* Buscador flotante del Temario: cuando el buscador de arriba sale de la pantalla aparece un botón circular.
+   Al tocarlo se abre una caja de texto horizontal con sus propios resultados, sin mover la página. */
+function bflotAbierto(){return el('aa-bflot').classList.contains('abierto');}
 function verBuscarFlotante(){
   try{
-    var b=el('aa-buscar-flotante'),enTemario=el('v-levels').classList.contains('active');
+    var b=el('aa-bflot'),enTemario=el('v-levels').classList.contains('active');
+    if(!enTemario&&bflotAbierto())cerrarBuscarFlotante();
     var top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aa-barra-alto'))||58;
     var r=document.querySelector('#v-levels .aa-buscador').getBoundingClientRect();
-    var ver=enTemario&&r.height>0&&r.bottom<top;
-    b.classList.toggle('visible',ver);b.tabIndex=ver?0:-1;
+    var ver=enTemario&&(bflotAbierto()||(r.height>0&&r.bottom<top));
+    b.classList.toggle('visible',ver);el('aa-buscar-flotante').tabIndex=ver?0:-1;
   }catch(e){}
+}
+function buscarFlotante(){
+  var txt=el('aa-bflot-input').value.trim(),res=el('aa-bflot-res'),html=resultadosBusqueda(txt);
+  el('aa-bflot-x').hidden=!txt;res.innerHTML=html;res.hidden=!html;res.scrollTop=0;
+}
+function abrirBuscarFlotante(){
+  var inp=el('aa-bflot-input');
+  el('aa-bflot').classList.add('abierto');el('aa-buscar-flotante').setAttribute('aria-expanded','true');inp.tabIndex=0;
+  try{inp.focus({preventScroll:true});}catch(e){inp.focus();}
+  buscarFlotante();
+}
+function cerrarBuscarFlotante(){
+  el('aa-bflot').classList.remove('abierto');el('aa-buscar-flotante').setAttribute('aria-expanded','false');
+  var inp=el('aa-bflot-input');inp.value='';inp.tabIndex=-1;inp.blur();buscarFlotante();verBuscarFlotante();
 }
 window.addEventListener('scroll',verBuscarFlotante,{passive:true});
 window.addEventListener('resize',verBuscarFlotante);
-el('aa-buscar-flotante').onclick=function(){
-  var inp=el('aa-buscar'),caja=document.querySelector('#v-levels .aa-buscador');
-  var top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aa-barra-alto'))||58;
-  try{inp.focus({preventScroll:true});}catch(e){inp.focus();}
-  window.scrollTo({top:Math.max(0,window.scrollY+caja.getBoundingClientRect().top-top-12),behavior:'smooth'});
-  this.classList.remove('visible');
-};
+el('aa-buscar-flotante').onclick=function(){bflotAbierto()?cerrarBuscarFlotante():abrirBuscarFlotante();};
+el('aa-bflot-input').addEventListener('input',buscarFlotante);
+el('aa-bflot-input').addEventListener('keydown',function(e){
+  if(e.key==='Escape')cerrarBuscarFlotante();
+  if(e.key==='Enter')this.blur();
+});
+el('aa-bflot-x').onclick=function(){var i=el('aa-bflot-input');i.value='';buscarFlotante();try{i.focus({preventScroll:true});}catch(e){i.focus();}};
+el('aa-bflot-cerrar').onclick=cerrarBuscarFlotante;
+el('aa-bflot-res').addEventListener('click',function(e){
+  var b=e.target.closest('[data-leccion]');if(!b)return;
+  A.temario={y:window.scrollY,id:b.dataset.leccion};cerrarBuscarFlotante();abrirLeccion(b.dataset.leccion);window.scrollTo({top:0});
+});
+/* tocar fuera, sin haber escrito nada, la cierra */
+document.addEventListener('click',function(e){
+  if(!bflotAbierto()||e.target.closest('#aa-bflot'))return;
+  if(!el('aa-bflot-input').value.trim())cerrarBuscarFlotante();
+});
 el('aa-buscar').addEventListener('keydown',function(e){
   if(e.key==='Escape'){this.value='';buscarLecciones();}
   if(e.key==='Enter'){this.blur();}
