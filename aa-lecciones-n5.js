@@ -175,7 +175,7 @@ L['N5-026']={
     bien:'¡Correcto! Las negras están en zugzwang.'}
 };
 
-/* N5-027 · Zugzwang recíproco */
+/* N5-027 · Zugzwang recíproco (Nivel III, lección 29) */
 L['N5-027']={
   tactica:false, motivo:'Zugzwang recíproco',
   objetivo:'Vas a aprender las posiciones en las que pierde quien tiene que mover.',

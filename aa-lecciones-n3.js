@@ -882,4 +882,35 @@ L['N3-038']={
     bien:'¡Bien! El caballo de d5 no tenía defensa.'}
 };
 
+
+/* N3-039 · Zugzwang táctico (ejercicios de Lichess Practice: Zugzwang) */
+L['N3-039']={
+  tactica:true, motivo:'Zugzwang',
+  objetivo:'Vas a aprender a usar el zugzwang para ganar: jugar una jugada de espera que obliga al rival a empeorar.',
+  idea:'En el **zugzwang táctico** no hace falta atacar: haces una **jugada de espera** y el rival, obligado a mover, tiene que **abrir la puerta** al mate o perder material.',
+  descubre:{fen:'3k4/8/2K5/7R/8/8/8/8 w - - 0 1',di:'El rey negro solo tiene dos casillas: c8 y e8. ¿Puedes hacer que solo le quede una?'},
+  observa:[
+    {marcas:[['c7','clave'],['d7','clave']],di:'Tu rey de c6 ya le quita c7 y d7.',sencillo:'Tu rey le quita casillas.'},
+    {jugada:'h5e5',flechas:[['e5','e8','linea']],di:'Te5!: una jugada de espera que le quita e8 y e7. No es jaque, pero las negras tienen que mover.',sencillo:'Jugada de espera.'},
+    {jugada:'d8c8',di:'…Rc8: la única casilla que le queda.',sencillo:'El rey tiene que ir a c8.'},
+    {jugada:'e5e8',marcas:[['c8','jaque']],di:'Te8#: el zugzwang le obligó a meterse en la red.',sencillo:'¡Mate!'}
+  ],
+  comprende:{di:'Si el rival solo tiene jugadas malas, no te apresures: una jugada de espera lo obliga a elegir una de ellas.'},
+  practica:{fen:'3k4/8/2K5/7R/8/8/8/8 w - - 0 1',linea:['h5e5','d8c8','e5e8'],meta:'mate',concepto:true,
+    di:'Mate en dos con una jugada de espera.',pistas:['Quítale al rey la casilla e8 sin darle jaque.'],
+    mal:{'*':'Busca una jugada de torre que le quite e8 y e7 sin dar jaque.'},
+    bien:'¡Mate! Te5, Rc8 y Te8#.'},
+  hazlo:{fen:'5rk1/6n1/8/7p/4q1pP/6P1/6RQ/6NK b - - 0 1',linea:['f8f1','h2h3','g4h3','g3g4','e4g2'],meta:'mate',
+    di:'Juegas con negras. Las piezas blancas están atadas. Deja que se estorben.',pistas:['Tu torre puede clavar el caballo de g1.','Después, las blancas solo tienen jugadas malas.'],
+    bien:'¡Correcto! …Tf1, Dh3 gxh3, g4 y …Dxg2#.'},
+  comprueba:{fen:'1k1b4/2n5/1K6/4B3/6B1/8/8/8 w - - 0 1',linea:['g4d7','b8a8','d7c6','a8b8','c6b7','d8h4','e5c7'],meta:'mate',
+    di:'Mate en cuatro con zugzwang.',pistas:['Lleva el alfil de g4 hacia b7.','El caballo de c7 está clavado y el alfil negro no puede ayudarlo.'],
+    bien:'¡Excelente! Ad7, Ac6+, Ab7 y Axc7#.'},
+  extra:[
+    {fen:'8/8/3k4/1p1p4/1P6/2P1K3/8/8 w - - 0 1',linea:['e3d4','d6c6','d4e5','c6b6','e5d5','b6c7','d5c5'],concepto:true,
+      di:'Final de peones: usa el zugzwang para ganar los peones negros.',pistas:['Ocupa d4 con el rey.','El rey negro no puede defender d5 y b5 a la vez.'],
+      mal:{'*':'Lleva tu rey a d4 y aprovecha que las negras tienen que mover.'},
+      bien:'¡Bien! Rd4, Re5, Rxd5 y Rc5: sigue Rxb5.'}
+  ]
+};
 })();
