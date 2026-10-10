@@ -3,7 +3,7 @@
 'use strict';
 var L=window.AA_LECCIONES=window.AA_LECCIONES||{};
 
-/* N3-001 · Rayos X (Nivel IV, lección 1) */
+/* N3-001 · Rayos X (Nivel II) */
 L['N3-001']={
   tactica:true, motivo:'Rayos X',
   objetivo:'Vas a aprender a atacar una pieza valiosa para ganar la que está detrás de ella.',
@@ -26,7 +26,7 @@ L['N3-001']={
     bien:'¡Correcto! Ta4+ y Txg4.'}
 };
 
-/* N3-002 · Desviación (Nivel IV, lección 2) */
+/* N3-002 · Desviación (Nivel II) */
 L['N3-002']={
   tactica:true, motivo:'Desviación',
   objetivo:'Vas a aprender a ofrecer material para que un defensor abandone su tarea.',
@@ -51,7 +51,7 @@ L['N3-002']={
     bien:'¡Excelente! Si …Dxg4, Txe8#. Si …g6, Dxd7 gana la dama.'}
 };
 
-/* N3-003 · Atracción (Nivel IV, lección 3) */
+/* N3-003 · Atracción (Nivel II) */
 L['N3-003']={
   tactica:true, motivo:'Atracción',
   objetivo:'Vas a aprender a atraer al rey rival, con sacrificios, hacia una red de mate.',
@@ -86,7 +86,7 @@ L['N3-003']={
     bien:'¡Excelente! …Dxa2+, Rxa2 y …Ta6#.'}
 };
 
-/* N3-004 · Sobrecarga (Nivel IV, lección 4) */
+/* N3-004 · Sobrecarga (Nivel II) */
 L['N3-004']={
   tactica:true, motivo:'Sobrecarga',
   objetivo:'Vas a aprender a aprovechar una pieza que tiene dos tareas a la vez.',

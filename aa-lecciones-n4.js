@@ -49,7 +49,7 @@ L['N4-003']={
     bien:'¡Excelente! Ab6+, Rb8 y Da7#.'}
 };
 
-/* N4-004 · Bloqueo (Nivel IV, lección 6) */
+/* N4-004 · Bloqueo (Nivel II) */
 L['N4-004']={
   tactica:true, motivo:'Bloqueo',
   objetivo:'Vas a aprender a obligar a una pieza rival a tapar la salida de su propio rey.',
@@ -687,7 +687,7 @@ L['N4-034']={
     di:'Juegas con negras. Toca tu peón pasado protegido.',pista:'Lo defiende otro peón.',bien:'¡Bien! El peón de d4.'}
 };
 
-/* N4-001 · Interferencia (Nivel IV, lección 5) */
+/* N4-001 · Interferencia (Nivel II) */
 L['N4-001']={
   tactica:true, motivo:'Interferencia',
   objetivo:'Vas a aprender a cortar la línea de un defensor rival interponiendo una pieza que ofreces.',
