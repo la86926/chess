@@ -776,3 +776,14 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-flecha.anim:not(.t-amenaza):not(.t-defensa):not(.t-linea) polygon{opacity:0;animation:aaPunta .14s ease-out .5s forwards}
 @keyframes aaPunta{to{opacity:.92}}
 @media (prefers-reduced-motion:reduce){.aa-flecha.anim polygon{animation:none!important;opacity:.92!important}}
+/* Casillas que nombra el tutor: tono suave, sin tapar las piezas */
+.aa-app #board .sq.aa-mencion::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:rgba(86,156,214,.20);box-shadow:inset 0 0 0 2px rgba(86,156,214,.42);animation:aaMencion .35s ease-out both}
+.aa-app #board .sq.aa-mencion .pc{position:relative;z-index:1}
+@keyframes aaMencion{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.aa-app #board .sq.aa-mencion::before{animation:none}}
+/* Temario: la cabecera del nivel abierto queda fija bajo las pestañas mientras recorres sus lecciones */
+.aa-nivel{overflow:hidden;overflow:clip}
+.aa-nivel.abierto>.aa-nivel-cab{position:sticky;top:var(--aa-barra-alto,58px);z-index:6;background:var(--panel);
+  border-bottom:1px solid transparent;transition:border-color .2s ease}
+.aa-nivel.abierto>.aa-nivel-cab.fija{border-bottom-color:var(--line);box-shadow:0 6px 12px -10px rgba(0,0,0,.25)}
