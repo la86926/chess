@@ -218,32 +218,47 @@ L['N4-005']={
     bien:'¡Excelente! Rf6 y Dh1#.'}
 };
 
-/* N4-021 · Regalo envenenado (Nivel II) */
+/* N4-021 · Regalo envenenado (Nivel III, después de El peón envenenado; ejercicios de Lichess Practice: The Greek Gift) */
 L['N4-021']={
   tactica:true, motivo:'Regalo envenenado',
-  objetivo:'Vas a aprender el regalo envenenado: el sacrificio del alfil en h7.',
-  idea:'En el **regalo envenenado** (o sacrificio griego) el alfil se entrega en **h7** con jaque. Si el rey lo acepta, llegan el **caballo** a g5 y la **dama** a la columna h, y el regalo se vuelve mortal.',
-  descubre:{fen:'rnbq1rk1/pppnbppp/4p3/3pP3/3P3P/2NB1N2/PPP2PP1/R1BQK2R w KQ - 1 8',di:'Tu alfil apunta a h7 y el caballo negro ya no está en f6. ¿Le haces un regalo al rey?'},
+  objetivo:'Vas a aprender el regalo envenenado: el sacrificio del alfil en h7 para atacar al rey enrocado.',
+  idea:'En el **regalo envenenado** (o sacrificio griego) el alfil se entrega en **h7** con jaque. Si el rey lo acepta, el **caballo** salta a g5 y la **dama** llega a la columna h: el regalo se vuelve veneno.',
+  descubre:{fen:'rnbq1rk1/pppn1ppp/4p3/3pP3/1b1P4/2NB1N2/PPP2PPP/R1BQK2R w KQq - 0 1',di:'Tu alfil apunta a h7 y el caballo negro de d7 ya no defiende el enroque. ¿Le haces un regalo al rey?'},
   observa:[
-    {flechas:[['d3','h7','ataque']],marcas:[['h7','clave']],di:'Solo el rey defiende h7: el caballo negro está en d7, lejos.',sencillo:'h7 está casi sin defensa.'},
-    {flechas:[['f3','g5','mov'],['d1','h5','linea']],di:'Tu caballo puede llegar a g5 y tu dama a h5: esas son las piezas del ataque.',sencillo:'Caballo y dama listos.'},
-    {jugada:'d3h7',marcas:[['g8','jaque']],di:'Axh7+!: el regalo.',sencillo:'¡El alfil se entrega!'},
-    {jugada:'g8h7',di:'…Rxh7: el rey acepta (si …Rh8, el alfil sigue vivo y gana).',sencillo:'El rey se lo come.'},
-    {jugada:'f3g5',marcas:[['h7','jaque']],di:'Cg5+: el caballo da jaque. Si …Rg6 o …Rh6, el ataque sigue con h5 o Dd3.',sencillo:'El caballo salta con jaque.'},
-    {jugada:'h7g8',di:'…Rg8',sencillo:'El rey vuelve.'},
-    {jugada:'d1h5',flechas:[['h5','h7','amenaza']],di:'Dh5: amenaza Dh7#. El regalo era veneno.',sencillo:'Amenaza mate en h7.'}
+    {flechas:[['d3','h7','ataque'],['f3','g5','mov'],['d1','h5','linea']],marcas:[['h7','clave']],di:'Alfil hacia h7, caballo que llega a g5 y dama que llega a h5: las tres piezas del ataque.',sencillo:'Tres piezas contra h7.'},
+    {jugada:'d3h7',marcas:[['g8','jaque']],di:'1.Axh7+!: el regalo.',sencillo:'¡El alfil se entrega!'},
+    {jugada:'g8h7',di:'1…Rxh7: el rey acepta.',sencillo:'El rey se lo come.'},
+    {jugada:'f3g5',marcas:[['h7','jaque']],di:'2.Cg5+: jaque de caballo.',sencillo:'El caballo salta con jaque.'},
+    {jugada:'h7g8',di:'2…Rg8',sencillo:'El rey vuelve.'},
+    {jugada:'d1h5',flechas:[['h5','h7','amenaza']],di:'3.Dh5: amenaza Dh7#. Las negras tienen que dar la dama.',sencillo:'Amenaza mate en h7.'},
+    {jugada:'d8g5',di:'3…Dxg5',sencillo:'La dama negra captura el caballo.'},
+    {jugada:'c1g5',di:'4.Axg5: recuperas la pieza y ganas la dama por el alfil.',sencillo:'Ganas la dama.'}
   ],
-  comprende:{di:'Condiciones del regalo envenenado: alfil hacia h7, caballo que llegue a g5, dama que llegue a la columna h y sin defensores negros cerca.'},
-  practica:{fen:'rnbq1rk1/pppnbppp/4p3/3pP3/3P3P/2NB1N2/PPP2PP1/R1BQK2R w KQ - 1 8',linea:['d3h7','g8h7','f3g5','h7g8','d1h5'],
+  comprende:{di:'Condiciones del regalo envenenado: alfil hacia h7, caballo que llegue a g5, dama que llegue a la columna h y pocos defensores negros cerca.'},
+  practica:{fen:'rnbq1rk1/pppn1ppp/4p3/3pP3/1b1P4/2NB1N2/PPP2PPP/R1BQK2R w KQq - 0 1',linea:['d3h7','g8h7','f3g5','h7g8','d1h5','d8g5','c1g5'],concepto:true,
     di:'Haz el regalo envenenado.',pistas:['El alfil captura en h7 con jaque.','Después, caballo a g5 y dama a h5.'],
-    bien:'¡Bien! Axh7+, Cg5+ y Dh5: el mate en h7 no se puede parar.'},
-  hazlo:{fen:'r1bqk2r/ppp2pp1/2nb1n2/3p3p/3Pp3/4P3/PPPNBPPP/RNBQ1RK1 b kq - 0 1',linea:['d6h2','g1h2','f6g4','h2g1','d8h4'],
-    di:'Juegas con negras. Haz el regalo envenenado.',pistas:['Tu alfil de d6 apunta a h2.','Después, caballo a g4 y dama a h4.'],
-    bien:'¡Correcto! …Axh2+, …Cg4+ y …Dh4.'},
+    mal:{'*':'Sigue el patrón: Axh7+, Cg5+ y Dh5.'},
+    bien:'¡Bien! Axh7+, Cg5+, Dh5 y Axg5: ganas la dama.'},
+  hazlo:{fen:'r2qrbk1/5ppp/pn1p4/np2P1P1/3p4/5N2/PPB2PP1/R1BQR1K1 w - - 1 20',linea:['c2h7','g8h7','g5g6','f7g6','f3g5','h7g8','d1f3','d8g5','c1g5'],concepto:true,
+    di:'Ahora con el alfil desde c2. Haz el regalo envenenado.',pistas:['Axh7+ y, después, un peón da jaque en g6.','El caballo llega a g5 y la dama a f3.'],
+    mal:{'*':'Sigue el patrón: Axh7+, g6+, Cg5+ y Df3.'},
+    bien:'¡Correcto! Axh7+, g6+, Cg5+, Df3 y Axg5.'},
+  comprueba:{fen:'rnb2rk1/pp1nqppp/4p3/3pP3/3p3P/2NB3N/PPP2PP1/R2QK2R w KQ - 0 10',linea:['d3h7','g8h8','d1h5','e7h4','h5h4','g7g5','h3g5','h8g7','h4h6','g7h8','h7d3','h8g8','h6h7'],meta:'mate',concepto:true,
+    di:'Regalo envenenado con la columna h abierta. Llega hasta el mate.',pistas:['Axh7+ y, si el rey no captura, Dh5.','Tras los cambios en h4, el caballo de h3 entra por g5.'],
+    mal:{'*':'Sigue con jaques y amenazas sobre h7.'},
+    bien:'¡Mate! Dh7#.'},
   extra:[
-    {fen:'rnbq1r2/pppnbpp1/4p1k1/3pP1N1/3P3P/2N5/PPP2PP1/R1BQK2R w KQ - 2 10',linea:['d1d3'],acepta:{0:['d1g4']},concepto:true,mal:{'*':'Busca un jaque o un ataque de dama contra el rey de g6.'},
-      di:'Tras el regalo, el rey negro salió a g6. Sigue el ataque.',pistas:['Un jaque de dama por la diagonal b1–h7.'],
-      bien:'¡Bien! Dd3+: el rey queda a la intemperie y el mate llega pronto.'}
+    {fen:'r3r1k1/1b2qppp/p7/1p1Pb3/1P6/P2B4/1B2Q1PP/3R1RK1 w - - 0 21',linea:['d3h7','g8h7','e2h5','h7g8','b2e5','e7e5','h5f7','g8h8','f1f5','e5e3','g1h1','e3e1','d1e1','e8e1','f5f1','e1f1','f7f1'],concepto:true,
+      di:'Regalo envenenado con la dama desde e2. Calcula hasta el final.',pistas:['Axh7+ y Dh5+.','Después, el alfil de b2 captura en e5.'],
+      mal:{'*':'Sigue el patrón: Axh7+, Dh5+ y Axe5.'},
+      bien:'¡Bien! Llegas a un final con una pieza de más.'},
+    {fen:'3r1rk1/bpq2ppp/p1b1p3/2P5/1P2B3/P4Q2/1B3PPP/2R2RK1 w - - 3 18',linea:['e4h7','g8h7','f3h5','h7g8','b2g7','f7f5','h5h8','g8f7','g7f8','a7b8','h8g7','f7e8','g7c7'],concepto:true,
+      di:'Doble sacrificio: el alfil de e4 en h7 y el de b2 en g7.',pistas:['Axh7+ y Dh5+.','Después, Axg7.'],
+      mal:{'*':'Sigue el patrón: Axh7+, Dh5+ y Axg7.'},
+      bien:'¡Excelente! Dxc7: ganas la dama.'},
+    {fen:'r1bqk2r/ppp2pp1/2nb1n2/3p3p/3Pp3/4P3/PPPNBPPP/RNBQ1RK1 b kq - 0 1',linea:['d6h2','g1h2','f6g4','h2g1','d8h4'],
+      di:'Juegas con negras. Haz el regalo envenenado.',pistas:['Tu alfil de d6 apunta a h2.','Después, caballo a g4 y dama a h4.'],
+      bien:'¡Correcto! …Axh2+, …Cg4+ y …Dh4.'}
   ]
 };
 
