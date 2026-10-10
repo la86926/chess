@@ -913,4 +913,40 @@ L['N3-039']={
       bien:'¡Bien! Rd4, Re5, Rxd5 y Rc5: sigue Rxb5.'}
   ]
 };
+
+/* N3-040 · Contra amenaza (ejercicios de Lichess Practice: Zwischenzug) */
+L['N3-040']={
+  tactica:true, motivo:'Contra amenaza',
+  objetivo:'Vas a aprender a responder a una amenaza con otra amenaza más fuerte.',
+  idea:'En la **contra amenaza** no respondes a lo que te atacan: creas **una amenaza mayor**. El rival tiene que atenderla y, cuando lo hace, ganas tú.',
+  descubre:{fen:'2r3k1/q5pp/4p3/2rp1p2/1p1B1P2/1P1QP3/P1R3PP/6K1 w - - 2 28',di:'Las negras presionan tu torre de c2. Mira la diagonal de tu alfil de d4: ¿qué hay detrás de la torre de c5?'},
+  observa:[
+    {flechas:[['d4','a7','linea']],marcas:[['c5','clave'],['a7','clave']],di:'Tu alfil ataca la torre de c5 y, detrás, la dama de a7: la torre está clavada.',sencillo:'La torre de c5 está clavada.'},
+    {jugada:'d3b5',flechas:[['b5','c5','ataque']],di:'Db5!: en lugar de defenderte, atacas otra vez la torre clavada.',sencillo:'Contra amenaza.'},
+    {jugada:'c5c2',di:'…Txc2: la torre se mueve… (si …Txb5, Txc8+ Rf7 y Axa7).',sencillo:'La torre se va.'},
+    {jugada:'d4a7',di:'Axa7: y la dama negra cae. Ganas la dama por una torre.',sencillo:'¡Ganas la dama!'}
+  ],
+  comprende:{di:'Cuando te amenacen, busca primero una amenaza tuya más fuerte: jaques, ataques a la dama o a piezas clavadas.'},
+  practica:{fen:'2r3k1/q5pp/4p3/2rp1p2/1p1B1P2/1P1QP3/P1R3PP/6K1 w - - 2 28',linea:['d3b5','c5c2','d4a7'],
+    di:'Responde con una contra amenaza.',pistas:['La torre de c5 está clavada a su dama.','Atácala otra vez con la dama.'],
+    bien:'¡Bien! Db5 y Axa7: la dama negra cae.'},
+  hazlo:{fen:'2r2rk1/pp1b1ppp/1q2p3/3pP3/1B3Pn1/3B1N2/P3Q1PP/RN2KR2 b Q - 0 16',linea:['c8c1','e1d2','c1f1','e2f1','b6b4'],
+    di:'Juegas con negras. Tu dama está atacada por el alfil de b4. ¿Hay algo más fuerte que retirarla?',pistas:['Empieza con un jaque de torre en c1.','Después, la dama captura el alfil con jaque.'],
+    bien:'¡Correcto! …Tc1+, Rd2, …Txf1, Dxf1 y …Dxb4+.'},
+  comprueba:{fen:'r1b5/4kq2/p1Bbp1Qp/6p1/8/4B1P1/PPP4P/6K1 w - - 0 29',linea:['g6h6','a8b8','e3g5'],concepto:true,
+    di:'Las negras amenazan tu dama. Busca la contra amenaza.',pistas:['Captura un peón con la dama y crea otra amenaza.','Después, el alfil da jaque en g5.'],
+    mal:{'*':'Busca Dxh6: la dama se salva y prepara Axg5+.'},
+    bien:'¡Excelente! Dxh6 y Axg5+: el ataque es decisivo.'},
+  extra:[
+    {fen:'2r2r1k/1pN1Qpbp/p4pp1/qb6/8/1B6/PP3PPP/2RR2K1 w - - 10 23',linea:['b3e6','b5e2','e6c8','e2d1','c1d1'],
+      di:'Tu dama está atacada por el alfil de b5. Contraataca.',pistas:['Tu alfil puede atacar la torre de c8.','Al final, recaptura en d1.'],
+      bien:'¡Bien! Ae6, …Ae2, Axc8, …Axd1 y Txd1: ganas material.'},
+    {fen:'2r3k1/q5pp/4p3/2rp1p2/1p1B1P2/1P1QP3/P1R3PP/6K1 w - - 2 28',linea:['d3b5','c5b5','c2c8','g8f7','d4a7'],
+      di:'La misma posición, pero ahora las negras capturan tu dama. ¿Cómo sigues?',pistas:['Primero, Db5.','Si …Txb5, la torre de c2 da jaque en c8.'],
+      bien:'¡Bien! Txc8+ y Axa7: ganas la dama igual.'},
+    {fen:'rBbqk2r/pp3ppp/8/3n4/1bpP4/8/PP2BKPP/RN1Q2NR b kq - 2 10',linea:['a8b8'],
+      di:'Juegas con negras. El alfil blanco acaba de capturar en b8. Antes de buscar jugadas intermedias, comprueba la recaptura.',pistas:['La torre de a8 puede capturar.'],
+      bien:'¡Correcto! …Txb8: aquí la recaptura es lo mejor.'}
+  ]
+};
 })();
