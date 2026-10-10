@@ -776,11 +776,19 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-flecha.anim:not(.t-amenaza):not(.t-defensa):not(.t-linea) polygon{opacity:0;animation:aaPunta .14s ease-out .5s forwards}
 @keyframes aaPunta{to{opacity:.92}}
 @media (prefers-reduced-motion:reduce){.aa-flecha.anim polygon{animation:none!important;opacity:.92!important}}
-/* Casillas que nombra el tutor: tono suave, sin tapar las piezas */
-.aa-app #board .sq.aa-mencion::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:rgba(86,156,214,.20);box-shadow:inset 0 0 0 2px rgba(86,156,214,.42);animation:aaMencion .35s ease-out both}
-.aa-app #board .sq.aa-mencion .pc{position:relative;z-index:1}
-@keyframes aaMencion{from{opacity:0}to{opacity:1}}
+/* Casillas que menciona el tutor: entran con un pequeño "pop", laten tres veces y quedan marcadas. */
+.aa-app #board .sq.aa-mencion::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:rgba(138,84,250,.34);box-shadow:inset 0 0 0 3px rgba(112,56,230,.9);
+  animation:aaMencionEntra .45s cubic-bezier(.2,.9,.3,1.3) var(--aa-m-t,0ms) both,
+            aaMencionLatido .9s ease-in-out calc(var(--aa-m-t,0ms) + .45s) 3 both}
+.aa-app #board .sq.aa-mencion .pc{position:relative;z-index:2}
+@keyframes aaMencionEntra{
+  0%{opacity:0;transform:scale(.35);border-radius:50%}
+  70%{opacity:1;transform:scale(1.04);border-radius:12%}
+  100%{opacity:1;transform:scale(1);border-radius:0}}
+@keyframes aaMencionLatido{
+  0%,100%{background:rgba(138,84,250,.34);box-shadow:inset 0 0 0 3px rgba(112,56,230,.9)}
+  50%{background:rgba(138,84,250,.62);box-shadow:inset 0 0 0 6px rgba(112,56,230,1)}}
 @media (prefers-reduced-motion:reduce){.aa-app #board .sq.aa-mencion::before{animation:none}}
 /* Temario: la cabecera del nivel abierto queda fija bajo las pestañas mientras recorres sus lecciones */
 .aa-nivel{overflow:hidden;overflow:clip}
