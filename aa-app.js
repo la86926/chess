@@ -235,16 +235,22 @@ function casillasDelTexto(texto){
   }
   return out;
 }
-function pintarMenciones(){
+function pintarMenciones(reiniciar){
   try{
-    boardEl.querySelectorAll('.sq.aa-mencion').forEach(function(c){c.classList.remove('aa-mencion');});
-    if(!(A.modo==='leccion'||A.modo==='descubre'))return;
-    if(A.tarea&&A.tarea.tipo==='casilla'&&!A.resuelta)return;
-    (A.menciones||[]).forEach(function(sq){var c=boardEl.querySelector('.sq[data-sq="'+sq+'"]');if(c)c.classList.add('aa-mencion');});
+    var previas=boardEl.querySelectorAll('.sq.aa-mencion');
+    var visibles=(A.modo==='leccion'||A.modo==='descubre')&&!(A.tarea&&A.tarea.tipo==='casilla'&&!A.resuelta);
+    var lista=visibles?(A.menciones||[]):[];
+    previas.forEach(function(c){if(reiniciar||lista.indexOf(c.getAttribute('data-sq'))<0)c.classList.remove('aa-mencion');});
+    if(!lista.length)return;
+    if(reiniciar)void boardEl.offsetWidth; /* reinicia la animación aunque la casilla ya estuviera resaltada */
+    /* Si el tablero se vuelve a dibujar a mitad de la animación, esta continúa donde iba en vez de empezar de nuevo. */
+    var t=-Math.min(Math.max(Date.now()-(A.mencionT||0),0),60000)+'ms';
+    lista.forEach(function(sq){var c=boardEl.querySelector('.sq[data-sq="'+sq+'"]');if(c){c.style.setProperty('--aa-m-t',t);c.classList.add('aa-mencion');}});
   }catch(e){}
 }
 function tutor(texto,tono){
-  A.menciones=casillasDelTexto(texto);pintarMenciones();
+  var nuevas=casillasDelTexto(texto),cambio=String(texto)!==A.mencionTexto;
+  A.menciones=nuevas;A.mencionTexto=String(texto);if(cambio)A.mencionT=Date.now();pintarMenciones(cambio);
   /* Mientras el ejercicio no esté resuelto, debajo de cada mensaje (acierto parcial, error o pista)
      se repite lo que hay que hacer, para no perder la consigna. */
   var recordar=(A.consigna&&A.tarea&&!A.resuelta&&plano(texto)!==plano(A.consigna))?'<span class="aa-consigna">'+rico(A.consigna)+'</span>':'';
