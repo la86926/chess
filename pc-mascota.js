@@ -17,7 +17,7 @@
   var PROPORCION = 949 / 1016;           // ancho / alto de la caja del personaje
   var CUADRO_MS = 85;
   var DOBLE_MS = 320;
-  var CLAVE = 'pc_mascota_oculta';        // 'siempre' (local) o 'sesion' (sesión)
+  var CLAVE = 'mascotaPC_oculta_v2';     // 'siempre' (local) o 'sesion' (sesión); sin prefijo pc_ para que no se sincronice
   var CLAVE_AVISO = 'pc_mascota_aviso_v2';
   var reducido = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
