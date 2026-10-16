@@ -827,3 +827,15 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .aa-bflot-res .aa-buscar-panel{box-shadow:none;border:0;margin:0}
 .aa-bflot-res .aa-buscar-panel .aa-lista-lecciones{padding:0}
 @media (prefers-reduced-motion:reduce){.aa-buscar-flotante,.aa-bflot-barra{transition:opacity .15s}}
+/* Mac y iPad horizontal: el globo es más alto (6 renglones), así que la mascota del tutor crece
+   para acompañarlo; la punta del globo baja hasta la altura de su cara. */
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  .aa-app .aa-tutor{gap:.9rem}
+  .aa-app .aa-tutor-cara{width:104px;height:104px;flex:0 0 104px;margin-top:6px}
+  .aa-app .aa-tutor-globo:before{top:40px}
+  .aa-app .aa-cara-notas i{max-width:28px}
+}
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px) and (max-width:1100px){
+  .aa-app .aa-tutor-cara{width:88px;height:88px;flex-basis:88px}
+  .aa-app .aa-tutor-globo:before{top:34px}
+}
