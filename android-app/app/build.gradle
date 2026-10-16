@@ -14,30 +14,26 @@ android {
         versionName '3'
     }
 
+    def ks = System.getenv('ANDROID_KEYSTORE_FILE')
+
     signingConfigs {
-        release {
-            def ks = System.getenv('ANDROID_KEYSTORE_FILE')
-            if (ks) {
+        if (ks) {
+            release {
                 storeFile file(ks)
                 storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
                 keyAlias System.getenv('ANDROID_KEY_ALIAS')
                 keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
-            } else {
-                // Sin clave guardada: usa la clave de prueba
-                storeFile signingConfigs.debug.storeFile
-                storePassword signingConfigs.debug.storePassword
-                keyAlias signingConfigs.debug.keyAlias
-                keyPassword signingConfigs.debug.keyPassword
+                enableV1Signing true
+                enableV2Signing true
             }
-            enableV1Signing true
-            enableV2Signing true
         }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            // Con clave fija firma con ella; si no, con la de prueba
+            signingConfig ks ? signingConfigs.release : signingConfigs.debug
         }
     }
 }
