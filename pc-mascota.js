@@ -4,8 +4,8 @@
    - Al resolver un ejercicio festeja como en Aprende Ajedrez: baila, suben notas
      musicales y levanta la guitarra cada tanto. Al cargar otro ejercicio se calma.
    - Doble toque: ventanita flotante con «Quitar por esta vez», «Quitar para siempre» y cerrar.
-   - Cuando no está, arriba a la derecha aparece un botón con su carita que abre la misma
-     ventanita con «Agregar a la escena».
+   - Arriba a la derecha, a la izquierda del regalo, un botón cuadrado con su carita abre la misma
+     ventanita: si está, para quitarla; si no está, «Agregar a la escena».
    «Por esta vez» dura hasta que se vuelve a abrir la app (sessionStorage);
    «para siempre» queda guardado (localStorage) hasta que se agregue de nuevo. */
 (function(){
@@ -69,13 +69,14 @@
   'html[data-modo="oscuro"] .pc-mascota .pcm-globo:after{border-bottom-color:#2c2c30}' +
 
   /* ---------- botón arriba a la derecha (cuando la mascota no está) ---------- */
-  '.pcm-boton{position:absolute;z-index:60;width:40px;height:40px;padding:0;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:visible;-webkit-tap-highlight-color:transparent;transition:transform .2s ease,box-shadow .2s ease}' +
-  '.pcm-boton img{width:30px;height:30px;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none;transform:translateY(1px)}' +
+  '.pcm-boton{position:absolute;z-index:60;width:2.5rem;height:2.5rem;padding:0;margin:0;border:1px solid var(--line,rgba(0,0,0,.1));border-radius:var(--r-ico,12px);background:var(--tinte-oro,#fbf3e2);box-shadow:var(--luz-interna,0 0 0 transparent),var(--s1,0 2px 8px rgba(0,0,0,.08));display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:visible;-webkit-tap-highlight-color:transparent;transition:transform .2s,border-color .2s,background .2s}' +
+  '.pcm-boton img{width:1.6rem;height:1.6rem;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none}' +
   '.pcm-boton:active{transform:scale(.92)}' +
-  '@media (hover:hover){.pcm-boton:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.14)}.pcm-boton:hover img{animation:pcmSaluda .6s ease-in-out}}' +
-  '.pcm-boton .pcm-onda{position:absolute;inset:-1px;border-radius:12px;border:2px solid var(--acento-tema,#53707F);opacity:0;pointer-events:none}' +
+  '@media (hover:hover){.pcm-boton:hover{transform:translateY(-1px);border-color:var(--gold,#E2B65F);background:var(--panel2,#fff)}.pcm-boton:hover img{animation:pcmSaluda .6s ease-in-out}}' +
+  '.pcm-boton .pcm-onda{position:absolute;inset:-1px;border-radius:inherit;border:2px solid var(--gold,#E2B65F);opacity:0;pointer-events:none}' +
   '.pcm-boton .pcm-onda.va{animation:pcmOnda .8s ease-out}' +
-  'html[data-modo="oscuro"] .pcm-boton{background:rgba(44,44,48,.92);border-color:rgba(255,255,255,.1);box-shadow:0 4px 14px rgba(0,0,0,.35)}' +
+  '.pcm-boton.recibe img{animation:pcmRecibe .5s cubic-bezier(.3,1.6,.5,1)}' +
+  '@keyframes pcmRecibe{0%{transform:scale(.7)}45%{transform:scale(1.22) rotate(-6deg)}100%{transform:none}}' +
 
   /* ---------- ventanita flotante ---------- */
   '.pcm-pop{position:fixed;z-index:9000;width:min(252px,calc(100vw - 24px));padding:8px;border-radius:22px;background:rgba(250,250,252,.86);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:0 22px 60px rgba(0,0,0,.2),0 2px 8px rgba(0,0,0,.06),0 0 0 .5px rgba(0,0,0,.1);color:#1d1d1f;font:500 15px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;will-change:transform,opacity}' +
@@ -83,7 +84,7 @@
   '.pcm-pop *{-webkit-tap-highlight-color:transparent;box-sizing:border-box}.pcm-pop button:focus{outline:none}.pcm-pop button:focus-visible{outline:2px solid var(--acento-tema,#53707F);outline-offset:-2px}' +
   '.pcm-pop-cab{display:flex;align-items:center;gap:9px;padding:4px 4px 10px 6px}' +
   '.pcm-pop-cara{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--acento-tema,#53707F) 14%,transparent);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:0 0 30px}' +
-  '.pcm-pop-cara img{width:30px;height:30px;object-fit:cover;object-position:50% 12%;transform:scale(1.25) translateY(3px)}' +
+  '.pcm-pop-cara img{width:26px;height:26px;object-fit:contain;margin-bottom:2px}' +
   '.pcm-pop-cab b{flex:1;font-weight:600;font-size:15px;letter-spacing:-.01em}' +
   '.pcm-pop-x{width:28px;height:28px;border-radius:50%;border:0;padding:0;background:rgba(118,118,128,.14);color:#6e6e73;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s}' +
   '.pcm-pop-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}' +
@@ -120,7 +121,7 @@
   estilo.id = 'pc-mascota-css';
   estilo.textContent = CSS;
   (document.head || document.documentElement).appendChild(estilo);
-  POSES.forEach(function(src){ var i = new Image(); i.src = src; });
+  POSES.concat(['mascota-cara.png']).forEach(function(src){ var i = new Image(); i.src = src; });
 
   /* ---------- estado guardado ---------- */
   function leer(){
@@ -329,8 +330,11 @@
       if (boton.parentElement !== bar) bar.appendChild(boton);
       var rb = bar.getBoundingClientRect();
       boton.style.position = 'absolute';
-      boton.style.left = Math.round(g.left - rb.left - 40 - 10) + 'px';
-      boton.style.top = Math.round(g.top - rb.top + (g.height - 40) / 2) + 'px';
+      var gap = Math.max(8, Math.round(g.width * .25));
+      boton.style.width = g.width + 'px';
+      boton.style.height = g.height + 'px';
+      boton.style.left = Math.round(g.left - rb.left - g.width - gap) + 'px';
+      boton.style.top = Math.round(g.top - rb.top) + 'px';
       boton.style.right = '';
     } else {
       if (boton.parentElement !== document.body) document.body.appendChild(boton);
@@ -345,17 +349,18 @@
     boton = document.createElement('button');
     boton.type = 'button';
     boton.className = 'pcm-boton';
-    boton.setAttribute('aria-label', 'Mascota: agregar a la escena');
+    boton.setAttribute('aria-label', 'Mascota');
     boton.setAttribute('aria-haspopup', 'dialog');
-    boton.innerHTML = '<img src="mascota.png" alt="" draggable="false"><span class="pcm-onda"></span>';
-    boton.addEventListener('click', function(e){ e.stopPropagation(); abrirMenuAgregar(); });
+    boton.innerHTML = '<img src="mascota-cara.png" alt="" draggable="false"><span class="pcm-onda"></span>';
+    boton.addEventListener('click', function(e){ e.stopPropagation(); abrirMenuBoton(); });
     colocarBoton();
     return boton;
   }
   function onda(){
-    var o = boton && boton.querySelector('.pcm-onda');
-    if (!o) return;
+    if (!boton) return;
+    var o = boton.querySelector('.pcm-onda');
     o.classList.remove('va'); void o.offsetWidth; o.classList.add('va');
+    boton.classList.remove('recibe'); void boton.offsetWidth; boton.classList.add('recibe');
   }
   function quitarBoton(conAnimacion, listo){
     var b = boton; boton = null;
@@ -407,7 +412,7 @@
     p.setAttribute('aria-label', 'Mascota');
     var solo = opciones.length === 1 && opciones[0].principal;
     p.innerHTML =
-      '<div class="pcm-pop-cab"><span class="pcm-pop-cara"><img src="mascota.png" alt=""></span><b>Mascota</b>' +
+      '<div class="pcm-pop-cab"><span class="pcm-pop-cara"><img src="mascota-cara.png" alt=""></span><b>Mascota</b>' +
       '<button type="button" class="pcm-pop-x" aria-label="Cerrar">' + ICONO.x + '</button></div>' +
       '<div class="pcm-pop-grupo' + (solo ? ' solo' : '') + '">' +
       opciones.map(function(o){
@@ -460,15 +465,16 @@
     }, 0);
   }
 
-  function abrirMenuQuitar(){
+  function abrirMenuQuitar(ancla){
     if (!el) return;
-    abrirPop(el, [
+    abrirPop(ancla || el, [
       { acc: 'sesion', icono: 'reloj', texto: 'Quitar por esta vez' },
       { acc: 'siempre', icono: 'basura', texto: 'Quitar para siempre', peligro: true }
     ], function(acc){ guardar(acc); irseVolando(); });
   }
-  function abrirMenuAgregar(){
+  function abrirMenuBoton(){
     if (!boton) return;
+    if (el) { abrirMenuQuitar(boton); return; }
     abrirPop(boton, [
       { acc: 'agregar', icono: 'mas', texto: 'Agregar a la escena', principal: true }
     ], function(){ guardar(''); volverVolando(); });
@@ -481,8 +487,6 @@
     if (!el) return;
     calmar();
     crearBoton();
-    boton.style.opacity = '0';
-    boton.style.transform = 'scale(0)';
     var m = el, rm = m.getBoundingClientRect(), rb = boton.getBoundingClientRect();
     var a0 = centro(rm), a1 = centro(rb);
     var dx = a1.x - a0.x, dy = a1.y - a0.y;
@@ -498,17 +502,7 @@
       { transform: 'translate(' + (dx * .92) + 'px,' + (dy * .92) + 'px) scale(' + (fin * 1.15) + ') rotate(4deg)', opacity: .9, offset: .88 },
       { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + fin + ') rotate(0)', opacity: 0, offset: 1 }
     ], { duration: 720, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'forwards' });
-    setTimeout(function(){
-      if (!boton) return;
-      boton.style.opacity = ''; boton.style.transform = '';
-      animar(boton, [
-        { transform: 'scale(0)', opacity: 0 },
-        { transform: 'scale(1.18)', opacity: 1, offset: .55 },
-        { transform: 'scale(.96)', offset: .8 },
-        { transform: 'scale(1)', opacity: 1 }
-      ], { duration: 460, easing: 'cubic-bezier(.3,.8,.4,1)' });
-      onda();
-    }, a ? 600 : 0);
+    setTimeout(onda, a ? 640 : 0);
     alTerminar(a, function(){
       if (gesto) gesto.limpiar();
       if (m.parentElement) m.parentElement.removeChild(m);
@@ -517,7 +511,7 @@
 
   function volverVolando(){
     var rb = boton ? boton.getBoundingClientRect() : null;
-    quitarBoton(true);
+    if (boton) animar(boton, [{ transform: 'scale(1)' }, { transform: 'scale(.86)', offset: .4 }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.3,1.4,.5,1)' });
     crear();
     var m = el;
     if (!rb || !m.getBoundingClientRect().width) { m.classList.add('aterriza'); return; }
@@ -552,11 +546,10 @@
         var a = animado ? animar(m, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.6)' }], { duration: 220, fill: 'forwards' }) : null;
         alTerminar(a, function(){ if (m.parentElement) m.parentElement.removeChild(m); }, 220);
       }
-      crearBoton();
     } else {
-      if (boton) quitarBoton(animado);
       if (!el) { crear(); if (animado) { el.classList.add('aterriza'); } }
     }
+    crearBoton();
   }
   window.addEventListener('storage', function(e){
     if (e.key === null || e.key === CLAVE) aplicarEstado(true);
@@ -570,7 +563,7 @@
   setInterval(function(){
     if (document.hidden) return;
     /* por si la otra sección cambió el estado sin avisar */
-    if (!pop && (!!leer() !== !!boton || (!leer() && !el))) aplicarEstado(false);
+    if (!pop && (!!leer() === !!el || !boton)) aplicarEstado(false);
     recolocar();
   }, 1200);
 
