@@ -1,4 +1,4 @@
-name: Build PajaritoC APK
+name: Build Chess de L APK
 
 on:
   push:
@@ -90,20 +90,32 @@ jobs:
 
       - name: Build APK
         working-directory: android-app
-        run: gradle :app:assembleDebug --no-daemon
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+            echo "Firmando con la clave fija"
+          else
+            echo "::warning::Sin clave fija guardada; se firma con clave de prueba"
+          fi
+          gradle :app:assembleRelease --no-daemon
 
       - name: Verify APK
         run: |
-          APK=android-app/app/build/outputs/apk/debug/app-debug.apk
+          APK=android-app/app/build/outputs/apk/release/app-release.apk
           test -s "$APK"
-          $ANDROID_HOME/build-tools/35.0.0/aapt dump badging "$APK" | grep -F "package: name='com.luis.pajaritoc.sync2026'"
+          $ANDROID_HOME/build-tools/35.0.0/aapt dump badging "$APK" | grep -F "package: name='com.luis.chessdel'"
           $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$APK"
-          cp "$APK" PajaritoC.apk
+          cp "$APK" ChessDeL.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PajaritoC
-          path: PajaritoC.apk
+          name: ChessDeL
+          path: ChessDeL.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -112,7 +124,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete apk-latest --yes --cleanup-tag || true
-          gh release create apk-latest PajaritoC.apk \
-            --title "PajaritoC APK" \
+          gh release create apk-latest ChessDeL.apk \
+            --title "Chess de L — APK" \
             --notes "APK listo para instalar en Android. Se actualiza solo con cada cambio." \
             --latest

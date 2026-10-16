@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'PajaritoC'
+rootProject.name = 'ChessDeL'
 include ':app'
