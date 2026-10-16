@@ -1,321 +1,610 @@
-/* PC · Mascota bailarina
-   Aparece bailando sobre el tablero cuando se resuelve un ejercicio.
-   - Aparece abajo a la derecha, pisando el borde inferior del tablero, y mide 3 casillas de alto.
-   - Toca la guitarra al ritmo, con notas musicales alrededor.
-   - Un toque: levanta la guitarra con una sola ala (cuadro por cuadro, 4 poses),
-     la tiene en alto 1 segundo y la baja por las mismas poses al revés.
-   - Si la arrastras mientras la tiene arriba, la baja enseguida.
-   - Doble toque: se cierra. La primera vez avisa con un globo de 2 segundos.
-   - Desaparece al cargar otro ejercicio (siguiente, anterior, reiniciar). */
+/* PC · Mascota junto al tablero (Método PC1 y Método PC2)
+   - Vive pequeña, sentada sobre el borde superior del tablero (fuera de las casillas).
+   - Quieta respira suave; un toque: levanta la guitarra un momento.
+   - Al resolver un ejercicio festeja como en Aprende Ajedrez: baila, suben notas
+     musicales y levanta la guitarra cada tanto. Al cargar otro ejercicio se calma.
+   - Doble toque: ventanita flotante con «Quitar por esta vez», «Quitar para siempre» y cerrar.
+   - Cuando no está, arriba a la derecha aparece un botón con su carita que abre la misma
+     ventanita con «Agregar a la escena».
+   «Por esta vez» dura hasta que se vuelve a abrir la app (sessionStorage);
+   «para siempre» queda guardado (localStorage) hasta que se agregue de nuevo. */
 (function(){
   'use strict';
   if (window.__pcMascota) return;
   window.__pcMascota = true;
 
-  var ALTO_CASILLAS = 3;
-  // Poses en orden: tocando → subiendo → casi arriba → guitarra en alto
   var POSES = ['mascota.png', 'mascota-sube1.png', 'mascota-sube2.png', 'mascota-rock.png'];
-  var CUADRO_MS = 85;                     // tiempo entre una pose y la siguiente
-  // Caja del personaje (de la cresta a las patitas). Las dos imágenes comparten
-  // el mismo recorte y sobresalen de la caja para que quepa la guitarra en alto.
-  var PROPORCION = 949 / 1016;
-  var CLAVE_AVISO = 'pc_mascota_aviso_doble_toque';
-  var TEXTO_AVISO = 'Dame doble toque para cerrarme';
-  var DOBLE_TOQUE_MS = 320;
-  var ARRIBA_MS = 1000;                   // tiempo con la guitarra en alto
+  var PROPORCION = 949 / 1016;           // ancho / alto de la caja del personaje
+  var CUADRO_MS = 85;
+  var DOBLE_MS = 320;
+  var CLAVE = 'pc_mascota_oculta';        // 'siempre' (local) o 'sesion' (sesión)
+  var CLAVE_AVISO = 'pc_mascota_aviso_v2';
+  var reducido = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  // Notas musicales de fiesta que suben alrededor de la mascota.
   function nota(color, doble){
     return doble
       ? '<svg viewBox="0 0 40 40"><path d="M14 30V9l20-5v21" fill="none" stroke="' + color + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 13l20-5" stroke="' + color + '" stroke-width="5"/><ellipse cx="10" cy="30" rx="6" ry="5" fill="' + color + '"/><ellipse cx="30" cy="25" rx="6" ry="5" fill="' + color + '"/></svg>'
       : '<svg viewBox="0 0 40 40"><path d="M22 30V6q8 2 10 9" fill="none" stroke="' + color + '" stroke-width="4" stroke-linecap="round"/><ellipse cx="17" cy="30" rx="7" ry="5.5" fill="' + color + '"/></svg>';
   }
+  var COLORES = ['#FF9FB0', '#B9A4F2', '#8CC4EC', '#F5C96A'];
   var NOTAS = '<div class="pcm-notas" aria-hidden="true">' +
-    '<span class="pcm-nota n1">' + nota('#FF9FB0', false) + '</span>' +
-    '<span class="pcm-nota n2">' + nota('#B9A4F2', true) + '</span>' +
-    '<span class="pcm-nota n3">' + nota('#8CC4EC', false) + '</span>' +
-    '<span class="pcm-nota n4">' + nota('#F5C96A', true) + '</span>' +
-    '<span class="pcm-nota n5">' + nota('#FF9FB0', true) + '</span>' +
-  '</div>';
+    COLORES.map(function(c, i){ return '<i class="n' + (i + 1) + '">' + nota(c, i % 2 === 1) + '</i>'; }).join('') + '</div>';
+
+  var ICONO = {
+    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+    reloj: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.6V12l3 2"/></svg>',
+    basura: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.8 7h14.4M9.6 7V5.2h4.8V7M7 7l.8 12.2h8.4L17 7M10.3 10.5v5.4M13.7 10.5v5.4"/></svg>',
+    mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>'
+  };
 
   var CSS = '' +
-  '@property --pcm-rock{syntax:"<number>";inherits:true;initial-value:0}' +
-  '.pc-mascota{position:absolute;z-index:40;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;transform-origin:50% 100%;animation:pcmEntrar .38s cubic-bezier(.34,1.56,.64,1) both;--pcm-rock:0;transition:--pcm-rock .3s ease}' +
+  /* ---------- la mascota ---------- */
+  '.pc-mascota{position:absolute;z-index:30;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;transform-origin:50% 100%}' +
   '.pc-mascota,.pc-mascota *{-webkit-tap-highlight-color:transparent;outline:none}' +
-  '.pc-mascota.arrastrando{cursor:grabbing}' +
-  '.pc-mascota.rockera{--pcm-rock:1}' +
-  '.pc-mascota.saliendo{animation:pcmSalir .22s ease-in both;pointer-events:none}' +
-  '.pc-mascota .pcm-sombra{position:absolute;left:16%;right:16%;bottom:-2.5%;height:7%;border-radius:50%;background:rgba(0,0,0,.22);filter:blur(2px);animation:pcmSombra 1s ease-in-out infinite}' +
-  '.pc-mascota .pcm-baile{position:absolute;inset:0;transform-origin:50% 100%;animation:pcmBaile 1s ease-in-out infinite}' +
+  '.pc-mascota .pcm-sombra{position:absolute;left:18%;right:18%;bottom:-3%;height:8%;border-radius:50%;background:rgba(0,0,0,.2);filter:blur(1.5px);transform-origin:50% 50%}' +
+  '.pc-mascota .pcm-baile{position:absolute;inset:0;transform-origin:50% 100%;animation:pcmRespira 3.4s ease-in-out infinite}' +
   '.pc-mascota .pcm-presion{position:absolute;inset:0;transform-origin:50% 100%;transition:transform .5s cubic-bezier(.3,1.9,.5,1)}' +
-  '.pc-mascota.presionada .pcm-presion{transform:scale(1.07,.84);transition:transform .11s ease-out}' +
+  '.pc-mascota.presionada .pcm-presion{transform:scale(1.08,.86);transition:transform .1s ease-out}' +
   '.pc-mascota .pcm-salto{position:absolute;inset:0;transform-origin:50% 100%}' +
-  '.pc-mascota .pcm-salto.salta{animation:pcmLevanta .5s ease-in-out}' +
-  '.pc-mascota .pcm-animo{position:absolute;inset:0;transform-origin:50% 100%;animation:pcmCelebra .5s ease-in-out infinite}' +
-  '.pc-mascota .pcm-pose{position:absolute;left:-12.223%;top:-14.567%;width:114.226%;height:114.567%;max-width:none;display:block;pointer-events:none;-webkit-user-drag:none}' +
-  // cambio de pose instantáneo (cuadro por cuadro): nunca se ven dos poses a la vez
-  '.pc-mascota .pcm-pose{opacity:0}' +
+  '.pc-mascota .pcm-salto.salta{animation:pcmImpulso .5s ease-in-out}' +
+  '.pc-mascota .pcm-pose{position:absolute;left:-12.223%;top:-14.567%;width:114.226%;height:114.567%;max-width:none;display:block;pointer-events:none;-webkit-user-drag:none;opacity:0}' +
   '.pc-mascota[data-pose="0"] .pcm-pose.p0,.pc-mascota[data-pose="1"] .pcm-pose.p1,.pc-mascota[data-pose="2"] .pcm-pose.p2,.pc-mascota[data-pose="3"] .pcm-pose.p3{opacity:1}' +
-  '.pc-mascota .pcm-globo{position:absolute;right:0;bottom:calc(100% + 10px);transform:translateY(6px) scale(.85);transform-origin:80% 100%;opacity:0;pointer-events:none;white-space:nowrap;padding:8px 13px;border-radius:16px;background:#fff;color:#3a3a40;font:600 13px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.05);transition:opacity .28s ease,transform .32s cubic-bezier(.34,1.56,.64,1)}' +
-  '.pc-mascota .pcm-globo:after{content:"";position:absolute;right:28%;top:100%;margin-right:-7px;border:7px solid transparent;border-top-color:#fff}' +
-  '.pc-mascota .pcm-globo.visible{opacity:1;transform:translateY(0) scale(1)}' +
-  'html[data-modo="oscuro"] .pc-mascota .pcm-globo{background:#2c2c30;color:#f2f2f5;box-shadow:0 6px 18px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.08)}' +
-  'html[data-modo="oscuro"] .pc-mascota .pcm-globo:after{border-top-color:#2c2c30}' +
-  '.pc-mascota .pcm-notas{position:absolute;inset:-6% 0 20% -40%;pointer-events:none}' +
-  '.pc-mascota .pcm-nota{position:absolute;bottom:0;width:22%;max-width:34px;aspect-ratio:1;opacity:0;animation:pcmNotaSube 2.6s ease-out infinite}' +
-  '.pc-mascota .pcm-nota svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.15))}' +
-  '.pc-mascota .pcm-nota.n1{left:2%;animation-delay:0s}' +
-  '.pc-mascota .pcm-nota.n2{right:2%;animation-delay:-.55s}' +
-  '.pc-mascota .pcm-nota.n3{left:12%;animation-delay:-1.1s;width:17%}' +
-  '.pc-mascota .pcm-nota.n4{left:38%;animation-delay:-1.65s;width:18%}' +
-  '.pc-mascota .pcm-nota.n5{left:0;animation-delay:-2.1s;width:16%}' +
-  '@keyframes pcmNotaSube{0%{opacity:0;transform:translate(0,0) rotate(-10deg) scale(.6)}15%{opacity:1}50%{transform:translate(10px,-60%) rotate(10deg) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-6px,-130%) rotate(-8deg) scale(.9)}}' +
-  '@keyframes pcmEntrar{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}' +
-  '@keyframes pcmSalir{to{opacity:0;transform:scale(.6)}}' +
-  // tocando la guitarra: rebote al ritmo, inclinándose a un lado y al otro
-  '@keyframes pcmBaile{' +
-    '0%{transform:translateY(0) rotate(0) scale(1,1)}' +
-    '25%{transform:translateY(-3.5%) rotate(-3deg) scale(.98,1.025)}' +
-    '50%{transform:translateY(0) rotate(0) scale(1.035,.965)}' +
-    '75%{transform:translateY(-3.5%) rotate(3deg) scale(.98,1.025)}' +
-    '100%{transform:translateY(0) rotate(0) scale(1,1)}}' +
-  '@keyframes pcmSombra{0%,50%,100%{transform:scaleX(1);opacity:1}25%,75%{transform:scaleX(.86);opacity:.7}}' +
-  // impulso al subir o bajar la guitarra (empieza y termina en reposo)
-  '@keyframes pcmLevanta{' +
-    '0%{transform:translateY(0) scale(1,1)}' +
-    '22%{transform:translateY(0) scale(1.07,.9)}' +
-    '50%{transform:translateY(-7%) scale(.96,1.06)}' +
-    '78%{transform:translateY(0) scale(1.03,.97)}' +
-    '100%{transform:translateY(0) scale(1,1)}}' +
-  // festejo con la guitarra en alto: su amplitud depende de --pcm-rock (0 = quieto)
-  '@keyframes pcmCelebra{' +
-    '0%,100%{transform:translateY(0) rotate(0)}' +
-    '50%{transform:translateY(calc(var(--pcm-rock) * -2.5%)) rotate(calc(var(--pcm-rock) * -2deg))}}' +
-  '@media (prefers-reduced-motion:reduce){.pc-mascota .pcm-baile,.pc-mascota .pcm-sombra{animation-duration:2s}}';
+  '.pc-mascota .pcm-notas{position:absolute;inset:-35% -15% 35% -45%;pointer-events:none;display:none}' +
+  '.pc-mascota .pcm-notas i{position:absolute;bottom:0;width:30%;max-width:22px;aspect-ratio:1;opacity:0;animation:pcmNota 2.6s ease-out infinite}' +
+  '.pc-mascota .pcm-notas i svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.15))}' +
+  '.pc-mascota .pcm-notas .n1{left:0;animation-delay:0s}.pc-mascota .pcm-notas .n2{right:0;animation-delay:-.65s}' +
+  '.pc-mascota .pcm-notas .n3{left:22%;animation-delay:-1.3s}.pc-mascota .pcm-notas .n4{left:55%;animation-delay:-1.95s}' +
+  '.pc-mascota.festeja .pcm-baile{animation:pcmBaile 1s ease-in-out infinite}' +
+  '.pc-mascota.festeja .pcm-sombra{animation:pcmSombra 1s ease-in-out infinite}' +
+  '.pc-mascota.festeja .pcm-notas{display:block}' +
+  '.pc-mascota.aterriza .pcm-presion{animation:pcmAterriza .55s cubic-bezier(.3,1.5,.5,1)}' +
+  /* destellos (al festejar y al volver) */
+  '.pcm-chispas{position:absolute;left:50%;top:55%;width:0;height:0;pointer-events:none;z-index:31}' +
+  '.pcm-chispas i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;opacity:0;animation:pcmChispa .7s cubic-bezier(.2,.8,.3,1) forwards}' +
+  /* aviso de la primera vez */
+  '.pc-mascota .pcm-globo{position:absolute;right:-4px;top:calc(100% + 12px);transform:translateY(-6px) scale(.9);transform-origin:85% 0;opacity:0;pointer-events:none;white-space:nowrap;padding:7px 12px;border-radius:14px;background:#fff;color:#3a3a40;font:600 12.5px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.16),0 0 0 .5px rgba(0,0,0,.06);transition:opacity .28s ease,transform .32s cubic-bezier(.34,1.56,.64,1)}' +
+  '.pc-mascota .pcm-globo:after{content:"";position:absolute;right:22px;bottom:100%;border:6px solid transparent;border-bottom-color:#fff}' +
+  '.pc-mascota .pcm-globo.visible{opacity:1;transform:none}' +
+  'html[data-modo="oscuro"] .pc-mascota .pcm-globo{background:#2c2c30;color:#f2f2f5;box-shadow:0 6px 18px rgba(0,0,0,.4),0 0 0 .5px rgba(255,255,255,.1)}' +
+  'html[data-modo="oscuro"] .pc-mascota .pcm-globo:after{border-bottom-color:#2c2c30}' +
+
+  /* ---------- botón arriba a la derecha (cuando la mascota no está) ---------- */
+  '.pcm-boton{position:absolute;z-index:60;width:40px;height:40px;padding:0;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:visible;-webkit-tap-highlight-color:transparent;transition:transform .2s ease,box-shadow .2s ease}' +
+  '.pcm-boton img{width:30px;height:30px;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none;transform:translateY(1px)}' +
+  '.pcm-boton:active{transform:scale(.92)}' +
+  '@media (hover:hover){.pcm-boton:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.14)}.pcm-boton:hover img{animation:pcmSaluda .6s ease-in-out}}' +
+  '.pcm-boton .pcm-onda{position:absolute;inset:-1px;border-radius:12px;border:2px solid var(--acento-tema,#53707F);opacity:0;pointer-events:none}' +
+  '.pcm-boton .pcm-onda.va{animation:pcmOnda .8s ease-out}' +
+  'html[data-modo="oscuro"] .pcm-boton{background:rgba(44,44,48,.92);border-color:rgba(255,255,255,.1);box-shadow:0 4px 14px rgba(0,0,0,.35)}' +
+
+  /* ---------- ventanita flotante ---------- */
+  '.pcm-pop{position:fixed;z-index:9000;width:min(252px,calc(100vw - 24px));padding:8px;border-radius:22px;background:rgba(250,250,252,.86);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:0 22px 60px rgba(0,0,0,.2),0 2px 8px rgba(0,0,0,.06),0 0 0 .5px rgba(0,0,0,.1);color:#1d1d1f;font:500 15px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;will-change:transform,opacity}' +
+  '@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.pcm-pop{background:#fbfbfd}}' +
+  '.pcm-pop *{-webkit-tap-highlight-color:transparent;box-sizing:border-box}.pcm-pop button:focus{outline:none}.pcm-pop button:focus-visible{outline:2px solid var(--acento-tema,#53707F);outline-offset:-2px}' +
+  '.pcm-pop-cab{display:flex;align-items:center;gap:9px;padding:4px 4px 10px 6px}' +
+  '.pcm-pop-cara{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--acento-tema,#53707F) 14%,transparent);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:0 0 30px}' +
+  '.pcm-pop-cara img{width:30px;height:30px;object-fit:cover;object-position:50% 12%;transform:scale(1.25) translateY(3px)}' +
+  '.pcm-pop-cab b{flex:1;font-weight:600;font-size:15px;letter-spacing:-.01em}' +
+  '.pcm-pop-x{width:28px;height:28px;border-radius:50%;border:0;padding:0;background:rgba(118,118,128,.14);color:#6e6e73;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s}' +
+  '.pcm-pop-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}' +
+  '.pcm-pop-x:active{transform:scale(.88);background:rgba(118,118,128,.24)}' +
+  '.pcm-pop-grupo{border-radius:14px;background:rgba(255,255,255,.75);overflow:hidden;box-shadow:0 0 0 .5px rgba(0,0,0,.06)}' +
+  '.pcm-pop-op{position:relative;display:flex;align-items:center;gap:11px;width:100%;min-height:46px;padding:0 14px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .15s}' +
+  '.pcm-pop-op+.pcm-pop-op:before{content:"";position:absolute;left:44px;right:0;top:0;height:.5px;background:rgba(60,60,67,.2)}' +
+  '.pcm-pop-op svg{width:19px;height:19px;flex:0 0 19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.85}' +
+  '.pcm-pop-op:active,.pcm-pop-op.elegida{background:rgba(118,118,128,.16)}' +
+  '@media (hover:hover){.pcm-pop-op:hover{background:rgba(118,118,128,.1)}.pcm-pop-x:hover{background:rgba(118,118,128,.22)}}' +
+  '.pcm-pop-op.peligro{color:#E5352B}' +
+  '.pcm-pop-op.principal{justify-content:center;color:#fff;font-weight:600;background:var(--acento-tema,#53707F);border-radius:14px}' +
+  '.pcm-pop-op.principal:active,.pcm-pop-op.principal.elegida{background:var(--acento-tema,#53707F);filter:brightness(.92)}' +
+  '.pcm-pop-grupo.solo{background:transparent;box-shadow:none}' +
+  'html[data-modo="oscuro"] .pcm-pop{background:rgba(40,40,44,.82);color:#f5f5f7;box-shadow:0 22px 60px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.12)}' +
+  'html[data-modo="oscuro"] .pcm-pop-grupo{background:rgba(255,255,255,.07);box-shadow:none}' +
+  'html[data-modo="oscuro"] .pcm-pop-x{background:rgba(255,255,255,.12);color:#c7c7cc}' +
+  'html[data-modo="oscuro"] .pcm-pop-op+.pcm-pop-op:before{background:rgba(255,255,255,.12)}' +
+  'html[data-modo="oscuro"] .pcm-pop-op.peligro{color:#FF5A4F}' +
+
+  /* ---------- movimientos ---------- */
+  '@keyframes pcmRespira{0%,100%{transform:scale(1,1)}50%{transform:scale(1.018,.986) translateY(.5%)}}' +
+  '@keyframes pcmBaile{0%{transform:translateY(0) rotate(0) scale(1,1)}25%{transform:translateY(-5%) rotate(-5deg) scale(.98,1.03)}50%{transform:translateY(0) rotate(0) scale(1.04,.96)}75%{transform:translateY(-5%) rotate(5deg) scale(.98,1.03)}100%{transform:translateY(0) rotate(0) scale(1,1)}}' +
+  '@keyframes pcmSombra{0%,50%,100%{transform:scale(1);opacity:1}25%,75%{transform:scale(.82);opacity:.7}}' +
+  '@keyframes pcmImpulso{0%{transform:translateY(0) scale(1,1)}22%{transform:translateY(0) scale(1.07,.9)}50%{transform:translateY(-8%) scale(.96,1.06)}78%{transform:translateY(0) scale(1.03,.97)}100%{transform:none}}' +
+  '@keyframes pcmAterriza{0%{transform:scale(1.14,.82)}45%{transform:scale(.95,1.07)}75%{transform:scale(1.02,.98)}100%{transform:none}}' +
+  '@keyframes pcmNota{0%{opacity:0;transform:translate(0,0) rotate(-10deg) scale(.6)}15%{opacity:1}50%{transform:translate(6px,-60%) rotate(10deg) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-4px,-130%) rotate(-8deg) scale(.9)}}' +
+  '@keyframes pcmChispa{0%{opacity:0;transform:translate(0,0) scale(.3)}20%{opacity:1}100%{opacity:0;transform:translate(var(--cx),var(--cy)) scale(1)}}' +
+  '@keyframes pcmOnda{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.55)}}' +
+  '@keyframes pcmSaluda{0%,100%{transform:translateY(1px) rotate(0)}30%{transform:translateY(-1px) rotate(-8deg)}65%{transform:translateY(0) rotate(6deg)}}' +
+  '@media (prefers-reduced-motion:reduce){.pc-mascota .pcm-baile{animation:none}.pc-mascota.festeja .pcm-baile{animation-duration:2s}.pcm-chispas{display:none}}';
 
   var estilo = document.createElement('style');
   estilo.id = 'pc-mascota-css';
   estilo.textContent = CSS;
   (document.head || document.documentElement).appendChild(estilo);
-
-  // precarga para que aparezca al instante
   POSES.forEach(function(src){ var i = new Image(); i.src = src; });
 
-  var el = null;      // nodo de la mascota
-  var dx = 0, dy = 0; // desplazamiento por arrastre, en casillas
-
-  function tablero(){ return document.getElementById('board'); }
-
-  function medidas(){
-    var b = tablero();
-    if (!b || !b.parentElement) return null;
-    var cont = b.parentElement;
-    var rb = b.getBoundingClientRect(), rc = cont.getBoundingClientRect();
-    if (!rb.width) return null;
-    var casilla = rb.width / 8;
-    var alto = casilla * ALTO_CASILLAS, ancho = alto * PROPORCION;
-    return {
-      cont: cont, rb: rb, rc: rc, casilla: casilla, alto: alto, ancho: ancho,
-      // esquina inferior derecha del tablero
-      x0: rb.right - rc.left - ancho,
-      y0: rb.bottom - rc.top - alto
-    };
+  /* ---------- estado guardado ---------- */
+  function leer(){
+    try { if (localStorage.getItem(CLAVE) === 'siempre') return 'siempre'; } catch (e) {}
+    try { if (sessionStorage.getItem(CLAVE) === 'sesion') return 'sesion'; } catch (e) {}
+    return '';
+  }
+  function guardar(v){
+    try { if (v === 'siempre') localStorage.setItem(CLAVE, 'siempre'); else localStorage.removeItem(CLAVE); } catch (e) {}
+    try { if (v === 'sesion') sessionStorage.setItem(CLAVE, 'sesion'); else sessionStorage.removeItem(CLAVE); } catch (e) {}
   }
 
-  function limitar(m){
-    var bl = m.rb.left - m.rc.left, bt = m.rb.top - m.rc.top;
-    var x = Math.min(bl + m.rb.width - m.ancho, Math.max(bl, m.x0 + dx * m.casilla));
-    var y = Math.min(bt + m.rb.height - m.alto, Math.max(bt, m.y0 + dy * m.casilla));
-    dx = (x - m.x0) / m.casilla; dy = (y - m.y0) / m.casilla;
-    return { x: x, y: y };
+  function animar(nodo, cuadros, opc){
+    if (nodo && nodo.animate && !reducido) {
+      try { return nodo.animate(cuadros, opc); } catch (e) {}
+    }
+    return null;
   }
+  function alTerminar(a, fn, ms){
+    var hecho = false;
+    function f(){ if (!hecho) { hecho = true; fn(); } }
+    if (a) { a.onfinish = f; a.oncancel = f; }
+    setTimeout(f, a ? (ms || 1200) + 200 : 0);
+  }
+
+  /* ---------- ubicación: sentada sobre el borde superior del tablero ---------- */
+  var el = null, boton = null, pop = null;
+
+  function partes(){
+    var b = document.getElementById('board');
+    if (!b) return null;
+    var marco = b.closest ? (b.closest('.frame') || b.parentElement) : b.parentElement;
+    var col = marco && marco.parentElement;
+    if (!col) return null;
+    var rm = marco.getBoundingClientRect();
+    if (!rm.width) return null;
+    return { marco: marco, col: col, rm: rm, cab: col.querySelector('.boardhead') };
+  }
+  function visible(n){ if (!n) return null; var r = n.getBoundingClientRect(); return (r.width && r.height) ? r : null; }
 
   function colocar(){
     if (!el) return;
-    var m = medidas();
-    if (!m) return;
-    if (el.parentElement !== m.cont) m.cont.appendChild(el);
-    var p = limitar(m);
-    el.style.width = m.ancho + 'px';
-    el.style.height = m.alto + 'px';
-    el.style.left = p.x + 'px';
-    el.style.top = p.y + 'px';
+    var p = partes();
+    if (!p) { el.style.visibility = 'hidden'; return; }
+    el.style.visibility = '';
+    if (getComputedStyle(p.col).position === 'static') p.col.style.position = 'relative';
+    if (el.parentElement !== p.col) p.col.appendChild(el);
+    var rc = p.col.getBoundingClientRect(), rm = p.rm;
+    var alto = Math.round(Math.max(56, Math.min(78, rm.width * 0.15)));
+    var ancho = Math.round(alto * PROPORCION);
+    var centro = p.cab && visible(p.cab.querySelector('.boardhead-center'));
+    var derecha = p.cab && visible(p.cab.querySelector('.boardhead-right'));
+    var borde = derecha ? Math.min(derecha.left - 14, rm.right - 10) : rm.right - 12;
+    var minimo = centro ? centro.right + 10 : rm.left + 8;
+    var x = Math.max(minimo, borde - ancho);
+    el.style.width = ancho + 'px';
+    el.style.height = alto + 'px';
+    el.style.left = Math.round(x - rc.left) + 'px';
+    el.style.top = Math.round(rm.top - rc.top - alto + alto * 0.05) + 'px';
   }
 
-  function quitar(){
-    if (!el) return;
-    var viejo = el; el = null;
-    if (viejo._limpiar) viejo._limpiar();
-    viejo.classList.add('saliendo');
-    setTimeout(function(){ if (viejo.parentElement) viejo.parentElement.removeChild(viejo); }, 240);
-  }
+  /* ---------- crear / quitar la mascota ---------- */
+  var festejo = { activo: false, t: [] };
+  var gesto = null;
 
-  // Detiene una animación CSS desde la pose en que está y la lleva suave a reposo.
-  function detenerSuave(nodo){
-    var cs = getComputedStyle(nodo);
-    nodo.style.transform = cs.transform === 'none' ? '' : cs.transform;
-    nodo.style.opacity = cs.opacity;
-    nodo.style.animation = 'none';
-    void nodo.offsetWidth;
-    nodo.style.transition = 'transform .35s ease-out, opacity .35s ease-out';
-    nodo.style.transform = 'none';
-    nodo.style.opacity = '1';
-  }
-  // Reanuda desde el inicio del ciclo, que es la pose de reposo: no hay salto.
-  function reanudar(nodo){
-    nodo.style.transition = '';
-    nodo.style.transform = '';
-    nodo.style.opacity = '';
-    nodo.style.animation = '';
-  }
-
-  function avisoVisto(){ try { return localStorage.getItem(CLAVE_AVISO) === '1'; } catch (e) { return true; } }
-  function marcarAviso(){ try { localStorage.setItem(CLAVE_AVISO, '1'); } catch (e) {} }
-
-  function mostrar(){
-    if (el) { if (el._limpiar) el._limpiar(); el.parentElement && el.parentElement.removeChild(el); el = null; }
-    var m = medidas();
-    if (!m) return;
-    dx = 0; dy = 0;
+  function crear(){
+    if (el) return el;
     el = document.createElement('div');
     el.className = 'pc-mascota';
     el.id = 'pc-mascota';
     el.setAttribute('data-pose', '0');
-    el.setAttribute('role', 'img');
-    el.setAttribute('aria-label', 'Mascota celebrando. Doble toque para cerrarla.');
-    el.innerHTML =
-      '<div class="pcm-sombra"></div>' + NOTAS +
-      '<div class="pcm-baile"><div class="pcm-presion"><div class="pcm-salto"><div class="pcm-animo">' +
-        POSES.map(function(src, i){ return '<img class="pcm-pose p' + i + '" src="' + src + '" alt="" draggable="false">'; }).join('') +
-      '</div></div></div></div>';
-    activarInteraccion(el);
-    m.cont.appendChild(el);
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', 'Mascota. Doble toque para ver opciones.');
+    el.innerHTML = '<div class="pcm-sombra"></div>' + NOTAS +
+      '<div class="pcm-baile"><div class="pcm-presion"><div class="pcm-salto">' +
+      POSES.map(function(src, i){ return '<img class="pcm-pose p' + i + '" src="' + src + '" alt="" draggable="false">'; }).join('') +
+      '</div></div></div>';
+    activarGestos(el);
     colocar();
-
-    if (!avisoVisto()) {
-      marcarAviso();
-      var globo = document.createElement('div');
-      globo.className = 'pcm-globo';
-      globo.textContent = TEXTO_AVISO;
-      el.appendChild(globo);
-      var nodo = el;
-      setTimeout(function(){ globo.classList.add('visible'); }, 450);
-      setTimeout(function(){ globo.classList.remove('visible'); }, 450 + 2000);
-      setTimeout(function(){ if (globo.parentElement === nodo) nodo.removeChild(globo); }, 450 + 2000 + 400);
-    }
+    return el;
+  }
+  function destruir(){
+    calmar();
+    if (gesto) gesto.limpiar();
+    if (el && el.parentElement) el.parentElement.removeChild(el);
+    el = null;
   }
 
-  function activarInteraccion(nodo){
-    var baile = nodo.querySelector('.pcm-baile');
-    var sombra = nodo.querySelector('.pcm-sombra');
-    var id = null, sx = 0, sy = 0, bx = 0, by = 0, movio = false;
-    var salto = nodo.querySelector('.pcm-salto');
-    var ultimoToque = 0, tSubir = null, tBajar = null, tReanudar = null, tCuadro = null, arriba = false;
-    var pose = 0, ULTIMA = POSES.length - 1;
+  function posar(p){ if (el) el.setAttribute('data-pose', String(p)); }
+  function impulso(){
+    var s = el && el.querySelector('.pcm-salto');
+    if (!s) return;
+    s.classList.remove('salta'); void s.offsetWidth; s.classList.add('salta');
+  }
+  function chispas(cuantas, radio){
+    if (!el || reducido) return;
+    var c = document.createElement('div');
+    c.className = 'pcm-chispas';
+    for (var i = 0; i < cuantas; i++) {
+      var a = (Math.PI * 2 * i / cuantas) - Math.PI / 2 + (Math.random() - .5) * .4;
+      var r = radio * (0.8 + Math.random() * 0.4);
+      var s = document.createElement('i');
+      s.style.background = COLORES[i % COLORES.length];
+      s.style.setProperty('--cx', Math.round(Math.cos(a) * r) + 'px');
+      s.style.setProperty('--cy', Math.round(Math.sin(a) * r) + 'px');
+      s.style.animationDelay = (i * 12) + 'ms';
+      c.appendChild(s);
+    }
+    el.appendChild(c);
+    setTimeout(function(){ if (c.parentElement) c.parentElement.removeChild(c); }, 1000);
+  }
 
-    function impulso(){
-      salto.classList.remove('salta');
-      void salto.offsetWidth;
-      salto.classList.add('salta');
-    }
-    // Avanza una pose por cuadro hasta llegar a la pose pedida (sube o baja desde donde esté)
-    function irAPose(destino, alLlegar){
-      clearTimeout(tCuadro);
-      (function paso(){
-        if (pose === destino) { if (alLlegar) alLlegar(); return; }
-        pose += destino > pose ? 1 : -1;
-        nodo.setAttribute('data-pose', String(pose));
-        tCuadro = setTimeout(paso, CUADRO_MS);
-      })();
-    }
-    function subir(){
-      clearTimeout(tReanudar); clearTimeout(tBajar);
-      if (!arriba) {
-        arriba = true;
-        detenerSuave(baile); detenerSuave(sombra);
-        nodo.classList.add('rockera');
-        impulso();
-      }
-      irAPose(ULTIMA, function(){
-        tBajar = setTimeout(bajar, ARRIBA_MS);    // 1 segundo con la guitarra en alto
-      });
-    }
-    function bajar(){
-      clearTimeout(tSubir); clearTimeout(tBajar);
-      if (!arriba) return;
-      arriba = false;
-      nodo.classList.remove('rockera');
+  /* Festejo como en Aprende Ajedrez: baila, notas y guitarra en alto cada tanto */
+  function festejar(){
+    if (!el) return;
+    calmar();
+    festejo.activo = true;
+    el.classList.add('festeja');
+    chispas(8, (el.offsetHeight || 60) * 0.85);
+    (function ciclo(){
+      if (!festejo.activo) return;
+      var t = 0;
+      festejo.t.push(setTimeout(impulso, 0));
+      [1, 2, 3].forEach(function(p){ festejo.t.push(setTimeout(function(){ posar(p); }, t += CUADRO_MS)); });
+      t += 1000;
+      festejo.t.push(setTimeout(impulso, t));
+      [2, 1, 0].forEach(function(p){ festejo.t.push(setTimeout(function(){ posar(p); }, t += CUADRO_MS)); });
+      festejo.t.push(setTimeout(ciclo, t + 1600));
+    })();
+    avisoPrimeraVez();
+  }
+  function calmar(){
+    festejo.activo = false;
+    festejo.t.forEach(clearTimeout); festejo.t = [];
+    if (el) el.classList.remove('festeja');
+    posar(0);
+  }
+
+  function avisoPrimeraVez(){
+    var visto = true;
+    try { visto = localStorage.getItem(CLAVE_AVISO) === '1'; } catch (e) {}
+    if (visto || !el) return;
+    try { localStorage.setItem(CLAVE_AVISO, '1'); } catch (e) {}
+    var g = document.createElement('div');
+    g.className = 'pcm-globo';
+    g.textContent = 'Doble toque para opciones';
+    var nodo = el;
+    nodo.appendChild(g);
+    setTimeout(function(){ g.classList.add('visible'); }, 500);
+    setTimeout(function(){ g.classList.remove('visible'); }, 3000);
+    setTimeout(function(){ if (g.parentElement) g.parentElement.removeChild(g); }, 3400);
+  }
+
+  /* Un toque: levanta la guitarra un momento. Doble toque: ventanita. */
+  function activarGestos(nodo){
+    var ultimo = 0, tUno = null, tLev = [];
+    function levantar(){
+      if (festejo.activo) { impulso(); return; }
+      tLev.forEach(clearTimeout); tLev = [];
+      var t = 0;
       impulso();
-      irAPose(0, function(){
-        // vuelve a tocar cuando terminó de bajar la guitarra
-        tReanudar = setTimeout(function(){ if (!arriba) { reanudar(baile); reanudar(sombra); } }, 260);
-      });
+      [1, 2, 3].forEach(function(p){ tLev.push(setTimeout(function(){ posar(p); }, t += CUADRO_MS)); });
+      t += 900;
+      tLev.push(setTimeout(impulso, t));
+      [2, 1, 0].forEach(function(p){ tLev.push(setTimeout(function(){ posar(p); }, t += CUADRO_MS)); });
     }
-    nodo._limpiar = function(){ clearTimeout(tSubir); clearTimeout(tBajar); clearTimeout(tReanudar); clearTimeout(tCuadro); };
-
-    nodo.addEventListener('pointerdown', function(e){
-      if (id !== null) return;
+    function abajo(e){
       e.preventDefault(); e.stopPropagation();
-      var ahora = Date.now();
-      if (ahora - ultimoToque < DOBLE_TOQUE_MS) { ultimoToque = 0; quitar(); return; }
-      ultimoToque = ahora; movio = false;
-      clearTimeout(tSubir);
-      id = e.pointerId; sx = e.clientX; sy = e.clientY; bx = dx; by = dy;
-      try { nodo.setPointerCapture(id); } catch (err) {}
       nodo.classList.add('presionada');
-    });
-    nodo.addEventListener('pointermove', function(e){
-      if (e.pointerId !== id) return;
-      e.preventDefault(); e.stopPropagation();
-      var m = medidas(); if (!m) return;
-      if (!movio && Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) {
-        movio = true; ultimoToque = 0;
-        nodo.classList.remove('presionada');
-        nodo.classList.add('arrastrando');
-        bajar();
-      }
-      if (!movio) return;
-      dx = bx + (e.clientX - sx) / m.casilla;
-      dy = by + (e.clientY - sy) / m.casilla;
-      colocar();
-    });
-    function soltar(e){
-      if (e.pointerId !== id) return;
-      e.stopPropagation();
-      id = null;
-      nodo.classList.remove('presionada');
-      nodo.classList.remove('arrastrando');
-      // un toque sin arrastrar: levanta la guitarra (espera un instante por si es doble toque)
-      if (!movio && e.type === 'pointerup') tSubir = setTimeout(subir, DOBLE_TOQUE_MS - 60);
     }
-    nodo.addEventListener('pointerup', soltar);
-    nodo.addEventListener('pointercancel', soltar);
-    // que el toque no llegue al tablero (selección de piezas, flechas)
+    function arriba(e){
+      e.preventDefault(); e.stopPropagation();
+      nodo.classList.remove('presionada');
+      var ahora = Date.now();
+      if (ahora - ultimo < DOBLE_MS) {
+        ultimo = 0; clearTimeout(tUno);
+        abrirMenuQuitar();
+        return;
+      }
+      ultimo = ahora;
+      clearTimeout(tUno);
+      tUno = setTimeout(levantar, DOBLE_MS - 40);
+    }
+    nodo.addEventListener('pointerdown', abajo);
+    nodo.addEventListener('pointerup', arriba);
+    nodo.addEventListener('pointercancel', function(){ nodo.classList.remove('presionada'); });
+    nodo.addEventListener('pointerleave', function(){ nodo.classList.remove('presionada'); });
+    nodo.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirMenuQuitar(); }
+    });
     ['mousedown','touchstart','click','dblclick','contextmenu'].forEach(function(t){
       nodo.addEventListener(t, function(e){ e.stopPropagation(); if (t !== 'mousedown' && t !== 'touchstart') e.preventDefault(); }, { passive: false });
     });
+    gesto = { limpiar: function(){ clearTimeout(tUno); tLev.forEach(clearTimeout); } };
   }
 
-  window.addEventListener('resize', colocar);
-  window.addEventListener('orientationchange', function(){ setTimeout(colocar, 250); });
+  /* ---------- botón arriba a la derecha ---------- */
+  function regalo(){ return document.getElementById('b-gift'); }
+  function colocarBoton(){
+    if (!boton) return;
+    var g = visible(regalo());
+    var bar = document.querySelector('.topbar');
+    if (g && bar) {
+      if (getComputedStyle(bar).position === 'static') bar.style.position = 'relative';
+      if (boton.parentElement !== bar) bar.appendChild(boton);
+      var rb = bar.getBoundingClientRect();
+      boton.style.position = 'absolute';
+      boton.style.left = Math.round(g.left - rb.left - 40 - 10) + 'px';
+      boton.style.top = Math.round(g.top - rb.top + (g.height - 40) / 2) + 'px';
+      boton.style.right = '';
+    } else {
+      if (boton.parentElement !== document.body) document.body.appendChild(boton);
+      boton.style.position = 'fixed';
+      boton.style.left = '';
+      boton.style.right = '12px';
+      boton.style.top = '10px';
+    }
+  }
+  function crearBoton(){
+    if (boton) return boton;
+    boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'pcm-boton';
+    boton.setAttribute('aria-label', 'Mascota: agregar a la escena');
+    boton.setAttribute('aria-haspopup', 'dialog');
+    boton.innerHTML = '<img src="mascota.png" alt="" draggable="false"><span class="pcm-onda"></span>';
+    boton.addEventListener('click', function(e){ e.stopPropagation(); abrirMenuAgregar(); });
+    colocarBoton();
+    return boton;
+  }
+  function onda(){
+    var o = boton && boton.querySelector('.pcm-onda');
+    if (!o) return;
+    o.classList.remove('va'); void o.offsetWidth; o.classList.add('va');
+  }
+  function quitarBoton(conAnimacion, listo){
+    var b = boton; boton = null;
+    if (!b) { if (listo) listo(); return; }
+    var a = conAnimacion ? animar(b, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(1.12)', opacity: 1, offset: .35 },
+      { transform: 'scale(0)', opacity: 0 }
+    ], { duration: 300, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' }) : null;
+    alTerminar(a, function(){ if (b.parentElement) b.parentElement.removeChild(b); if (listo) listo(); }, 300);
+  }
 
-  // Enganche con la app: onSolved() muestra, load() (cambio de ejercicio) oculta.
+  /* ---------- ventanita flotante ---------- */
+  function cerrarPop(elegida, listo){
+    var p = pop; pop = null;
+    if (!p) { if (listo) listo(); return; }
+    document.removeEventListener('pointerdown', p._fuera, true);
+    document.removeEventListener('keydown', p._tecla, true);
+    window.removeEventListener('resize', p._cerrar);
+    var a;
+    if (elegida) {
+      /* se cierra llevándose la opción elegida: el resto se desvanece y todo se recoge hacia ella */
+      elegida.classList.add('elegida');
+      var rp = p.getBoundingClientRect(), re = elegida.getBoundingClientRect();
+      p.style.transformOrigin = (re.left + re.width / 2 - rp.left) + 'px ' + (re.top + re.height / 2 - rp.top) + 'px';
+      Array.prototype.forEach.call(p.querySelectorAll('.pcm-pop-cab,.pcm-pop-op'), function(n){
+        if (n !== elegida) animar(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' });
+      });
+      a = animar(p, [
+        { transform: 'scale(1)', opacity: 1, filter: 'blur(0)' },
+        { transform: 'scale(.97)', opacity: 1, filter: 'blur(0)', offset: .35 },
+        { transform: 'scale(.55)', opacity: 0, filter: 'blur(5px)' }
+      ], { duration: 380, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' });
+    } else {
+      a = animar(p, [
+        { transform: 'scale(1)', opacity: 1, filter: 'blur(0)' },
+        { transform: 'scale(.88)', opacity: 0, filter: 'blur(4px)' }
+      ], { duration: 200, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' });
+    }
+    alTerminar(a, function(){ if (p.parentElement) p.parentElement.removeChild(p); if (listo) listo(); }, 380);
+  }
+
+  function abrirPop(ancla, opciones, alElegir){
+    if (pop) { cerrarPop(); return; }
+    var ra = ancla.getBoundingClientRect();
+    var p = document.createElement('div');
+    p.className = 'pcm-pop';
+    p.setAttribute('role', 'dialog');
+    p.setAttribute('aria-label', 'Mascota');
+    var solo = opciones.length === 1 && opciones[0].principal;
+    p.innerHTML =
+      '<div class="pcm-pop-cab"><span class="pcm-pop-cara"><img src="mascota.png" alt=""></span><b>Mascota</b>' +
+      '<button type="button" class="pcm-pop-x" aria-label="Cerrar">' + ICONO.x + '</button></div>' +
+      '<div class="pcm-pop-grupo' + (solo ? ' solo' : '') + '">' +
+      opciones.map(function(o){
+        return '<button type="button" class="pcm-pop-op' + (o.peligro ? ' peligro' : '') + (o.principal ? ' principal' : '') + '" data-acc="' + o.acc + '">' +
+          ICONO[o.icono] + '<span>' + o.texto + '</span></button>';
+      }).join('') + '</div>';
+    document.body.appendChild(p);
+    pop = p;
+    p._ancla = ancla;
+
+    /* posición: debajo del ancla, alineada a su derecha; si no cabe, encima */
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var w = p.offsetWidth, h = p.offsetHeight;
+    var left = Math.min(vw - w - 12, Math.max(12, ra.right + 10 - w));
+    var top = ra.bottom + 10, abajo = true;
+    if (top + h > vh - 12) { top = Math.max(12, ra.top - 10 - h); abajo = false; }
+    p.style.left = Math.round(left) + 'px';
+    p.style.top = Math.round(top) + 'px';
+    var ox = Math.max(16, Math.min(w - 16, ra.left + ra.width / 2 - left));
+    p.style.transformOrigin = ox + 'px ' + (abajo ? '0px' : h + 'px');
+
+    animar(p, [
+      { transform: 'scale(.35) translateY(' + (abajo ? -8 : 8) + 'px)', opacity: 0, filter: 'blur(8px)' },
+      { transform: 'scale(1.025)', opacity: 1, filter: 'blur(0)', offset: .62 },
+      { transform: 'scale(1)', opacity: 1, filter: 'blur(0)' }
+    ], { duration: 460, easing: 'cubic-bezier(.2,.9,.3,1)' });
+    Array.prototype.forEach.call(p.querySelectorAll('.pcm-pop-cab,.pcm-pop-op'), function(n, i){
+      animar(n, [{ opacity: 0, transform: 'translateY(7px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 300, delay: 90 + i * 55, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' });
+    });
+
+    p.querySelector('.pcm-pop-x').addEventListener('click', function(e){ e.stopPropagation(); cerrarPop(); });
+    Array.prototype.forEach.call(p.querySelectorAll('.pcm-pop-op'), function(b){
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (p._listo) return; p._listo = true;
+        var acc = b.getAttribute('data-acc');
+        cerrarPop(b);
+        setTimeout(function(){ alElegir(acc); }, reducido ? 0 : 200);
+      });
+    });
+    p._fuera = function(e){ if (pop === p && !p.contains(e.target) && !ancla.contains(e.target)) cerrarPop(); };
+    p._tecla = function(e){ if (e.key === 'Escape') cerrarPop(); };
+    p._cerrar = function(){ cerrarPop(); };
+    setTimeout(function(){
+      if (pop !== p) return;
+      document.addEventListener('pointerdown', p._fuera, true);
+      document.addEventListener('keydown', p._tecla, true);
+      window.addEventListener('resize', p._cerrar);
+    }, 0);
+  }
+
+  function abrirMenuQuitar(){
+    if (!el) return;
+    abrirPop(el, [
+      { acc: 'sesion', icono: 'reloj', texto: 'Quitar por esta vez' },
+      { acc: 'siempre', icono: 'basura', texto: 'Quitar para siempre', peligro: true }
+    ], function(acc){ guardar(acc); irseVolando(); });
+  }
+  function abrirMenuAgregar(){
+    if (!boton) return;
+    abrirPop(boton, [
+      { acc: 'agregar', icono: 'mas', texto: 'Agregar a la escena', principal: true }
+    ], function(){ guardar(''); volverVolando(); });
+  }
+
+  /* ---------- vuelos entre el tablero y el botón ---------- */
+  function centro(r){ return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+
+  function irseVolando(){
+    if (!el) return;
+    calmar();
+    crearBoton();
+    boton.style.opacity = '0';
+    boton.style.transform = 'scale(0)';
+    var m = el, rm = m.getBoundingClientRect(), rb = boton.getBoundingClientRect();
+    var a0 = centro(rm), a1 = centro(rb);
+    var dx = a1.x - a0.x, dy = a1.y - a0.y;
+    var fin = Math.max(.3, 34 / rm.height);
+    var alza = Math.min(90, 30 + Math.abs(dx) * .12);
+    m.style.transformOrigin = '50% 50%';
+    m.style.pointerEvents = 'none';
+    el = null;
+    var a = animar(m, [
+      { transform: 'translate(0,0) scale(1,1) rotate(0)', opacity: 1, offset: 0 },
+      { transform: 'translate(0,4px) scale(1.1,.86) rotate(0)', opacity: 1, offset: .14 },
+      { transform: 'translate(' + (dx * .45) + 'px,' + (dy * .45 - alza) + 'px) scale(.8) rotate(-10deg)', opacity: 1, offset: .55 },
+      { transform: 'translate(' + (dx * .92) + 'px,' + (dy * .92) + 'px) scale(' + (fin * 1.15) + ') rotate(4deg)', opacity: .9, offset: .88 },
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + fin + ') rotate(0)', opacity: 0, offset: 1 }
+    ], { duration: 720, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'forwards' });
+    setTimeout(function(){
+      if (!boton) return;
+      boton.style.opacity = ''; boton.style.transform = '';
+      animar(boton, [
+        { transform: 'scale(0)', opacity: 0 },
+        { transform: 'scale(1.18)', opacity: 1, offset: .55 },
+        { transform: 'scale(.96)', offset: .8 },
+        { transform: 'scale(1)', opacity: 1 }
+      ], { duration: 460, easing: 'cubic-bezier(.3,.8,.4,1)' });
+      onda();
+    }, a ? 600 : 0);
+    alTerminar(a, function(){
+      if (gesto) gesto.limpiar();
+      if (m.parentElement) m.parentElement.removeChild(m);
+    }, 720);
+  }
+
+  function volverVolando(){
+    var rb = boton ? boton.getBoundingClientRect() : null;
+    quitarBoton(true);
+    crear();
+    var m = el;
+    if (!rb || !m.getBoundingClientRect().width) { m.classList.add('aterriza'); return; }
+    var rm = m.getBoundingClientRect();
+    var a0 = centro(rb), a1 = centro(rm);
+    var dx = a0.x - a1.x, dy = a0.y - a1.y;
+    var ini = Math.max(.3, 34 / rm.height);
+    var alza = Math.min(90, 30 + Math.abs(dx) * .12);
+    m.style.transformOrigin = '50% 50%';
+    var a = animar(m, [
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + ini + ') rotate(0)', opacity: 0, offset: 0 },
+      { transform: 'translate(' + (dx * .9) + 'px,' + (dy * .9 - 10) + 'px) scale(' + (ini * 1.2) + ') rotate(-6deg)', opacity: 1, offset: .14 },
+      { transform: 'translate(' + (dx * .45) + 'px,' + (dy * .45 - alza) + 'px) scale(.85) rotate(8deg)', opacity: 1, offset: .55 },
+      { transform: 'translate(0,0) scale(1) rotate(0)', opacity: 1, offset: 1 }
+    ], { duration: 680, easing: 'cubic-bezier(.4,0,.3,1)', delay: 120, fill: 'backwards' });
+    alTerminar(a, function(){
+      if (el !== m) return;
+      m.style.transformOrigin = '';
+      m.classList.remove('aterriza'); void m.offsetWidth; m.classList.add('aterriza');
+      chispas(7, rm.height * .75);
+      setTimeout(function(){ m.classList.remove('aterriza'); }, 600);
+    }, 800);
+  }
+
+  /* ---------- estado inicial y cambios desde la otra sección ---------- */
+  function aplicarEstado(animado){
+    var oculto = !!leer();
+    if (oculto) {
+      if (pop && el && pop._ancla === el) cerrarPop();
+      if (el) {
+        var m = el; el = null; calmar();
+        var a = animado ? animar(m, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.6)' }], { duration: 220, fill: 'forwards' }) : null;
+        alTerminar(a, function(){ if (m.parentElement) m.parentElement.removeChild(m); }, 220);
+      }
+      crearBoton();
+    } else {
+      if (boton) quitarBoton(animado);
+      if (!el) { crear(); if (animado) { el.classList.add('aterriza'); } }
+    }
+  }
+  window.addEventListener('storage', function(e){
+    if (e.key === null || e.key === CLAVE) aplicarEstado(true);
+  });
+
+  function recolocar(){ colocar(); colocarBoton(); }
+  window.addEventListener('resize', recolocar);
+  window.addEventListener('orientationchange', function(){ setTimeout(recolocar, 250); });
+  try { new MutationObserver(function(){ requestAnimationFrame(recolocar); })
+    .observe(document.documentElement, { attributes: true }); } catch (e) {}
+  setInterval(function(){
+    if (document.hidden) return;
+    /* por si la otra sección cambió el estado sin avisar */
+    if (!pop && (!!leer() !== !!boton || (!leer() && !el))) aplicarEstado(false);
+    recolocar();
+  }, 1200);
+
+  /* Enganche con la app: onSolved() festeja, load() (cambio de ejercicio) calma */
   function enganchar(){
     if (typeof window.onSolved !== 'function' || typeof window.load !== 'function') return false;
-    var solvedOriginal = window.onSolved;
-    var loadOriginal = window.load;
+    var solvedOriginal = window.onSolved, loadOriginal = window.load;
     window.onSolved = function(){
       var r = solvedOriginal.apply(this, arguments);
-      try { mostrar(); } catch (e) {}
+      try { festejar(); } catch (e) {}
       return r;
     };
     window.load = function(){
-      try { quitar(); } catch (e) {}
-      return loadOriginal.apply(this, arguments);
+      try { calmar(); } catch (e) {}
+      var r = loadOriginal.apply(this, arguments);
+      setTimeout(recolocar, 60);
+      return r;
     };
     return true;
   }
-  if (!enganchar()) document.addEventListener('DOMContentLoaded', enganchar, { once: true });
+  function iniciar(){
+    enganchar();
+    aplicarEstado(false);
+    setTimeout(recolocar, 300);
+    setTimeout(recolocar, 1200);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar, { once: true });
+  else iniciar();
 
-  window.pcMascota = { mostrar: mostrar, quitar: quitar };
+  /* API: mostrar() festeja (lo usa el tutorial), quitar() la calma (al cambiar de sección) */
+  window.pcMascota = {
+    mostrar: function(){ if (el) festejar(); },
+    quitar: calmar,
+    festejar: festejar,
+    calmar: calmar
+  };
 })();
