@@ -839,3 +839,6 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
   .aa-app .aa-tutor-cara{width:88px;height:88px;flex-basis:88px}
   .aa-app .aa-tutor-globo:before{top:34px}
 }
+
+/* En Aprende Ajedrez no va el botón de la mascota: el tutor usa la que se eligió en el Método PC1 / PC2 */
+.pcm-boton,.pcm-pop{display:none!important}

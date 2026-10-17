@@ -498,6 +498,30 @@ var cara=el('aa-tutor-cara'),festejo={t:[],activo:false};
   if(n)n.innerHTML=[['#FF9FB0',0],['#B9A4F2',1],['#8CC4EC',0],['#F5C96A',1]].map(function(x,i){return '<i class="n'+(i+1)+'">'+nota(x[0],x[1])+'</i>';}).join('');
 })();
 function posarCara(p){if(cara)cara.dataset.pose=String(p);}
+/* La mascota del tutor es la misma que se eligió en el Método PC1 / PC2 (botón junto al regalo).
+   Se cambian solo sus 4 poses; si cambia en otra sección, se actualiza al momento. */
+(function(){
+  var IDS=['gato','zorro','pinguino','conejita','panda','buho','dino','rana','koala','corgi'];
+  var PAJARO=['mascota.png','mascota-sube1.png','mascota-sube2.png','mascota-rock.png'];
+  function poses(){
+    var id='';try{id=localStorage.getItem('mascotaPC_elegida')||'';}catch(e){}
+    if(IDS.indexOf(id)<0)return PAJARO;
+    return [0,1,2,3].map(function(k){return 'mascotas/'+id+'-'+k+'.webp';});
+  }
+  function aplicar(animar){
+    if(!cara)return;
+    var imgs=cara.querySelectorAll('img.p0,img.p1,img.p2,img.p3'),ps=poses();
+    if(!imgs.length||imgs[0].getAttribute('src')===ps[0])return;
+    var cambiar=function(){for(var i=0;i<imgs.length;i++)imgs[i].setAttribute('src',ps[i]);};
+    var caja=cara.querySelector('.aa-cara-baile')||cara;
+    if(!animar||!caja.animate){cambiar();return;}
+    var sale=caja.animate([{transform:'scale(1) rotate(0)',opacity:1},{transform:'scale(.2) rotate(-25deg)',opacity:0}],{duration:220,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'});
+    sale.onfinish=function(){cambiar();sale.cancel();caja.animate([{transform:'scale(.2) rotate(25deg)',opacity:0},{transform:'scale(1.15) rotate(-4deg)',opacity:1,offset:.6},{transform:'scale(1) rotate(0)',opacity:1}],{duration:480,easing:'cubic-bezier(.2,.8,.3,1)'});};
+  }
+  aplicar(false);
+  window.addEventListener('storage',function(e){if(e.key==='mascotaPC_elegida'||e.key===null)aplicar(true);});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)aplicar(true);});
+})();
 function festejarTutor(){
   if(!cara)return;
   calmarTutor();
