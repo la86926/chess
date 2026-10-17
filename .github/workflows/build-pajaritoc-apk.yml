@@ -13,6 +13,7 @@ on:
       - '*.js'
       - '*.css'
       - '*.wasm'
+      - 'mascotas/**'
       - 'android-app/**'
       - '.github/workflows/build-pajaritoc-apk.yml'
   workflow_dispatch:
@@ -79,11 +80,13 @@ jobs:
           cp -f *.js android-app/app/src/main/assets/ || true
           cp -f *.css android-app/app/src/main/assets/ || true
           cp -f *.wasm android-app/app/src/main/assets/ || true
+          cp -R mascotas android-app/app/src/main/assets/
           cp torre.png android-app/app/src/main/res/drawable/torre.png
 
       - name: Verify cloud sync assets
         run: |
           test -f android-app/app/src/main/assets/pc-cloud-sync.js
+          test -f android-app/app/src/main/assets/mascotas/corgi-3.webp
           test -f android-app/app/src/main/assets/pc-cloud-sync.css
           test -f android-app/app/src/main/assets/pc-frame-cloud-bridge.js
           grep -Fq 'android.permission.INTERNET' android-app/app/src/main/AndroidManifest.xml
