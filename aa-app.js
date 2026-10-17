@@ -520,6 +520,8 @@ function posarCara(p){if(cara)cara.dataset.pose=String(p);}
   }
   aplicar(false);
   window.addEventListener('storage',function(e){if(e.key==='mascotaPC_elegida'||e.key===null)aplicar(true);});
+  /* elegida aquí mismo, con el botón de la mascota junto a las pestañas */
+  window.addEventListener('pcmascota-cambio',function(e){aplicar(!(e.detail&&e.detail.sinAnimar));});
   document.addEventListener('visibilitychange',function(){if(!document.hidden)aplicar(true);});
 })();
 function festejarTutor(){
@@ -1773,7 +1775,7 @@ function pintarVolver(){}
 /* =====================================================================
    Pestañas
    ===================================================================== */
-/* Pestañas: Mi lección, Temario, Mis favoritos, Repaso y Ayuda. La lección (vista «train») queda
+/* Pestañas: Mi lección, Temario, Mis favoritos y Repaso (Ayuda se quitó para dar lugar al botón de la mascota). La lección (vista «train») queda
    marcada como «Mi lección»; una posición de Repaso, como «Repaso». */
 function pestanaMarcada(v){
   if(v!=='train')return v;
@@ -1916,14 +1918,14 @@ var TOUR=[
   {t:'Tu lección',x:'Así se ve una lección. Te muestro en un momento qué tocar.',sel:null},
   {t:'Los pasos',x:'Cada número a la derecha del tablero es un paso de la lección. Se pone verde cuando lo terminas. Toca cualquiera para ir a él.',sel:'#aa-etapas'},
   {t:'Mueve en el tablero',x:'Cuando tu tutor diga «Mueve en el tablero», arrastra la pieza o tócala y luego toca la casilla.',sel:'#board',arrastre:true},
-  {t:'Tu tutor',x:'La mascota te explica cada paso y la lección avanza sola.',sel:'#aa-tutor'},
+  {t:'Tu tutor',x:'La mascota te explica cada paso y la lección avanza sola. Con el botón de su carita, arriba a la derecha, eliges otra mascota.',sel:'#aa-tutor'},
   {t:'Pausa y avanza',x:'«Pausar» detiene la lección. Con ‹ y › pasas al número anterior o al siguiente. Al terminar la lección, el botón de la lección siguiente se ilumina.',sel:'#aa-controles'},
   {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio.',sel:'#aa-fila-nav-izq'},
   {t:'Otras lecciones',x:'Aquí pasas a la lección anterior o a la siguiente.',sel:'.aa-fila-nav-der'},
   {t:'Guarda tus favoritos',x:'El corazón guarda el ítem que estás viendo (nivel, lección y número) en una o varias carpetas. Desde Mis favoritos vuelves justo a ese ítem.',sel:'#aa-corazon'},
   {t:'Siempre a mano',x:'Las pestañas quedan siempre arriba. «Mi lección» te devuelve a tu lección tal como la dejaste; «Temario», a la lista.',sel:'#tabs'},
   {t:'Tu tablero',x:'Aquí eliges el tablero. Tus tableros favoritos y personalizados son los mismos en el Método PC1 y el Método PC2.',sel:'#pc-tablero-btn'},
-  {t:'¡A aprender!',x:'Tu avance se guarda solo y, con tu ID, se sincroniza en tus dispositivos. Puedes volver a ver este recorrido desde Ayuda.',sel:null,fin:true}
+  {t:'¡A aprender!',x:'Tu avance se guarda solo y, con tu ID, se sincroniza en tus dispositivos.',sel:null,fin:true}
 ];
 var tour={i:0,nodo:null};
 function crearTour(){

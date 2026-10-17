@@ -34,6 +34,12 @@
     try { id = localStorage.getItem(CLAVE_ELEGIDA) || ''; } catch (e) {}
     return buscar(id) || MASCOTAS[0];
   }
+  /* En Aprende Ajedrez no hay mascota sobre el tablero: la mascota es la del tutor, junto al globo */
+  function tutorCara(){ return document.getElementById('aa-tutor-cara'); }
+  function tutorCaja(){ var c = tutorCara(); return c && (c.closest ? c.closest('.aa-tutor') : c.parentElement); }
+  var MODO_TUTOR = !!tutorCara();
+  function tutorOculto(){ var t = tutorCaja(); return !!(t && t.classList.contains('pcm-sin-cara')); }
+  function presente(){ return MODO_TUTOR ? !tutorOculto() : !!el; }
   function guardarElegida(id){ try { localStorage.setItem(CLAVE_ELEGIDA, id); } catch (e) {} }
   function precargar(m){ return m.poses.map(function(src){ var i = new Image(); i.src = src; return i; }); }
   var PROPORCION = 949 / 1016;           // ancho / alto de la caja del personaje
@@ -121,6 +127,8 @@
   '.pcm-pop-op.principal{justify-content:center;color:#fff;font-weight:600;background:var(--acento-tema,#53707F);border-radius:14px}' +
   '.pcm-pop-op.principal:active,.pcm-pop-op.principal.elegida{background:var(--acento-tema,#53707F);filter:brightness(.92)}' +
   '.pcm-pop-grupo.solo{background:transparent;box-shadow:none}' +
+  '.aa-tutor.pcm-sin-cara .aa-tutor-cara{display:none}.aa-tutor.pcm-sin-cara .aa-tutor-globo:before{display:none}' +
+  '.aa-barra-fija.pcm-con-boton{padding-right:58px}' +
   '.pcm-pop.con-galeria{width:min(300px,calc(100vw - 24px))}' +
   '.pcm-gal{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:6px 10px 12px;margin:0 -8px 4px;scroll-snap-type:x proximity;scroll-padding:0 10px;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%)}' +
   '.pcm-gal::-webkit-scrollbar{display:none}' +
@@ -358,6 +366,19 @@
   function regalo(){ return document.getElementById('b-gift'); }
   function colocarBoton(){
     if (!boton) return;
+    var barra = MODO_TUTOR && document.getElementById('aa-barra-fija');
+    if (barra && barra.getBoundingClientRect().width) {
+      if (getComputedStyle(barra).position === 'static') barra.style.position = 'relative';
+      if (boton.parentElement !== barra) barra.appendChild(boton);
+      barra.classList.add('pcm-con-boton');
+      var tabs = barra.querySelector('.tabs'), rt = tabs && tabs.getBoundingClientRect(), rr = barra.getBoundingClientRect();
+      var lado = rt && rt.height ? Math.max(34, Math.min(40, rt.height)) : 40;
+      boton.style.position = 'absolute';
+      boton.style.width = lado + 'px'; boton.style.height = lado + 'px';
+      boton.style.left = ''; boton.style.right = '12px';
+      boton.style.top = Math.round((rt && rt.height ? rt.top - rr.top + (rt.height - lado) / 2 : (rr.height - lado) / 2)) + 'px';
+      return;
+    }
     var g = visible(regalo());
     var bar = document.querySelector('.topbar');
     if (g && bar) {
@@ -535,6 +556,13 @@
   function elegirMascota(id, p){
     var m = buscar(id);
     if (!m) return;
+    if (MODO_TUTOR) {
+      if (m.id !== actual().id) { guardarElegida(m.id); refrescarCaras(p); if (boton) onda(); }
+      precargar(m);
+      if (tutorOculto()) { guardar(''); mostrarTutor(true); }
+      else try { window.dispatchEvent(new CustomEvent('pcmascota-cambio', { detail: { id: m.id } })); } catch (e) {}
+      return;
+    }
     if (m.id === actual().id && el) { if (el) { impulso(); chispas(6, (el.offsetHeight || 60) * .7); } return; }
     guardarElegida(m.id);
     refrescarCaras(p);
@@ -584,18 +612,70 @@
   }
 
   function abrirMenuQuitar(ancla){
-    if (!el) return;
+    if (!presente()) return;
     abrirPop(ancla || el, [
       { acc: 'sesion', icono: 'reloj', texto: 'Quitar por esta vez' },
       { acc: 'siempre', icono: 'basura', texto: 'Quitar para siempre', peligro: true }
-    ], function(acc){ guardar(acc); irseVolando(); });
+    ], function(acc){ guardar(acc); if (MODO_TUTOR) ocultarTutor(true); else irseVolando(); });
   }
   function abrirMenuBoton(){
     if (!boton) return;
-    if (el) { abrirMenuQuitar(boton); return; }
+    if (presente()) { abrirMenuQuitar(boton); return; }
     abrirPop(boton, [
       { acc: 'agregar', icono: 'mas', texto: 'Agregar a la escena', principal: true }
-    ], function(){ guardar(''); volverVolando(); });
+    ], function(){ guardar(''); if (MODO_TUTOR) mostrarTutor(true); else volverVolando(); });
+  }
+
+  /* ---------- tutor de Aprende Ajedrez: se va al botón y vuelve de él ---------- */
+  var tutorVolando = false;
+  function ocultarTutor(animado){
+    var c = tutorCara(), t = tutorCaja();
+    if (!c || !t || tutorOculto()) return;
+    tutorVolando = true;
+    crearBoton();
+    var rc = c.getBoundingClientRect(), rb = boton.getBoundingClientRect();
+    var dx = rb.left + rb.width / 2 - (rc.left + rc.width / 2), dy = rb.top + rb.height / 2 - (rc.top + rc.height / 2);
+    var fin = Math.max(.3, 30 / (rc.height || 60));
+    var a = animado ? animar(c, [
+      { transform: 'translate(0,0) scale(1) rotate(0)', opacity: 1 },
+      { transform: 'translate(0,3px) scale(1.1,.86)', opacity: 1, offset: .14 },
+      { transform: 'translate(' + (dx * .45) + 'px,' + (dy * .45 - 50) + 'px) scale(.85) rotate(-10deg)', opacity: 1, offset: .55 },
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + fin + ') rotate(0)', opacity: 0 }
+    ], { duration: 700, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'forwards' }) : null;
+    if (animado) setTimeout(onda, a ? 620 : 0);
+    alTerminar(a, function(){ t.classList.add('pcm-sin-cara'); tutorVolando = false; if (a) try { a.cancel(); } catch (e) {} }, 700);
+  }
+  function mostrarTutor(animado){
+    var c = tutorCara(), t = tutorCaja();
+    if (!c || !t) return;
+    var rb = boton && boton.getBoundingClientRect();
+    t.classList.remove('pcm-sin-cara');
+    try { window.dispatchEvent(new CustomEvent('pcmascota-cambio', { detail: { sinAnimar: true } })); } catch (e) {}
+    if (!animado || !rb) return;
+    if (boton) animar(boton, [{ transform: 'scale(1)' }, { transform: 'scale(.86)', offset: .4 }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+    var rc = c.getBoundingClientRect();
+    var dx = rb.left + rb.width / 2 - (rc.left + rc.width / 2), dy = rb.top + rb.height / 2 - (rc.top + rc.height / 2);
+    var ini = Math.max(.3, 30 / (rc.height || 60));
+    animar(c, [
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + ini + ')', opacity: 0, offset: 0 },
+      { transform: 'translate(' + (dx * .9) + 'px,' + (dy * .9 - 10) + 'px) scale(' + (ini * 1.2) + ') rotate(-6deg)', opacity: 1, offset: .14 },
+      { transform: 'translate(' + (dx * .45) + 'px,' + (dy * .45 - 50) + 'px) scale(.85) rotate(8deg)', opacity: 1, offset: .55 },
+      { transform: 'translate(0,0) scale(1.08,.92) rotate(0)', opacity: 1, offset: .85 },
+      { transform: 'none', opacity: 1, offset: 1 }
+    ], { duration: 720, easing: 'cubic-bezier(.4,0,.3,1)', delay: 100, fill: 'backwards' });
+  }
+  function activarDobleToqueTutor(){
+    var c = tutorCara();
+    if (!c || c._pcm) return;
+    c._pcm = true;
+    c.style.cursor = 'pointer';
+    var ultimo = 0;
+    c.addEventListener('pointerup', function(e){
+      var ahora = Date.now();
+      if (ahora - ultimo < DOBLE_MS) { ultimo = 0; e.preventDefault(); abrirMenuQuitar(c); return; }
+      ultimo = ahora;
+    });
+    c.addEventListener('dblclick', function(e){ e.preventDefault(); });
   }
 
   /* ---------- vuelos entre el tablero y el botón ---------- */
@@ -657,6 +737,13 @@
   /* ---------- estado inicial y cambios desde la otra sección ---------- */
   function aplicarEstado(animado){
     var oculto = !!leer();
+    if (MODO_TUTOR) {
+      activarDobleToqueTutor();
+      crearBoton();
+      if (oculto && !tutorOculto()) { if (pop && pop._ancla === tutorCara()) cerrarPop(); if (animado) ocultarTutor(true); else { var t = tutorCaja(); if (t) t.classList.add('pcm-sin-cara'); } }
+      else if (!oculto && tutorOculto()) mostrarTutor(animado);
+      return;
+    }
     if (oculto) {
       if (pop && el && pop._ancla === el) cerrarPop();
       if (el) {
@@ -686,7 +773,7 @@
   setInterval(function(){
     if (document.hidden) return;
     /* por si la otra sección cambió el estado sin avisar */
-    if (!pop && (!!leer() === !!el || !boton)) aplicarEstado(false);
+    if (!pop && !tutorVolando && (!!leer() === presente() || !boton)) aplicarEstado(false);
     recolocar();
   }, 1200);
 
