@@ -6,6 +6,8 @@
    - Doble toque: ventanita flotante con «Quitar por esta vez», «Quitar para siempre» y cerrar.
    - Arriba a la derecha, a la izquierda del regalo, un botón cuadrado con su carita abre la misma
      ventanita: si está, para quitarla; si no está, «Agregar a la escena».
+   - En la misma ventanita, una galería con scroll para elegir entre 11 mascotas; al tocar una,
+     la actual se va girando y la nueva aparece con destellos (la ventanita sigue abierta).
    «Por esta vez» dura hasta que se vuelve a abrir la app (sessionStorage);
    «para siempre» queda guardado (localStorage) hasta que se agregue de nuevo. */
 (function(){
@@ -13,7 +15,27 @@
   if (window.__pcMascota) return;
   window.__pcMascota = true;
 
-  var POSES = ['mascota.png', 'mascota-sube1.png', 'mascota-sube2.png', 'mascota-rock.png'];
+  /* Mascotas: 4 poses cada una (tocando · subiendo · casi arriba · guitarra en alto), mismo lienzo 596×640 */
+  function serie(id, nombre){
+    return { id: id, nombre: nombre, cara: 'mascotas/' + id + '-cara.webp',
+      poses: [0, 1, 2, 3].map(function(k){ return 'mascotas/' + id + '-' + k + '.webp'; }) };
+  }
+  var MASCOTAS = [
+    { id: 'pajaro', nombre: 'Pajarito', cara: 'mascota-cara.png',
+      poses: ['mascota.png', 'mascota-sube1.png', 'mascota-sube2.png', 'mascota-rock.png'] },
+    serie('gato', 'Gatito'), serie('zorro', 'Zorrito'), serie('pinguino', 'Pingüino'),
+    serie('conejita', 'Conejita'), serie('panda', 'Panda'), serie('buho', 'Búho'),
+    serie('dino', 'Dino'), serie('rana', 'Ranita'), serie('koala', 'Koala'), serie('corgi', 'Corgi')
+  ];
+  var CLAVE_ELEGIDA = 'mascotaPC_elegida';  // por dispositivo; sin prefijo pc_ para que no se sincronice
+  function buscar(id){ for (var i = 0; i < MASCOTAS.length; i++) if (MASCOTAS[i].id === id) return MASCOTAS[i]; return null; }
+  function actual(){
+    var id = '';
+    try { id = localStorage.getItem(CLAVE_ELEGIDA) || ''; } catch (e) {}
+    return buscar(id) || MASCOTAS[0];
+  }
+  function guardarElegida(id){ try { localStorage.setItem(CLAVE_ELEGIDA, id); } catch (e) {} }
+  function precargar(m){ return m.poses.map(function(src){ var i = new Image(); i.src = src; return i; }); }
   var PROPORCION = 949 / 1016;           // ancho / alto de la caja del personaje
   var CUADRO_MS = 85;
   var DOBLE_MS = 320;
@@ -99,6 +121,18 @@
   '.pcm-pop-op.principal{justify-content:center;color:#fff;font-weight:600;background:var(--acento-tema,#53707F);border-radius:14px}' +
   '.pcm-pop-op.principal:active,.pcm-pop-op.principal.elegida{background:var(--acento-tema,#53707F);filter:brightness(.92)}' +
   '.pcm-pop-grupo.solo{background:transparent;box-shadow:none}' +
+  '.pcm-pop.con-galeria{width:min(300px,calc(100vw - 24px))}' +
+  '.pcm-gal{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:6px 10px 12px;margin:0 -8px 4px;scroll-snap-type:x proximity;scroll-padding:0 10px;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%)}' +
+  '.pcm-gal::-webkit-scrollbar{display:none}' +
+  '.pcm-gal-it{position:relative;flex:0 0 54px;width:54px;height:54px;padding:0;border:0;border-radius:50%;background:rgba(118,118,128,.12);cursor:pointer;scroll-snap-align:start;transition:transform .25s cubic-bezier(.3,1.5,.5,1),background .2s}' +
+  '.pcm-gal-it img{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);border-radius:50%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}' +
+  '.pcm-gal-it:after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2.5px solid var(--acento-tema,#53707F);opacity:0;transform:scale(.85);transition:opacity .25s,transform .35s cubic-bezier(.3,1.6,.5,1)}' +
+  '.pcm-gal-it.activa:after{opacity:1;transform:scale(1)}' +
+  '.pcm-gal-it.activa{background:color-mix(in srgb,var(--acento-tema,#53707F) 16%,transparent)}' +
+  '.pcm-gal-it:active{transform:scale(.9)}' +
+  '@media (hover:hover){.pcm-gal-it:hover{transform:translateY(-2px) scale(1.04)}}' +
+  '.pcm-pop-cab b{transition:opacity .18s}' +
+  'html[data-modo="oscuro"] .pcm-gal-it{background:rgba(255,255,255,.1)}' +
   'html[data-modo="oscuro"] .pcm-pop{background:rgba(40,40,44,.82);color:#f5f5f7;box-shadow:0 22px 60px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.12)}' +
   'html[data-modo="oscuro"] .pcm-pop-grupo{background:rgba(255,255,255,.07);box-shadow:none}' +
   'html[data-modo="oscuro"] .pcm-pop-x{background:rgba(255,255,255,.12);color:#c7c7cc}' +
@@ -121,7 +155,8 @@
   estilo.id = 'pc-mascota-css';
   estilo.textContent = CSS;
   (document.head || document.documentElement).appendChild(estilo);
-  POSES.concat(['mascota-cara.png']).forEach(function(src){ var i = new Image(); i.src = src; });
+  precargar(actual());
+  MASCOTAS.forEach(function(m){ var i = new Image(); i.src = m.cara; });
 
   /* ---------- estado guardado ---------- */
   function leer(){
@@ -198,7 +233,7 @@
     el.setAttribute('aria-label', 'Mascota. Doble toque para ver opciones.');
     el.innerHTML = '<div class="pcm-sombra"></div>' + NOTAS +
       '<div class="pcm-baile"><div class="pcm-presion"><div class="pcm-salto">' +
-      POSES.map(function(src, i){ return '<img class="pcm-pose p' + i + '" src="' + src + '" alt="" draggable="false">'; }).join('') +
+      actual().poses.map(function(src, i){ return '<img class="pcm-pose p' + i + '" src="' + src + '" alt="" draggable="false">'; }).join('') +
       '</div></div></div>';
     activarGestos(el);
     colocar();
@@ -351,7 +386,7 @@
     boton.className = 'pcm-boton';
     boton.setAttribute('aria-label', 'Mascota');
     boton.setAttribute('aria-haspopup', 'dialog');
-    boton.innerHTML = '<img src="mascota-cara.png" alt="" draggable="false"><span class="pcm-onda"></span>';
+    boton.innerHTML = '<img src="' + actual().cara + '" alt="" draggable="false"><span class="pcm-onda"></span>';
     boton.addEventListener('click', function(e){ e.stopPropagation(); abrirMenuBoton(); });
     colocarBoton();
     return boton;
@@ -386,7 +421,7 @@
       elegida.classList.add('elegida');
       var rp = p.getBoundingClientRect(), re = elegida.getBoundingClientRect();
       p.style.transformOrigin = (re.left + re.width / 2 - rp.left) + 'px ' + (re.top + re.height / 2 - rp.top) + 'px';
-      Array.prototype.forEach.call(p.querySelectorAll('.pcm-pop-cab,.pcm-pop-op'), function(n){
+      Array.prototype.forEach.call(p.querySelectorAll('.pcm-pop-cab,.pcm-gal,.pcm-pop-op'), function(n){
         if (n !== elegida) animar(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' });
       });
       a = animar(p, [
@@ -407,13 +442,18 @@
     if (pop) { cerrarPop(); return; }
     var ra = ancla.getBoundingClientRect();
     var p = document.createElement('div');
-    p.className = 'pcm-pop';
+    p.className = 'pcm-pop con-galeria';
     p.setAttribute('role', 'dialog');
     p.setAttribute('aria-label', 'Mascota');
     var solo = opciones.length === 1 && opciones[0].principal;
     p.innerHTML =
-      '<div class="pcm-pop-cab"><span class="pcm-pop-cara"><img src="mascota-cara.png" alt=""></span><b>Mascota</b>' +
+      '<div class="pcm-pop-cab"><span class="pcm-pop-cara"><img src="' + actual().cara + '" alt=""></span><b>' + actual().nombre + '</b>' +
       '<button type="button" class="pcm-pop-x" aria-label="Cerrar">' + ICONO.x + '</button></div>' +
+      '<div class="pcm-gal" role="listbox" aria-label="Elegir mascota">' +
+      MASCOTAS.map(function(m){
+        var on = m.id === actual().id;
+        return '<button type="button" class="pcm-gal-it' + (on ? ' activa' : '') + '" role="option" aria-selected="' + on + '" aria-label="' + m.nombre + '" data-id="' + m.id + '"><img src="' + m.cara + '" alt="" draggable="false"></button>';
+      }).join('') + '</div>' +
       '<div class="pcm-pop-grupo' + (solo ? ' solo' : '') + '">' +
       opciones.map(function(o){
         return '<button type="button" class="pcm-pop-op' + (o.peligro ? ' peligro' : '') + (o.principal ? ' principal' : '') + '" data-acc="' + o.acc + '">' +
@@ -439,6 +479,19 @@
       { transform: 'scale(1.025)', opacity: 1, filter: 'blur(0)', offset: .62 },
       { transform: 'scale(1)', opacity: 1, filter: 'blur(0)' }
     ], { duration: 460, easing: 'cubic-bezier(.2,.9,.3,1)' });
+    Array.prototype.forEach.call(p.querySelectorAll('.pcm-gal-it'), function(n, i){
+      animar(n, [{ opacity: 0, transform: 'translateX(18px) scale(.6)' }, { opacity: 1, transform: 'none' }],
+        { duration: 380, delay: 120 + Math.min(i, 6) * 40, easing: 'cubic-bezier(.25,1.4,.5,1)', fill: 'backwards' });
+    });
+    var gal = p.querySelector('.pcm-gal'), act = gal.querySelector('.activa');
+    if (act) gal.scrollLeft = Math.max(0, act.offsetLeft - gal.clientWidth / 2 + act.offsetWidth / 2);
+    /* en la Mac, la rueda del mouse también desplaza la galería de lado */
+    gal.addEventListener('wheel', function(e){
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { gal.scrollLeft += e.deltaY; e.preventDefault(); }
+    }, { passive: false });
+    Array.prototype.forEach.call(p.querySelectorAll('.pcm-gal-it'), function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); elegirMascota(b.getAttribute('data-id'), p); });
+    });
     Array.prototype.forEach.call(p.querySelectorAll('.pcm-pop-cab,.pcm-pop-op'), function(n, i){
       animar(n, [{ opacity: 0, transform: 'translateY(7px)' }, { opacity: 1, transform: 'none' }],
         { duration: 300, delay: 90 + i * 55, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' });
@@ -463,6 +516,71 @@
       document.addEventListener('keydown', p._tecla, true);
       window.addEventListener('resize', p._cerrar);
     }, 0);
+  }
+
+  /* ---------- elegir otra mascota ---------- */
+  function refrescarCaras(p){
+    var m = actual();
+    if (boton) { var bi = boton.querySelector('img'); if (bi) bi.src = m.cara; }
+    p = p || pop;
+    if (!p) return;
+    var ci = p.querySelector('.pcm-pop-cara img'), t = p.querySelector('.pcm-pop-cab b');
+    if (ci) { ci.src = m.cara; animar(ci, [{ transform: 'scale(.5) rotate(-20deg)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: .6 }, { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.3,1.4,.5,1)' }); }
+    if (t) t.textContent = m.nombre;
+    Array.prototype.forEach.call(p.querySelectorAll('.pcm-gal-it'), function(b){
+      var on = b.getAttribute('data-id') === m.id;
+      b.classList.toggle('activa', on); b.setAttribute('aria-selected', String(on));
+    });
+  }
+  function elegirMascota(id, p){
+    var m = buscar(id);
+    if (!m) return;
+    if (m.id === actual().id && el) { if (el) { impulso(); chispas(6, (el.offsetHeight || 60) * .7); } return; }
+    guardarElegida(m.id);
+    refrescarCaras(p);
+    if (boton) onda();
+    var imgs = precargar(m), listo = false;
+    function cuando(fn){
+      var n = 0, hecho = false;
+      function uno(){ if (++n >= imgs.length && !hecho) { hecho = true; fn(); } }
+      imgs.forEach(function(i){ if (i.complete) uno(); else { i.onload = uno; i.onerror = uno; } });
+      setTimeout(function(){ if (!hecho) { hecho = true; fn(); } }, 1500);
+    }
+    if (!el) {
+      /* estaba quitada: elegir una la trae de vuelta */
+      guardar('');
+      cuando(function(){ volverVolando(); });
+      return;
+    }
+    cambiarPoses(m, cuando);
+  }
+  function cambiarPoses(m, cuando){
+    var nodo = el;
+    if (!nodo) return;
+    var estabaFestejando = festejo.activo;
+    calmar();
+    var sale = animar(nodo, [
+      { transform: 'scale(1) rotate(0)', opacity: 1, filter: 'blur(0)' },
+      { transform: 'scale(1.08,.9) rotate(0)', opacity: 1, filter: 'blur(0)', offset: .3 },
+      { transform: 'scale(.15) rotate(-25deg)', opacity: 0, filter: 'blur(4px)' }
+    ], { duration: 260, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' });
+    var listos = 0;
+    function intercambiar(){
+      if (++listos < 2 || el !== nodo) return;
+      Array.prototype.forEach.call(nodo.querySelectorAll('.pcm-pose'), function(img, i){ img.src = m.poses[i]; });
+      posar(0);
+      var entra = animar(nodo, [
+        { transform: 'scale(.15) rotate(25deg)', opacity: 0, filter: 'blur(4px)' },
+        { transform: 'scale(1.14) rotate(-4deg)', opacity: 1, filter: 'blur(0)', offset: .55 },
+        { transform: 'scale(.95) rotate(1deg)', opacity: 1, filter: 'blur(0)', offset: .8 },
+        { transform: 'scale(1) rotate(0)', opacity: 1, filter: 'blur(0)' }
+      ], { duration: 520, easing: 'cubic-bezier(.2,.8,.3,1)' });
+      if (sale) try { sale.cancel(); } catch (e) {}
+      chispas(9, (nodo.offsetHeight || 60) * .85);
+      alTerminar(entra, function(){ if (estabaFestejando && el === nodo) festejar(); else impulso(); }, 520);
+    }
+    alTerminar(sale, intercambiar, 260);
+    cuando(intercambiar);
   }
 
   function abrirMenuQuitar(ancla){
@@ -553,6 +671,11 @@
   }
   window.addEventListener('storage', function(e){
     if (e.key === null || e.key === CLAVE) aplicarEstado(true);
+    if (e.key === CLAVE_ELEGIDA && el) {
+      var m = actual(), img = el.querySelector('.pcm-pose.p0');
+      if (img && img.getAttribute('src') !== m.poses[0]) { refrescarCaras(); cambiarPoses(m, function(fn){ fn(); }); }
+    }
+    if (e.key === CLAVE_ELEGIDA) refrescarCaras();
   });
 
   function recolocar(){ colocar(); colocarBoton(); }
