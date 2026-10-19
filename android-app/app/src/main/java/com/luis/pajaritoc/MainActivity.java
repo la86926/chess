@@ -37,6 +37,8 @@ public class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
+        // el tamaño de letra del sistema no reescala el diseño (se ve igual que en el iPhone y la web)
+        settings.setTextZoom(100);
 
         WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
