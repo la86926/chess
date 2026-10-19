@@ -208,6 +208,8 @@ boardEl.addEventListener('pointerdown',function(e){
    3. Tutor
    ===================================================================== */
 var tutorTexto=el('aa-dice'),tutorCaja=el('aa-tutor');
+tutorTexto.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('.aa-cref');if(!r)return;e.preventDefault();e.stopPropagation();latirCasilla(r.getAttribute('data-sq'));});
+tutorTexto.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' ')return;var r=e.target.closest&&e.target.closest('.aa-cref');if(!r)return;e.preventDefault();latirCasilla(r.getAttribute('data-sq'));});
 var dichos=[];
 /* Casillas que nombra el tutor (b2, Dxh7+, Cf6…): se resaltan en el tablero con un tono suave,
    para que el alumno vea enseguida de qué casillas se habla. En los ejercicios de tocar casillas
@@ -221,7 +223,36 @@ function casillasDelTexto(texto){
   }
   return out;
 }
+/* Casillas del globo que se pueden tocar: «c3», «Cc3», «Txh2», «caballo c3», «peón de e4»…
+   Al tocarlas, la casilla late en el tablero (lila; mostaza en modo oscuro). */
+var PIEZA_PALABRA='(?:[Rr]ey|[Dd]ama|[Tt]orre|[Aa]lfil|[Cc]aballo|[Pp]e[oó]n)(?:\\s+(?:de|en))?\\s+';
+var CASILLA_RE=new RegExp('((?:'+PIEZA_PALABRA+')?)((?:[KQRBNDTAC][a-h1-8]?x?|[a-h]x)?)([a-h][1-8])(?![0-9A-Za-záéíóúñ])','g');
+function conCasillas(html){
+  return String(html).split(/(<[^>]*>)/).map(function(parte){
+    if(!parte||parte.charAt(0)==='<')return parte;
+    return parte.replace(CASILLA_RE,function(todo,pieza,pre,sq,i,str){
+      var antes=i>0?str.charAt(i-1):'';
+      if(antes&&/[A-Za-z0-9áéíóúñÁÉÍÓÚÑ&#;]/.test(antes))return todo;
+      return '<span class="aa-cref'+(A.latido===sq?' activa':'')+'" role="button" tabindex="0" data-sq="'+sq+'" aria-label="Ver la casilla '+sq+' en el tablero">'+todo+'</span>';
+    });
+  }).join('');
+}
+function pintarLatido(){
+  try{
+    boardEl.querySelectorAll('.sq.aa-latido').forEach(function(c){if(c.getAttribute('data-sq')!==A.latido)c.classList.remove('aa-latido');});
+    if(A.latido){var c=boardEl.querySelector('.sq[data-sq="'+A.latido+'"]');if(c)c.classList.add('aa-latido');}
+    boardEl.classList.toggle('aa-con-latido',!!A.latido);
+    tutorTexto.querySelectorAll('.aa-cref').forEach(function(r){r.classList.toggle('activa',r.getAttribute('data-sq')===A.latido);});
+  }catch(e){}
+}
+function latirCasilla(sq){
+  A.latido=(A.latido===sq)?null:sq; /* tocar la misma otra vez la apaga */
+  boardEl.querySelectorAll('.sq.aa-latido').forEach(function(c){c.classList.remove('aa-latido');});
+  void boardEl.offsetWidth; /* así el latido empieza de nuevo en cada toque */
+  pintarLatido();
+}
 function pintarMenciones(reiniciar){
+  pintarLatido();
   try{
     var previas=boardEl.querySelectorAll('.sq.aa-mencion');
     var visibles=(A.modo==='leccion'||A.modo==='descubre')&&!(A.tarea&&A.tarea.tipo==='casilla'&&!A.resuelta);
@@ -236,13 +267,14 @@ function pintarMenciones(reiniciar){
 }
 function tutor(texto,tono){
   var nuevas=casillasDelTexto(texto),cambio=String(texto)!==A.mencionTexto;
+  if(cambio)A.latido=null;
   A.menciones=nuevas;A.mencionTexto=String(texto);if(cambio)A.mencionT=Date.now();pintarMenciones(cambio);
   /* Mientras el ejercicio no esté resuelto, debajo de cada mensaje (acierto parcial, error o pista)
      se repite lo que hay que hacer, para no perder la consigna. */
   var recordar=(A.consigna&&A.tarea&&!A.resuelta&&plano(texto)!==plano(A.consigna))?'<span class="aa-consigna">'+rico(A.consigna)+'</span>':'';
-  tutorTexto.innerHTML=rico(texto)+recordar;
+  tutorTexto.innerHTML=conCasillas(rico(texto)+recordar);
   /* el globo tiene siempre 4 renglones (los botones no se mueven): si el recordatorio no cabe, se omite */
-  if(recordar&&tutorTexto.scrollHeight>tutorTexto.clientHeight+2)tutorTexto.innerHTML=rico(texto);
+  if(recordar&&tutorTexto.scrollHeight>tutorTexto.clientHeight+2)tutorTexto.innerHTML=conCasillas(rico(texto));
   tutorTexto.scrollTop=0;
   tutorCaja.dataset.tono=tono||'';
   tutorCaja.classList.remove('habla');void tutorCaja.offsetWidth;tutorCaja.classList.add('habla');

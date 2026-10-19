@@ -890,3 +890,27 @@ html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:color-mi
    Al arrancar vuelve su animación de entrada de siempre. Si algo fallara, aparecen solas a los 6 s. */
 .aa-app:not(.aa-arrancada) > .view{opacity:0;pointer-events:none;animation:aaMostrarIgual 0s 6s forwards}
 @keyframes aaMostrarIgual{to{opacity:1;pointer-events:auto}}
+
+/* Casillas del globo que se pueden tocar: subrayado discreto; al tocarlas, la casilla late en el tablero.
+   Lila en modo claro; mostaza brillante en modo oscuro. Late como un corazón: dos pulsos y una pausa. */
+.aa-app .aa-cref{--aa-cref:#7A4BE8;cursor:pointer;border-radius:6px;padding:0 3px;margin:0 -3px;
+  text-decoration:underline dotted color-mix(in srgb,var(--aa-cref) 70%,transparent);text-decoration-thickness:1.5px;text-underline-offset:3px;
+  -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,box-shadow .2s}
+html[data-modo="oscuro"] .aa-app .aa-cref{--aa-cref:#F2BE32}
+@media (hover:hover){.aa-app .aa-cref:hover{background:color-mix(in srgb,var(--aa-cref) 12%,transparent)}}
+.aa-app .aa-cref:focus-visible{outline:2px solid var(--aa-cref);outline-offset:1px}
+.aa-app .aa-cref.activa{background:color-mix(in srgb,var(--aa-cref) 20%,transparent);text-decoration-style:solid;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--aa-cref) 45%,transparent)}
+.aa-app #board .sq.aa-latido{--aa-lt:122,75,232;position:relative;z-index:4}
+.aa-app #board .sq.aa-latido::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:0;
+  animation:aaLatido 1.25s cubic-bezier(.3,0,.3,1) infinite}
+.aa-app #board .sq.aa-latido .pc{position:relative;z-index:2}
+html[data-modo="oscuro"] .aa-app #board .sq.aa-latido{--aa-lt:242,190,50}
+@keyframes aaLatido{
+  0%,38%,100%{background:rgba(var(--aa-lt),.16);box-shadow:inset 0 0 0 3px rgba(var(--aa-lt),.95),inset 0 0 10px rgba(var(--aa-lt),.30),0 0 0 0 rgba(var(--aa-lt),0)}
+  12%{background:rgba(var(--aa-lt),.30);box-shadow:inset 0 0 0 5px rgba(var(--aa-lt),1),inset 0 0 22px rgba(var(--aa-lt),.55),0 0 18px 3px rgba(var(--aa-lt),.55)}
+  20%{background:rgba(var(--aa-lt),.18);box-shadow:inset 0 0 0 3px rgba(var(--aa-lt),.9),inset 0 0 12px rgba(var(--aa-lt),.32),0 0 8px 1px rgba(var(--aa-lt),.25)}
+  28%{background:rgba(var(--aa-lt),.28);box-shadow:inset 0 0 0 5px rgba(var(--aa-lt),1),inset 0 0 20px rgba(var(--aa-lt),.5),0 0 16px 3px rgba(var(--aa-lt),.5)}}
+@media (prefers-reduced-motion:reduce){.aa-app #board .sq.aa-latido::before{animation:none;background:rgba(var(--aa-lt),.22);box-shadow:inset 0 0 0 4px rgba(var(--aa-lt),1),0 0 12px 2px rgba(var(--aa-lt),.45)}}
+/* mientras una casilla late, las demás mencionadas se atenúan para que se note cuál tocaste */
+.aa-app #board.aa-con-latido .sq.aa-mencion:not(.aa-latido)::before{animation:none;background:rgba(138,84,250,.12);box-shadow:inset 0 0 0 2px rgba(112,56,230,.3)}
