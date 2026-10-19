@@ -503,7 +503,7 @@ function posarCara(p){if(cara)cara.dataset.pose=String(p);}
   var IDS=['gato','zorro','pinguino','conejita','panda','buho','dino','rana','koala','corgi'];
   var PAJARO=['mascota.png','mascota-sube1.png','mascota-sube2.png','mascota-rock.png'];
   function poses(){
-    var id='';try{id=localStorage.getItem('mascotaPC_elegida')||'';}catch(e){}
+    var id='';try{id=localStorage.getItem('pc_mascota_elegida')||localStorage.getItem('mascotaPC_elegida')||'';}catch(e){}
     if(IDS.indexOf(id)<0)return PAJARO;
     return [0,1,2,3].map(function(k){return 'mascotas/'+id+'-'+k+'.webp';});
   }
@@ -518,7 +518,7 @@ function posarCara(p){if(cara)cara.dataset.pose=String(p);}
     sale.onfinish=function(){cambiar();sale.cancel();caja.animate([{transform:'scale(.2) rotate(25deg)',opacity:0},{transform:'scale(1.15) rotate(-4deg)',opacity:1,offset:.6},{transform:'scale(1) rotate(0)',opacity:1}],{duration:480,easing:'cubic-bezier(.2,.8,.3,1)'});};
   }
   aplicar(false);
-  window.addEventListener('storage',function(e){if(e.key==='mascotaPC_elegida'||e.key===null)aplicar(true);});
+  window.addEventListener('storage',function(e){if(e.key==='pc_mascota_elegida'||e.key===null)aplicar(true);});
   /* elegida aquí mismo, con el botón de la mascota junto a las pestañas */
   window.addEventListener('pcmascota-cambio',function(e){aplicar(!(e.detail&&e.detail.sinAnimar));});
   document.addEventListener('visibilitychange',function(){if(!document.hidden)aplicar(true);});

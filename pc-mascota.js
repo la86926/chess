@@ -27,11 +27,13 @@
     serie('conejita', 'Conejita'), serie('panda', 'Panda'), serie('buho', 'Búho'),
     serie('dino', 'Dino'), serie('rana', 'Ranita'), serie('koala', 'Koala'), serie('corgi', 'Corgi')
   ];
-  var CLAVE_ELEGIDA = 'mascotaPC_elegida';  // por dispositivo; sin prefijo pc_ para que no se sincronice
+  /* La mascota elegida viaja con el ID (prefijo pc_): si cambias en un dispositivo, cambia en todos.
+     La clave antigua (solo de este dispositivo) se sigue leyendo hasta que se elija una nueva. */
+  var CLAVE_ELEGIDA = 'pc_mascota_elegida', CLAVE_ELEGIDA_ANTIGUA = 'mascotaPC_elegida';
   function buscar(id){ for (var i = 0; i < MASCOTAS.length; i++) if (MASCOTAS[i].id === id) return MASCOTAS[i]; return null; }
   function actual(){
     var id = '';
-    try { id = localStorage.getItem(CLAVE_ELEGIDA) || ''; } catch (e) {}
+    try { id = localStorage.getItem(CLAVE_ELEGIDA) || localStorage.getItem(CLAVE_ELEGIDA_ANTIGUA) || ''; } catch (e) {}
     return buscar(id) || MASCOTAS[0];
   }
   /* En Aprende Ajedrez no hay mascota sobre el tablero: la mascota es la del tutor, junto al globo */
@@ -129,6 +131,9 @@
   '.pcm-pop-grupo.solo{background:transparent;box-shadow:none}' +
   '.aa-tutor.pcm-sin-cara .aa-tutor-cara{display:none}.aa-tutor.pcm-sin-cara .aa-tutor-globo:before{display:none}' +
   '.aa-barra-fija.pcm-con-boton{padding-right:58px}' +
+  /* en Aprende Ajedrez el botón es parte del grupo de pestañas: mismo fondo, sin borde dorado */
+  '.aa-barra-fija .pcm-boton{background:var(--nav-fondo,rgba(0,0,0,.05));border:0;border-radius:14px;box-shadow:none}' +
+  '.aa-barra-fija .pcm-boton:hover{background:var(--nav-elegida,#fff);box-shadow:var(--nav-sombra,0 1px 3px rgba(0,0,0,.12))}' +
   '.pcm-pop.con-galeria{width:min(300px,calc(100vw - 24px))}' +
   '.pcm-gal{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:6px 10px 12px;margin:0 -8px 4px;scroll-snap-type:x proximity;scroll-padding:0 10px;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%)}' +
   '.pcm-gal::-webkit-scrollbar{display:none}' +
@@ -378,10 +383,15 @@
       if (boton.parentElement !== barra) barra.appendChild(boton);
       barra.classList.add('pcm-con-boton');
       var tabs = barra.querySelector('.tabs'), rt = tabs && tabs.getBoundingClientRect(), rr = barra.getBoundingClientRect();
-      var lado = rt && rt.height ? Math.max(34, Math.min(40, rt.height)) : 40;
+      /* junto a la última pestaña, a la distancia de un pequeño hueco y a la altura de la barra de pestañas,
+         como un botón más del mismo grupo; si no cabe (pantallas muy angostas), pegado al borde derecho */
+      var lado = rt && rt.height ? Math.max(34, Math.min(48, rt.height)) : 40, hueco = 8;
+      var cabe = rt && rt.width && (rt.right + hueco + lado <= rr.right - 10);
+      if (!cabe) lado = rt && rt.height ? Math.max(34, Math.min(40, rt.height)) : 40;
       boton.style.position = 'absolute';
       boton.style.width = lado + 'px'; boton.style.height = lado + 'px';
-      boton.style.left = ''; boton.style.right = '12px';
+      if (cabe) { boton.style.left = Math.round(rt.right - rr.left + hueco) + 'px'; boton.style.right = ''; }
+      else { boton.style.left = ''; boton.style.right = '12px'; }
       boton.style.top = Math.round((rt && rt.height ? rt.top - rr.top + (rt.height - lado) / 2 : (rr.height - lado) / 2)) + 'px';
       return;
     }
