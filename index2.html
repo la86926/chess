@@ -1974,8 +1974,7 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
 header.topbar.topbar-anim{overflow:hidden}
 /* el hueco del botón de menú solo se anima durante la persiana (al cargar o con movimiento reducido, sin animación):
    al plegar se aparta pronto, antes de que el título suba; al desplegar espera a que la barra haya bajado */
-html[data-barra-anim] .boardhead{transition:padding-left .42s cubic-bezier(.3,0,.2,1),padding-right .42s cubic-bezier(.3,0,.2,1)}
-html[data-barra-anim="abre"] .boardhead{transition-delay:.2s}
+/* (el hueco cambia de golpe y el título se desliza con transform desde aplicarBanner: nada se recalcula en cada fotograma) */
 </style>
 <link rel="stylesheet" href="c17/fuentes.css?v=3">
 <link rel="stylesheet" href="c17/tokens.css?v=7">
@@ -6040,6 +6039,9 @@ function aplicarBanner(oculto,animar){
     mover.push(e);
   }
   const ancla=mover[0]||null;
+  // el título de la fila del ejercicio también se aparta del botón de menú: se mide para deslizarlo
+  const izq=document.querySelector('.boardhead-left');
+  const xIzq=izq?izq.getBoundingClientRect().left:0;
   // dónde se ve todo AHORA (con lo que esté animándose), antes de tocar nada
   const encVisible=getComputedStyle(encabezado).display!=='none';
   const rEnc=encVisible?encabezado.getBoundingClientRect():null;
@@ -6086,6 +6088,10 @@ function aplicarBanner(oculto,animar){
       :[{opacity:opIni,clipPath:recorte(fracIni)},{offset:.35,opacity:Math.max(opIni,.35),clipPath:recorte(fracIni*.65)},{opacity:1,clipPath:recorte(0)}];
     anims.push(encabezado.animate(cuadrosEnc,{duration:D,easing:curva,fill:'both'}));
     if(Math.abs(dy)>.5)mover.forEach(e=>anims.push(e.animate([{transform:'translateY('+dy+'px)'},{transform:'translateY(0px)'}],{duration:D,easing:curva,fill:'backwards'})));
+  }
+  if(izq&&!reducir){
+    const dx=xIzq-izq.getBoundingClientRect().left;
+    if(Math.abs(dx)>.5)anims.push(izq.animate([{transform:'translateX('+dx+'px)'},{transform:'translateX(0px)'}],{duration:Math.min(D,420),delay:oculto?0:Math.min(200,D/3),easing:'cubic-bezier(.3,0,.2,1)',fill:'backwards'}));
   }
   bannerAnim=anims;
   anims[0].onfinish=()=>{
@@ -7854,7 +7860,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="pc-mascota.js?v=19"></script>
+<script src="pc-mascota.js?v=20"></script>
 <script id="pc-comentarios">
 /* Los comentarios del libro llegan después del tablero: no hacen falta para empezar a resolver. */
 window.pcComentariosListos=function(){

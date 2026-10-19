@@ -69,7 +69,7 @@
 
   var CSS = '' +
   /* ---------- la mascota ---------- */
-  '.pc-mascota{position:absolute;z-index:30;transition:left .45s cubic-bezier(.2,.8,.2,1);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;transform-origin:50% 100%}' +
+  '.pc-mascota{position:absolute;z-index:30;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;transform-origin:50% 100%}' +
   '.pc-mascota,.pc-mascota *{-webkit-tap-highlight-color:transparent;outline:none}' +
   '.pc-mascota .pcm-sombra{position:absolute;left:18%;right:18%;bottom:-3%;height:8%;border-radius:50%;background:rgba(0,0,0,.2);filter:blur(1.5px);transform-origin:50% 50%}' +
   '.pc-mascota .pcm-baile{position:absolute;inset:0;transform-origin:50% 100%;animation:pcmRespira 3.4s ease-in-out infinite}' +
@@ -238,7 +238,15 @@
     var x = Math.max(minimo, borde - ancho);
     el.style.width = ancho + 'px';
     el.style.height = alto + 'px';
-    el.style.left = Math.round(x - rc.left) + 'px';
+    /* si cambia de sitio (barra plegada o desplegada), se desliza con «translate»: sin recalcular la página
+       en cada fotograma ni chocar con las animaciones propias de la mascota (que usan transform) */
+    var nuevoLeft = Math.round(x - rc.left), viejoLeft = parseFloat(el.style.left);
+    el.style.left = nuevoLeft + 'px';
+    if (!isNaN(viejoLeft) && Math.abs(viejoLeft - nuevoLeft) > 2 && el.animate) {
+      try { if (!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches))
+        el.animate([{ translate: (viejoLeft - nuevoLeft) + 'px 0px' }, { translate: '0px 0px' }], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      } catch (e) {}
+    }
     el.style.top = Math.round(rm.top - rc.top - alto + alto * 0.05) + 'px';
   }
 
