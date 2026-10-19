@@ -924,3 +924,13 @@ html[data-modo="oscuro"] .aa-app #board .sq.aa-latido{--aa-lt:242,190,50}
 html[data-enmarcado="si"][data-barra="oculta"] .aa-app .aa-boardhead{padding-left:0!important;padding-right:0!important}
 @media(max-width:360px){.aa-app .aa-eyebrow{font-size:.74rem}}
 @media(max-width:360px){.aa-app .aa-boardhead .boardhead-center{top:calc(var(--aa-bh-pt,0px) + .5rem)}}
+/* Pantallas anchas (computadora, iPad horizontal): el encabezado de la lección va en la columna lateral,
+   pero «Ocultar / Mostrar» queda centrado en la página, debajo de las pestañas y sobre el tablero */
+@media (orientation:landscape) and (min-width:900px) and (min-height:500px){
+  /* se abre una franja propia para el botón entre las pestañas y el tablero (no pisa el marco del tablero) */
+  .aa-app .boardcol{position:relative;padding-top:34px}
+  .aa-app .aa-boardhead{position:static}
+  .aa-app .aa-boardhead .boardhead-center{left:50%;top:1px;transform:translate(-50%,-50%)}
+  /* las pestañas se corren 4 px por el hueco del menú (66 px) frente al de la mascota (58 px): el botón las sigue */
+  html[data-enmarcado="si"] .aa-app .aa-boardhead .boardhead-center{left:calc(50% + 4px)}
+}

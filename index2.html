@@ -6021,33 +6021,69 @@ document.addEventListener('keydown',e=>{
 });
 
 let bannerAnim=null;
+/* Persiana del encabezado (Ocultar / Mostrar).
+   Se anima solo con transform y opacity (técnica FLIP): el diseño cambia una sola vez y lo que está
+   debajo se desliza desde donde estaba. Así va fluido a 60 fps en iPhone, iPad y computadora, sin
+   recalcular la página en cada fotograma (eso era lo que hacía «temblar» pestañas y tablero).
+   Con «reducir movimiento» no hay desplazamiento: solo un fundido breve. */
 function aplicarBanner(oculto,animar){
   const encabezado=document.querySelector('header.topbar'),boton=$('b-banner');
   if(!encabezado||!boton)return;
   boton.textContent=oculto?'Mostrar':'Ocultar';
   boton.setAttribute('aria-pressed',oculto?'true':'false');
   boton.setAttribute('aria-label',oculto?'Mostrar encabezado superior':'Ocultar encabezado superior');
+  const raizB=document.documentElement;
+  // si estaba a medio animar, se termina al instante y se parte del estado final
+  if(bannerAnim){const a=bannerAnim;bannerAnim=null;a.forEach(x=>{try{x.finish();}catch(e){}});}
+  const limpiar=()=>{encabezado.classList.remove('topbar-anim');['position','top','left','width','boxSizing','zIndex','pointerEvents'].forEach(k=>encabezado.style[k]='');raizB.removeAttribute('data-barra-anim');};
+  const yaVisible=getComputedStyle(encabezado).display!=='none';
+  if(!animar||!encabezado.animate||yaVisible===!oculto){limpiar();encabezado.style.display=oculto?'none':'';raizB.setAttribute('data-barra',oculto?'oculta':'visible');return;}
   const reducir=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const props=['height','paddingTop','paddingBottom','marginTop','marginBottom','borderBottomWidth','opacity','transform'];
-  // si estaba a medio animar, parte desde donde va (sin saltos)
-  let desde=null;
-  if(bannerAnim){const cs=getComputedStyle(encabezado);desde={};props.forEach(k=>desde[k]=cs[k]);bannerAnim.cancel();bannerAnim=null;}
-  if(!animar||reducir||!encabezado.animate){encabezado.classList.remove('topbar-anim');document.documentElement.removeAttribute('data-barra-anim');encabezado.style.display=oculto?'none':'';return;}
-  encabezado.style.display='';
-  const cs=getComputedStyle(encabezado);
-  const lleno={height:cs.height,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom,marginTop:cs.marginTop,marginBottom:cs.marginBottom,borderBottomWidth:cs.borderBottomWidth,opacity:'1',transform:'translateY(0px)'};
-  const vacio={height:'0px',paddingTop:'0px',paddingBottom:'0px',marginTop:'0px',marginBottom:'0px',borderBottomWidth:'0px',opacity:'0',transform:'translateY(-12px)'};
-  encabezado.classList.add('topbar-anim');
-  // persiana: al plegar, el contenido se desvanece primero y luego la barra baja su cortina;
-  // al desplegar, la barra se abre y el contenido aparece cuando ya hay espacio
-  const medio={opacity:0,transform:'translateY(-10px)'};
-  const cuadros=desde?[desde,oculto?vacio:lleno]:oculto?[lleno,Object.assign({offset:.42},medio),vacio]:[vacio,Object.assign({offset:.5},medio),lleno];
-  bannerAnim=encabezado.animate(cuadros,{duration:oculto?640:720,easing:'cubic-bezier(.45,0,.2,1)'});
-  // el encabezado de la app se acomoda al mismo tiempo que se pliega la barra
-  const raizB=document.documentElement;raizB.setAttribute('data-barra-anim',oculto?'cierra':'abre');
-  setTimeout(()=>raizB.setAttribute('data-barra',oculto?'oculta':'visible'),0);
-  const esta=bannerAnim;
-  esta.onfinish=()=>{if(bannerAnim!==esta)return;bannerAnim=null;encabezado.classList.remove('topbar-anim');if(oculto)encabezado.style.display='none';raizB.removeAttribute('data-barra-anim');};
+  // lo que hay debajo del encabezado y ocupa sitio en la página
+  const mover=[];
+  for(let e=encabezado.nextElementSibling;e;e=e.nextElementSibling){
+    if(e.tagName==='SCRIPT'||e.tagName==='STYLE')continue;
+    const c=getComputedStyle(e);if(c.display==='none'||c.position==='fixed'||c.position==='absolute')continue;
+    mover.push(e);
+  }
+  const alto=()=>{const r=encabezado.getBoundingClientRect(),c=getComputedStyle(encabezado);return r.height+(parseFloat(c.marginTop)||0)+(parseFloat(c.marginBottom)||0);};
+  const D=oculto?640:720,curva='cubic-bezier(.45,0,.2,1)',anims=[];
+  raizB.setAttribute('data-barra-anim',oculto?'cierra':'abre');
+  if(oculto){
+    const r=encabezado.getBoundingClientRect(),H=alto();
+    // el encabezado sale del flujo pero sigue dibujado donde estaba, mientras se desvanece y sube
+    Object.assign(encabezado.style,{position:'absolute',top:(r.top+window.scrollY)+'px',left:(r.left+window.scrollX)+'px',width:r.width+'px',boxSizing:'border-box',zIndex:'1',pointerEvents:'none'});
+    {const r2=encabezado.getBoundingClientRect();encabezado.style.top=(parseFloat(encabezado.style.top)+r.top-r2.top)+'px';encabezado.style.left=(parseFloat(encabezado.style.left)+r.left-r2.left)+'px';}
+    encabezado.classList.add('topbar-anim');
+    raizB.setAttribute('data-barra','oculta');
+    if(reducir){
+      anims.push(encabezado.animate([{opacity:1},{opacity:0}],{duration:200,easing:'ease-out',fill:'forwards'}));
+      mover.forEach(e=>anims.push(e.animate([{opacity:.55},{opacity:1}],{duration:260,easing:'ease-out'})));
+    }else{
+      anims.push(encabezado.animate([{opacity:1,transform:'translateY(0px)'},{offset:.42,opacity:0,transform:'translateY(-10px)'},{opacity:0,transform:'translateY(-10px)'}],{duration:D,easing:curva,fill:'forwards'}));
+      mover.forEach(e=>anims.push(e.animate([{transform:'translateY('+H+'px)'},{transform:'translateY(0px)'}],{duration:D,easing:curva})));
+    }
+  }else{
+    encabezado.style.display='';
+    const H=alto();
+    encabezado.classList.add('topbar-anim');
+    raizB.setAttribute('data-barra','visible');
+    if(reducir){
+      anims.push(encabezado.animate([{opacity:0},{opacity:1}],{duration:260,easing:'ease-out'}));
+      mover.forEach(e=>anims.push(e.animate([{opacity:.55},{opacity:1}],{duration:260,easing:'ease-out'})));
+    }else{
+      anims.push(encabezado.animate([{opacity:0,transform:'translateY(-10px)'},{offset:.5,opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'translateY(0px)'}],{duration:D,easing:curva}));
+      mover.forEach(e=>anims.push(e.animate([{transform:'translateY('+(-H)+'px)'},{transform:'translateY(0px)'}],{duration:D,easing:curva})));
+    }
+  }
+  bannerAnim=anims;
+  const principal=anims[0];
+  principal.onfinish=()=>{
+    if(bannerAnim!==anims)return;bannerAnim=null;
+    if(oculto)encabezado.style.display='none';
+    anims.forEach(x=>{try{x.cancel();}catch(e){}});
+    limpiar();
+  };
 }
 let bannerOculto=localStorage.getItem('wp_banner')==='1';
 aplicarBanner(bannerOculto);
