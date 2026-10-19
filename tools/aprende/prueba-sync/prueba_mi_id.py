@@ -39,7 +39,7 @@ try:
     ok(not pa.evaluate("!!document.getElementById('pc-sync-fab')"),'no hay nube flotante')
     ok(not pa.evaluate("document.getElementById('pc-sync-modal-bg').classList.contains('open')"),'no aparece ninguna ventana del código al entrar')
     menu=pa.evaluate("[...document.querySelectorAll('.app-choice')].map(b=>b.dataset.app)")
-    ok(menu==['id','3','1','2'],'«Mi ID» está arriba de todo en el menú: %s'%menu)
+    ok(menu==['3','1','2','id'],'orden del menú: las tres secciones y, al final, «Mi ID»: %s'%menu)
     ok(pa.evaluate("!/favorit/i.test(document.getElementById('app-frame-id').textContent)"),'«Mi ID» no muestra Favoritos')
     abrir_mi_id(pa)
     ok(pa.evaluate("document.getElementById('app-frame-id').classList.contains('active')"),'se abre la página Mi ID')

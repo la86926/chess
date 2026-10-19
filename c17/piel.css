@@ -1,0 +1,357 @@
+/* ==================================================================
+   Chess de L · piel «Luz» para Método PC1, Método PC2 y Aprende Ajedrez
+   Se carga en index1.html, index2.html e index3.html. Todas las reglas
+   cuelgan de html[data-piel] para ganar a los estilos originales sin
+   tocar su lógica ni sus identificadores.
+   ================================================================== */
+
+/* ---------- tokens originales → tokens nuevos ---------- */
+html[data-piel]{
+  --serif:var(--c-ft); --sans:var(--c-ft); --mono:var(--c-ft);
+  --r-cap:999px; --r-ico:12px; --r-card:22px; --r-box:28px; --r-campo:14px; --r-tab:12px; --r-marco:28px; --r-boton:12px;
+}
+html[data-piel][data-seccion="pc1"]{--c-sec:var(--c-pc1);--c-sec-t:var(--c-cielo)}
+html[data-piel][data-seccion="pc2"]{--c-sec:var(--c-pc2);--c-sec-t:var(--c-lila)}
+html[data-piel][data-seccion="aa"]{--c-sec:var(--c-aa);--c-sec-t:var(--c-menta)}
+html[data-piel][data-modo="claro"],html[data-piel][data-modo="oscuro"]{
+  --bg:var(--c-papel); --hondo:var(--c-relleno); --panel:var(--c-sup); --panel2:var(--c-sup2);
+  --line:var(--c-linea); --line-viva:var(--c-linea2);
+  --ink:var(--c-tinta); --muted:var(--c-tinta2); --muted2:var(--c-tinta3);
+  --crest:var(--c-sec); --gold:var(--c-sec); --good:var(--c-bien); --bad:var(--c-mal);
+  --solido-acento:var(--c-tinta); --solido-oro:var(--c-tinta); --sobre-solido:var(--c-papel);
+  --tinte-acento:color-mix(in srgb,var(--c-rosa) 60%,transparent);
+  --tinte-oro:color-mix(in srgb,var(--c-mant) 70%,transparent);
+  --tinte-bien:color-mix(in srgb,var(--c-menta) 70%,transparent);
+  --tinte-neutro:var(--c-relleno);
+  --barra:var(--c-vidrio); --velo:var(--c-velo);
+  --s1:var(--c-s1); --s2:var(--c-s2); --s3:var(--c-s3); --s4:var(--c-s3);
+  --s-acento:var(--c-s2); --luz-interna:0 0 0 transparent;
+  --acento-txt:var(--c-sec);
+  --verde-ok:var(--c-bien); --verde-ok-tinte:color-mix(in srgb,var(--c-menta) 70%,transparent);
+  --hero-bg:var(--c-sup); --hero-borde:var(--c-linea); --hero-ink:var(--c-tinta); --hero-ink2:var(--c-tinta2);
+  --hero-linea:var(--c-linea2); --hero-tinte:var(--c-relleno);
+  --hero-orbe:var(--c-sec-t); --hero-orbe-fondo:var(--c-sec-t); --hero-orbe-ink:#1C1B22;
+  --hero-oro:var(--c-sec); --hero-oro-tinte:color-mix(in srgb,var(--c-sec-t) 50%,transparent); --hero-oro-linea:var(--c-linea2);
+  --hero-blob:transparent; --hero-btn:var(--c-tinta); --hero-btn-ink:var(--c-papel);
+}
+html[data-piel][data-modo="oscuro"]{
+  --tinte-acento:color-mix(in srgb,var(--c-mal) 16%,transparent);
+  --tinte-oro:color-mix(in srgb,var(--c-aviso) 14%,transparent);
+  --tinte-bien:color-mix(in srgb,var(--c-bien) 14%,transparent);
+  --hero-orbe:color-mix(in srgb,var(--c-sec) 22%,var(--c-sup)); --hero-orbe-fondo:color-mix(in srgb,var(--c-sec) 22%,var(--c-sup)); --hero-orbe-ink:var(--c-tinta);
+}
+html[data-piel],html[data-piel] body{overscroll-behavior-y:none}
+html[data-piel] body{
+  color:var(--c-tinta);font-family:var(--c-ft);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  background:var(--c-papel) radial-gradient(70% 380px at 50% -120px,color-mix(in srgb,var(--c-sec-t) 70%,transparent),transparent) no-repeat;
+}
+html[data-piel][data-modo="oscuro"] body{background:var(--c-papel) radial-gradient(70% 380px at 50% -120px,color-mix(in srgb,var(--c-sec) 14%,transparent),transparent) no-repeat}
+html[data-piel] ::selection{background:color-mix(in srgb,var(--c-sec) 30%,transparent)}
+
+/* ---------- cabecera ---------- */
+html[data-piel] .topbar{background:transparent!important;border-bottom:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html[data-piel] .hdr-marca .home-icon{width:36px!important;height:36px!important;border-radius:18.2%!important;background:transparent!important;border:0!important;overflow:hidden;box-shadow:var(--c-s1)!important}
+html[data-piel] .hdr-marca .home-icon .crest{width:36px!important;height:36px!important;transform:none!important}
+html[data-piel] .hdr-marca .titulo b{font-family:var(--c-ft)!important;font-weight:650!important;font-size:1.12rem!important;letter-spacing:-.022em!important}
+html[data-piel] .hdr-marca .titulo small{font-family:var(--c-ft)!important;font-size:.8rem!important;letter-spacing:0!important;text-transform:none!important;color:var(--c-tinta2)!important;margin-top:1px}
+
+/* controles segmentados: apariencia y pestañas */
+html[data-piel] .pc-modo,
+html[data-piel] .tabs{border:0!important;background:var(--c-relleno)!important;border-radius:11px!important;padding:3px!important;gap:0!important;box-shadow:none!important}
+html[data-piel] .pc-modo button,
+html[data-piel] .tab,html[data-piel] .gtab{border:0!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;color:var(--c-tinta2)!important;font-family:var(--c-ft)!important;font-weight:550!important;letter-spacing:-.005em!important;transition:background .3s var(--c-mov),color .25s,box-shadow .3s!important}
+html[data-piel] .tab:hover,html[data-piel] .gtab:hover{color:var(--c-tinta)!important}
+html[data-piel] .pc-modo button[aria-pressed="true"],
+html[data-piel] .tab.active,html[data-piel] .gtab.active{background:var(--c-sup)!important;color:var(--c-tinta)!important;font-weight:600!important;box-shadow:0 0 0 .5px var(--c-linea),0 3px 8px rgba(20,20,40,.12),0 1px 1px rgba(20,20,40,.06)!important}
+html[data-piel][data-modo="oscuro"] .pc-modo button[aria-pressed="true"],
+html[data-piel][data-modo="oscuro"] .tab.active,html[data-piel][data-modo="oscuro"] .gtab.active{background:var(--c-relleno2)!important}
+
+/* botones de icono de la cabecera: tablero, regalo y mascota */
+html[data-piel] .pc-tablero,
+html[data-piel] .gift-btn,
+html[data-piel] .pcm-boton{border:0!important;background:var(--c-sup)!important;border-radius:12px!important;box-shadow:0 0 0 .5px var(--c-linea2),var(--c-s1)!important;animation:none!important;transition:transform .25s var(--c-mov),box-shadow .25s!important}
+html[data-piel][data-modo="oscuro"] .pc-tablero,html[data-piel][data-modo="oscuro"] .gift-btn,html[data-piel][data-modo="oscuro"] .pcm-boton{background:var(--c-sup2)!important}
+html[data-piel] .pc-tablero:hover,html[data-piel] .gift-btn:hover,html[data-piel] .pcm-boton:hover{transform:translateY(-1px)!important;box-shadow:0 0 0 .5px var(--c-linea2),var(--c-s2)!important}
+html[data-piel] .pc-tablero:active,html[data-piel] .gift-btn:active,html[data-piel] .pcm-boton:active{transform:scale(.94)!important}
+html[data-piel] .pc-tablero span{font-family:var(--c-ft)!important;font-weight:550!important;letter-spacing:0!important;text-transform:none!important;font-size:.82rem!important;color:var(--c-tinta)!important}
+html[data-piel] .pc-tablero .pc-muestra{border-radius:5px!important;box-shadow:0 0 0 .5px rgba(0,0,0,.15)!important}
+
+/* ---------- encabezado del ejercicio ---------- */
+html[data-piel] .exno{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.03em!important}
+html[data-piel] .exno span{color:var(--c-tinta)!important;font-variant-numeric:tabular-nums}
+html[data-piel] .chip{border:0!important;font-family:var(--c-ft)!important;letter-spacing:0!important;text-transform:none!important;font-weight:600!important;border-radius:999px!important}
+html[data-piel] .chip::before{width:6px!important;height:6px!important}
+html[data-piel] .chip.F{color:var(--c-bien)!important;background:var(--tinte-bien)!important}
+html[data-piel] .chip.I{color:var(--c-aviso)!important;background:var(--tinte-oro)!important}
+html[data-piel] .chip.A{color:var(--c-mal)!important;background:var(--tinte-acento)!important}
+html[data-piel] .toplay{color:var(--c-tinta2)!important}
+html[data-piel] .toplay b{color:var(--c-tinta)!important;font-weight:600}
+html[data-piel] .engine-banner-toggle{border:0!important;background:var(--c-relleno)!important;color:var(--c-tinta2)!important;border-radius:999px!important;font-family:var(--c-ft)!important;font-weight:550!important;box-shadow:none!important}
+html[data-piel] .engine-banner-toggle:hover{color:var(--c-tinta)!important}
+html[data-piel] .engine-banner-toggle[aria-pressed="true"]{background:var(--c-tinta)!important;color:var(--c-papel)!important}
+
+/* ---------- botones ---------- */
+html[data-piel] .btn,
+html[data-piel] .fbtn{
+  border:0!important;background:var(--c-relleno)!important;color:var(--c-tinta)!important;
+  border-radius:12px!important;font-family:var(--c-ft)!important;font-weight:580!important;letter-spacing:-.005em!important;
+  box-shadow:none!important;filter:none!important;
+  transition:transform .25s var(--c-mov),background .2s,color .2s,opacity .2s!important
+}
+html[data-piel] .btn:hover,html[data-piel] .fbtn:hover{background:var(--c-relleno2)!important;transform:none!important}
+html[data-piel] .btn:active,html[data-piel] .fbtn:active{transform:scale(.96)!important}
+html[data-piel] .btn.primary{background:var(--c-tinta)!important;color:var(--c-papel)!important}
+html[data-piel] .btn.primary:hover{opacity:.88}
+html[data-piel] .btn:disabled,html[data-piel] .btn[aria-disabled="true"]{opacity:.38!important;transform:none!important}
+html[data-piel] .btn.btn-anot-on,html[data-piel] #b-anotar[aria-pressed="true"]{background:var(--c-tinta)!important;color:var(--c-papel)!important}
+html[data-piel] .fbtn{color:var(--c-tinta2)!important}
+html[data-piel] .fbtn small{font-family:var(--c-ft)!important;letter-spacing:0!important;color:var(--c-tinta3)!important;font-variant-numeric:tabular-nums}
+html[data-piel] .fbtn.active{background:var(--c-sup)!important;color:var(--c-tinta)!important;box-shadow:0 0 0 1.5px var(--c-sec),0 4px 12px -6px color-mix(in srgb,var(--c-sec) 60%,transparent)!important}
+html[data-piel] .fbtn.active small{color:var(--c-sec)!important}
+html[data-piel] .btn svg{stroke-width:1.9}
+html[data-piel] #b-sol{background:color-mix(in srgb,var(--c-sec-t) 85%,transparent)!important;color:color-mix(in srgb,var(--c-sec) 70%,#1C1B22)!important}
+html[data-piel][data-modo="oscuro"] #b-sol{background:color-mix(in srgb,var(--c-sec) 20%,transparent)!important;color:color-mix(in srgb,var(--c-sec) 55%,#fff)!important}
+
+/* ---------- el tablero: un objeto que flota ---------- */
+html[data-piel] .frame{
+  background:var(--c-sup)!important;border:0!important;border-radius:28px!important;
+  box-shadow:0 0 0 .5px var(--c-linea),0 2px 4px rgba(30,25,70,.04),0 40px 80px -36px color-mix(in srgb,var(--c-sec) 55%,rgba(30,25,70,.4))!important;
+}
+html[data-piel][data-modo="oscuro"] .frame{background:var(--c-sup)!important;box-shadow:0 0 0 .5px var(--c-linea2),0 40px 90px -40px color-mix(in srgb,var(--c-sec) 45%,#000)!important}
+html[data-piel] .board{border-radius:16px!important;box-shadow:0 0 0 .5px rgba(0,0,0,.12)!important}
+html[data-piel] .sq .pc svg{filter:drop-shadow(0 1.5px 1.2px rgba(20,15,50,.22))}
+html[data-piel] .coord{font-family:var(--c-ft)!important;font-weight:600!important}
+
+/* estado bajo el tablero */
+html[data-piel] .status{border:0!important;border-radius:14px!important;background:var(--c-sup)!important;box-shadow:0 0 0 .5px var(--c-linea),var(--c-s1)!important;font-weight:520;color:var(--c-tinta)!important}
+html[data-piel] .status.ok{background:var(--tinte-bien)!important;color:var(--c-bien)!important;box-shadow:none!important;font-weight:600}
+html[data-piel] .status.no{background:var(--tinte-acento)!important;color:var(--c-mal)!important;box-shadow:none!important;font-weight:600}
+html[data-piel] .status.done{background:var(--tinte-oro)!important;color:var(--c-aviso)!important;box-shadow:none!important;font-weight:600}
+html[data-piel] .status.free{color:var(--c-tinta2)!important}
+
+/* lista de jugadas */
+html[data-piel] .moves{background:var(--c-sup)!important;border:0!important;border-radius:18px!important;box-shadow:0 0 0 .5px var(--c-linea)!important;font-family:var(--c-ft)!important;font-variant-numeric:tabular-nums;font-weight:520}
+html[data-piel] .moves .ply.now{background:var(--c-tinta)!important;color:var(--c-papel)!important;border-radius:7px!important}
+html[data-piel] #engine-box{border:0!important;border-radius:16px!important;background:var(--c-sup)!important;box-shadow:0 0 0 .5px var(--c-linea)!important}
+html[data-piel] #eng-eval,html[data-piel] #eng-line{font-family:var(--c-ft)!important;font-variant-numeric:tabular-nums}
+
+/* ---------- columna lateral ---------- */
+html[data-piel] .panel-card{background:var(--c-sup)!important;border:0!important;border-radius:24px!important;box-shadow:0 0 0 .5px var(--c-linea),var(--c-s1)!important}
+html[data-piel] .panel-card h3{font-family:var(--c-ft)!important;font-weight:650!important;font-size:1.12rem!important;letter-spacing:-.02em!important}
+html[data-piel] .jump input,html[data-piel] input[type="text"],html[data-piel] input:not([type]),html[data-piel] input[inputmode]{border:0!important;border-radius:12px!important;background:var(--c-relleno)!important;color:var(--c-tinta)!important;font-family:var(--c-ft)!important;box-shadow:none!important}
+html[data-piel] .jump input:focus,html[data-piel] input:focus{outline:none!important;background:var(--c-sup)!important;box-shadow:0 0 0 1px var(--c-sec),0 0 0 5px color-mix(in srgb,var(--c-sec) 18%,transparent)!important}
+html[data-piel] .prog .cell{border:0!important;background:var(--c-relleno)!important;border-radius:16px!important;box-shadow:none!important}
+html[data-piel] .prog .big{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.035em!important;color:var(--c-tinta)!important;font-variant-numeric:tabular-nums}
+html[data-piel] .prog .lbl{font-family:var(--c-ft)!important;letter-spacing:0!important;text-transform:none!important;font-size:.76rem!important;color:var(--c-tinta2)!important}
+html[data-piel] .bar{background:var(--c-relleno)!important;border-radius:99px!important;height:6px!important;overflow:hidden}
+html[data-piel] .bar i{background:var(--c-sec)!important;border-radius:99px!important}
+html[data-piel] .ref .vs{font-family:var(--c-ft)!important;font-weight:600;font-size:1.02rem;letter-spacing:-.01em}
+html[data-piel] details.expl summary{font-family:var(--c-ft)!important;font-weight:600;color:var(--c-sec)!important}
+html[data-piel] details.expl .body{font-family:var(--c-ft)!important;line-height:1.6}
+
+/* ---------- lecturas: Guía, Método, Motivos ---------- */
+html[data-piel] .reading h1{font-family:var(--c-ft)!important;font-weight:650!important;font-size:clamp(2.2rem,8vw,3.6rem)!important;letter-spacing:-.045em!important;line-height:1.02!important}
+html[data-piel] .reading h2{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.025em!important}
+html[data-piel] .reading h2 .k{font-family:var(--c-ft)!important;color:var(--c-sec)!important;font-weight:600;letter-spacing:0;margin-right:.4em;font-variant-numeric:tabular-nums}
+html[data-piel] .reading .lead{font-family:var(--c-ft)!important;color:var(--c-tinta2)!important;font-size:1.16rem!important;line-height:1.5!important;letter-spacing:-.01em}
+html[data-piel] .reading p,html[data-piel] .reading li{line-height:1.65}
+html[data-piel] .callout{background:color-mix(in srgb,var(--c-sec-t) 55%,var(--c-sup))!important;color:var(--c-tinta)!important;border:0!important;border-radius:20px!important;box-shadow:none!important;font-family:var(--c-ft)!important}
+html[data-piel][data-modo="oscuro"] .callout{background:color-mix(in srgb,var(--c-sec) 12%,var(--c-sup))!important}
+html[data-piel] .motif{background:var(--c-sup)!important;border:0!important;border-radius:20px!important;box-shadow:0 0 0 .5px var(--c-linea),var(--c-s1)!important;transition:transform .35s var(--c-mov),box-shadow .35s!important}
+html[data-piel] .motif:hover{transform:translateY(-2px)!important;box-shadow:0 0 0 .5px var(--c-linea),var(--c-s2)!important}
+html[data-piel] .motif h4{font-family:var(--c-ft)!important;font-weight:650!important;font-size:1.06rem!important;letter-spacing:-.015em}
+html[data-piel] .kbd{font-family:var(--c-ft)!important;border:0!important;border-radius:6px!important;box-shadow:0 0 0 .5px var(--c-linea2),0 1px 0 var(--c-linea2)!important;background:var(--c-sup)!important}
+html[data-piel] footer{font-family:var(--c-ft)!important;color:var(--c-tinta3)!important;border-top:0!important}
+
+/* ---------- ventanas ---------- */
+html[data-piel] .modal-bg,html[data-piel] .confirm-bg,html[data-piel] .workspace-bg,html[data-piel] .pc-temas-bg,html[data-piel] .pc-conf-bg,html[data-piel] .pc-perso-bg{background:var(--c-velo)!important;-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
+html[data-piel] .modal-box,html[data-piel] .confirm-box,html[data-piel] .pc-temas-box,html[data-piel] .pc-conf-box{background:var(--c-sup)!important;border:0!important;border-radius:28px!important;box-shadow:0 0 0 .5px var(--c-linea2),var(--c-s3)!important;color:var(--c-tinta)!important}
+html[data-piel] .modal-head h3,html[data-piel] .pc-temas-head h3,html[data-piel] .pc-conf-box h3,html[data-piel] .pc-perso-titulo h3{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.025em!important;font-size:1.36rem!important}
+html[data-piel] .confirm-box p{font-family:var(--c-ft)!important;font-weight:550;font-size:1.02rem;letter-spacing:-.01em}
+html[data-piel] .modal-x,html[data-piel] .pc-io-close,html[data-piel] .workspace-close{border:0!important;background:var(--c-relleno)!important;color:var(--c-tinta2)!important;border-radius:50%!important;box-shadow:none!important}
+html[data-piel] .modal-x:active,html[data-piel] .pc-io-close:active,html[data-piel] .workspace-close:active{transform:scale(.92)}
+html[data-piel] .pc-tema{border-radius:18px!important;border:0!important;background:var(--c-sup)!important;box-shadow:0 0 0 .5px var(--c-linea2)!important}
+html[data-piel] .pc-tema.activo,html[data-piel] .pc-tema[aria-pressed="true"],html[data-piel] .pc-tema.sel,html[data-piel] .pc-tema[aria-current="true"]{box-shadow:0 0 0 2px var(--c-sec)!important}
+html[data-piel] .pc-barra-btn,html[data-piel] .pc-interruptor{border:0!important;border-radius:999px!important;background:var(--c-relleno)!important;font-family:var(--c-ft)!important;font-weight:550!important;box-shadow:none!important}
+html[data-piel] .pc-buscar{border:0!important;border-radius:12px!important;background:var(--c-relleno)!important}
+html[data-piel] .pc-buscar input{border:0!important;box-shadow:none!important;background:transparent!important}
+
+/* espacio de trabajo: Tu entrenamiento y Explicación */
+html[data-piel] .workspace-shell{background:var(--c-papel)!important;color:var(--c-tinta)!important}
+html[data-piel] .workspace-topbar{background:var(--c-vidrio)!important;-webkit-backdrop-filter:blur(24px) saturate(180%)!important;backdrop-filter:blur(24px) saturate(180%)!important;border-bottom:.5px solid var(--c-linea)!important}
+html[data-piel][data-enmarcado="si"] .workspace-topbar{padding-left:66px!important}
+html[data-piel] .workspace-topbar h2{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.04em!important;font-size:clamp(1.8rem,7vw,2.6rem)!important;line-height:1.02!important}
+html[data-piel] .workspace-eyebrow,html[data-piel] .frase-eyebrow{font-family:var(--c-ft)!important;letter-spacing:0!important;text-transform:none!important;font-weight:600!important;color:var(--c-sec)!important;font-size:.82rem!important}
+html[data-piel] .frase-card{background:var(--c-sup)!important;border:0!important;border-radius:24px!important;box-shadow:0 0 0 .5px var(--c-linea),var(--c-s1)!important;color:var(--c-tinta)!important}
+html[data-piel] .frase-card:before,html[data-piel] .frase-card:after{display:none!important}
+html[data-piel] .frase-texto{font-family:var(--c-ft)!important;font-weight:550!important;font-size:1.2rem!important;letter-spacing:-.02em;line-height:1.35!important;color:var(--c-tinta)!important}
+html[data-piel] .frase-otra{border:0!important;background:var(--c-relleno)!important;color:var(--c-tinta)!important;border-radius:999px!important;box-shadow:none!important}
+html[data-piel] .frase-mini{border-radius:10px!important;box-shadow:0 0 0 .5px rgba(0,0,0,.12)!important}
+html[data-piel] .plan-hero-card,html[data-piel] .plan-stat,html[data-piel] .error-book,html[data-piel] .explain-section,html[data-piel] .explanation-hero,html[data-piel] .error-item{background:var(--c-sup)!important;border:0!important;border-radius:24px!important;box-shadow:0 0 0 .5px var(--c-linea),var(--c-s1)!important}
+html[data-piel] .explanation-hero:before,html[data-piel] .explanation-hero:after,html[data-piel] .plan-hero-card:before,html[data-piel] .plan-hero-card:after{display:none!important}
+html[data-piel] .goal-ring{background:conic-gradient(var(--c-sec) var(--goal),var(--c-relleno) 0)!important;box-shadow:none!important}
+html[data-piel] .goal-ring>div{background:var(--c-sup)!important;color:var(--c-tinta)!important;box-shadow:none!important}
+html[data-piel] .goal-ring strong{font-family:var(--c-ft)!important;font-weight:650!important;color:var(--c-tinta)!important;letter-spacing:-.04em}
+html[data-piel] .goal-ring span{font-family:var(--c-ft)!important;letter-spacing:0!important;color:var(--c-tinta2)!important}
+html[data-piel] .plan-pill{font-family:var(--c-ft)!important;letter-spacing:0!important;background:var(--c-relleno)!important;color:var(--c-tinta2)!important;border:0!important;border-radius:999px!important;font-weight:550!important}
+html[data-piel] .plan-hero-copy h3,html[data-piel] .section-heading h3,html[data-piel] .explanation-lead h3,html[data-piel] .snapshot-copy h3{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.025em!important}
+html[data-piel] .plan-primary,html[data-piel] .plan-secondary,html[data-piel] .text-action,html[data-piel] .goal-stepper button{border:0!important;border-radius:12px!important;box-shadow:none!important;font-family:var(--c-ft)!important;font-weight:600!important;transition:transform .25s var(--c-mov),opacity .2s!important}
+html[data-piel] .plan-primary{background:var(--c-tinta)!important;color:var(--c-papel)!important}
+html[data-piel] .plan-secondary,html[data-piel] .goal-stepper button{background:var(--c-relleno)!important;color:var(--c-tinta)!important}
+html[data-piel] .text-action{background:transparent!important;color:var(--c-sec)!important}
+html[data-piel] .plan-primary:active,html[data-piel] .plan-secondary:active,html[data-piel] .text-action:active,html[data-piel] .goal-stepper button:active{transform:scale(.96)!important}
+html[data-piel] .plan-stat strong{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+html[data-piel] .plan-stat span{font-family:var(--c-ft)!important;letter-spacing:0!important;text-transform:none!important;color:var(--c-tinta2)!important}
+html[data-piel] .move-orb{background:color-mix(in srgb,var(--c-sec-t) 80%,var(--c-sup))!important;color:var(--c-tinta)!important;border:0!important;box-shadow:none!important}
+html[data-piel][data-modo="oscuro"] .move-orb{background:color-mix(in srgb,var(--c-sec) 18%,var(--c-sup))!important}
+html[data-piel] .move-orb strong{font-family:var(--c-ft)!important;font-weight:650!important;color:var(--c-tinta)!important;letter-spacing:-.03em}
+html[data-piel] .move-orb span{font-family:var(--c-ft)!important;letter-spacing:0!important;text-transform:none!important;color:var(--c-tinta2)!important}
+html[data-piel] .explain-chips>*{border:0!important;background:var(--c-relleno)!important;color:var(--c-tinta2)!important;border-radius:999px!important;font-family:var(--c-ft)!important;letter-spacing:0!important;text-transform:none!important}
+html[data-piel] .snapshot-fen,html[data-piel] .line-flow{font-family:var(--c-ft)!important}
+html[data-piel] .explain-theme-switch{display:none!important}
+
+/* ---------- mascota: ventana de elección ---------- */
+html[data-piel] .pcm-pop{background:var(--c-vidrio)!important;-webkit-backdrop-filter:blur(30px) saturate(180%)!important;backdrop-filter:blur(30px) saturate(180%)!important;border:0!important;border-radius:22px!important;box-shadow:0 0 0 .5px var(--c-linea2),var(--c-s3)!important;color:var(--c-tinta)!important;font-family:var(--c-ft)!important}
+html[data-piel] .pcm-pop-cab b{font-family:var(--c-ft)!important;font-weight:650!important}
+html[data-piel] .pcm-pop-grupo{background:var(--c-sup)!important;border-radius:14px!important}
+html[data-piel] .pcm-gal-it.activa{box-shadow:0 0 0 2px var(--c-sec)!important}
+
+/* ---------- recorrido dentro de la lección (Aprende Ajedrez) ---------- */
+html[data-piel] .aa-tour:before{background:var(--c-velo)!important}
+html[data-piel] .aa-tour-foco{border-radius:18px!important;box-shadow:0 0 0 9999px var(--c-velo),0 0 0 2px rgba(255,255,255,.95),0 0 0 8px color-mix(in srgb,var(--c-sec) 35%,transparent)!important}
+html[data-piel] .aa-tour-mano{width:54px;height:54px;font-size:0!important;filter:drop-shadow(0 10px 14px rgba(20,15,60,.32))!important}
+html[data-piel] .aa-tour-mano svg{width:100%;height:100%;display:block}
+html[data-piel] .aa-tour-card{background:var(--c-vidrio)!important;-webkit-backdrop-filter:blur(30px) saturate(180%)!important;backdrop-filter:blur(30px) saturate(180%)!important;border:0!important;border-radius:28px!important;box-shadow:0 0 0 .5px var(--c-linea2),var(--c-s3)!important;padding:22px 22px 18px!important}
+html[data-piel] .aa-tour-paso{font-family:var(--c-ft)!important;font-size:.8rem!important;font-weight:600;letter-spacing:0!important;text-transform:none!important;color:var(--c-sec)!important}
+html[data-piel] .aa-tour-card h3{font-family:var(--c-ft)!important;font-weight:650!important;font-size:1.42rem!important;letter-spacing:-.03em;line-height:1.12;margin:.3rem 0 .45rem!important}
+html[data-piel] .aa-tour-card p{color:var(--c-tinta2)!important;font-size:.95rem!important}
+html[data-piel] .aa-tour-acc button{min-height:44px!important;border-radius:999px!important;border:0!important;background:var(--c-relleno)!important;color:var(--c-tinta)!important;font:600 .92rem var(--c-ft)!important;padding:0 18px!important}
+html[data-piel] .aa-tour-acc button:active{transform:scale(.96)}
+html[data-piel] .aa-tour-acc .aa-tour-sig{background:var(--c-tinta)!important;color:var(--c-papel)!important}
+html[data-piel] .aa-tour-acc .aa-tour-cerrar{background:transparent!important;color:var(--c-tinta2)!important}
+
+/* ---------- foco y movimiento ---------- */
+html[data-piel] :focus-visible{outline:2px solid var(--c-sec)!important;outline-offset:2px!important}
+@media (prefers-reduced-motion:reduce){
+  html[data-piel] .btn,html[data-piel] .fbtn,html[data-piel] .tab,html[data-piel] .motif{transition:none!important}
+}
+@media (max-width:480px){
+  html[data-piel] .frame{border-radius:24px!important}
+  html[data-piel] .board{border-radius:13px!important}
+}
+html[data-piel] .workspace-topbar>div:first-child{min-width:0;flex:1 1 auto}
+@media (max-width:520px){html[data-piel] .workspace-topbar .pc-modo-mini{display:none!important}}
+
+/* ---------- con fondo desenfocado: superficies translúcidas ----------
+   Sin desenfoque en vivo (backdrop-filter) en los elementos pequeños o numerosos:
+   en el teléfono cuesta mucho al procesador gráfico. El fondo ya viene desenfocado,
+   así que un blanco translúcido se ve igual de limpio y es mucho más ligero. */
+html[data-piel][data-fondo] .frame,
+html[data-piel][data-fondo] .panel-card,
+html[data-piel][data-fondo] .status:not(.ok):not(.no):not(.done),
+html[data-piel][data-fondo] .moves,
+html[data-piel][data-fondo] #engine-box,
+html[data-piel][data-fondo] .motif,
+html[data-piel][data-fondo] .pc-tablero,
+html[data-piel][data-fondo] .gift-btn,
+html[data-piel][data-fondo] .pcm-boton{background:color-mix(in srgb,var(--c-sup) 84%,transparent)!important}
+html[data-piel][data-fondo] .tabs,
+html[data-piel][data-fondo] .pc-modo{background:color-mix(in srgb,var(--c-sup) 52%,transparent)!important}
+html[data-piel][data-fondo] .btn,html[data-piel][data-fondo] .fbtn{background:color-mix(in srgb,var(--c-sup) 62%,transparent)!important}
+html[data-piel][data-fondo] .btn:hover,html[data-piel][data-fondo] .fbtn:hover{background:color-mix(in srgb,var(--c-sup) 80%,transparent)!important}
+html[data-piel][data-fondo] .btn.primary,html[data-piel][data-fondo] .btn.btn-anot-on,html[data-piel][data-fondo] #b-anotar[aria-pressed="true"]{background:var(--c-tinta)!important}
+html[data-piel][data-fondo] .fbtn.active{background:var(--c-sup)!important}
+html[data-piel][data-fondo] #b-sol{background:color-mix(in srgb,var(--c-sec-t) 80%,transparent)!important}
+html[data-piel][data-modo="oscuro"][data-fondo] #b-sol{background:color-mix(in srgb,var(--c-sec) 24%,transparent)!important}
+html[data-piel][data-fondo] .frame{box-shadow:0 0 0 .5px var(--c-linea2),0 40px 80px -36px rgba(20,15,60,.45)!important}
+html[data-piel][data-fondo] .workspace-shell{background:transparent!important}
+html[data-piel][data-fondo] .workspace-bg{background:color-mix(in srgb,var(--c-papel) 82%,transparent)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html[data-piel][data-fondo] .workspace-shell .plan-hero-card,html[data-piel][data-fondo] .workspace-shell .plan-stat,html[data-piel][data-fondo] .workspace-shell .error-book,html[data-piel][data-fondo] .workspace-shell .explain-section,html[data-piel][data-fondo] .workspace-shell .explanation-hero,html[data-piel][data-fondo] .workspace-shell .frase-card{background:color-mix(in srgb,var(--c-sup) 80%,transparent)!important}
+
+/* =================== Ronda 2 del árbitro =================== */
+/* tinta de texto de cada sección (contraste AA); --c-sec queda para trazos y anillos */
+html[data-piel][data-seccion="pc1"]{--c-sec-txt:var(--c-pc1-t)}
+html[data-piel][data-seccion="pc2"]{--c-sec-txt:var(--c-pc2-t)}
+html[data-piel][data-seccion="aa"]{--c-sec-txt:var(--c-aa-t)}
+html[data-piel][data-modo="claro"],html[data-piel][data-modo="oscuro"]{--crest:var(--c-sec-txt);--gold:var(--c-sec-txt);--acento-txt:var(--c-sec-txt)}
+html[data-piel] .fbtn.active small,html[data-piel] .reading h2 .k,html[data-piel] details.expl summary,
+html[data-piel] .workspace-eyebrow,html[data-piel] .frase-eyebrow,html[data-piel] .text-action,html[data-piel] .aa-tour-paso{color:var(--c-sec-txt)!important}
+
+/* error en el tablero: siempre rojo, nunca el color de la sección */
+html[data-piel] .sq.bad{animation:c17Mal .45s ease!important}
+@keyframes c17Mal{0%{box-shadow:inset 0 0 0 0 transparent}20%{box-shadow:inset 0 0 0 999px color-mix(in srgb,var(--c-mal) 42%,transparent);transform:translateX(-2px)}45%{transform:translateX(2px)}70%{transform:translateX(-1px)}100%{box-shadow:inset 0 0 0 0 transparent;transform:none}}
+html[data-piel] .pc-hex.mal{box-shadow:0 0 0 1px var(--c-mal),0 0 0 4px color-mix(in srgb,var(--c-mal) 18%,transparent)!important}
+html[data-piel] .pc-pista.mal{color:var(--c-mal)!important}
+
+/* sin mayúsculas de imprenta ni espaciado tipo máquina de escribir */
+html[data-piel] *{text-transform:none!important}
+html[data-piel] .aa-eyebrow,html[data-piel] .pc-tema b,html[data-piel] .pc-hexrow span,html[data-piel] .pc-hex,html[data-piel] .pc-nombre-row span,
+html[data-piel] .wordmark small,html[data-piel] .plan-stat>span,html[data-piel] .aa-fav-txt small,html[data-piel] .aa-fv-leccion span,
+html[data-piel] .aa-nivel-cuenta,html[data-piel] .aa-fl-num{letter-spacing:0!important;font-family:var(--c-ft)!important}
+html[data-piel] .aa-eyebrow{font-size:.8rem!important;font-weight:600;color:var(--c-sec-txt)!important}
+html[data-piel] .pc-tema b{font-size:.78rem!important;font-weight:550!important;color:var(--c-tinta2)!important}
+html[data-piel] .aa-nivel-n{font-family:var(--c-ft)!important;font-weight:650!important;letter-spacing:-.015em}
+
+/* iconos que sustituyen emojis y glifos */
+html[data-piel] .c17-ico{width:1.05em;height:1.05em;display:inline-block;vertical-align:-.16em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+html[data-piel] .modal-x svg,html[data-piel] .pc-io-close svg,html[data-piel] .workspace-close svg,html[data-piel] .pc-buscar-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+html[data-piel] .card-icon{font-size:0!important;color:var(--c-sec-txt)!important;background:color-mix(in srgb,var(--c-sec-t) 70%,transparent)!important;border-radius:11px!important}
+html[data-piel][data-modo="oscuro"] .card-icon{background:color-mix(in srgb,var(--c-sec) 18%,transparent)!important}
+html[data-piel] .card-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+html[data-piel] .pc-float-toggle{border:0!important;border-radius:12px!important;background:var(--c-relleno)!important;color:var(--c-tinta)!important;font-family:var(--c-ft)!important;font-weight:580!important;box-shadow:none!important}
+html[data-piel] .pc-float-toggle[aria-pressed="true"]{background:var(--c-tinta)!important;color:var(--c-papel)!important}
+html[data-piel] .pc-float-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+html[data-piel] .status .ico{display:inline-grid;place-items:center;width:20px;height:20px}
+html[data-piel] .status .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+html[data-piel] .gift-btn svg{width:21px;height:21px;fill:none;stroke:var(--c-tinta);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* modo oscuro: sin verdes oscuros en Aprende Ajedrez */
+html[data-piel][data-modo="oscuro"] body{background:var(--c-papel) radial-gradient(70% 380px at 50% -120px,color-mix(in srgb,var(--c-acento) 12%,transparent),transparent) no-repeat}
+html[data-piel][data-modo="oscuro"] .frame{box-shadow:0 0 0 .5px var(--c-linea2),0 40px 90px -40px rgba(0,0,0,.9)!important}
+html[data-piel][data-modo="oscuro"][data-seccion="aa"]{--c-sec-t:var(--c-cielo)}
+html[data-piel] #b-sol:disabled,html[data-piel] .btn.aa-btn-sol:disabled{background:var(--c-relleno)!important;color:var(--c-tinta2)!important}
+
+/* piezas que se levantan al arrastrarlas */
+html[data-piel] .sq .pc.drag{transform:scale(1.08)!important;filter:drop-shadow(0 10px 12px rgba(20,15,60,.35));transition:transform .12s var(--c-mov)}
+@media (hover:hover){html[data-piel] .sq:hover{box-shadow:inset 0 0 0 999px rgba(255,255,255,.08)}}
+
+/* pestañas con indicador que se desliza */
+html[data-piel] .tabs.c17-desliza{position:relative}
+html[data-piel] .tabs.c17-desliza .tab.active{background:transparent!important;box-shadow:none!important}
+html[data-piel] .tabs.c17-desliza .tab{position:relative;z-index:1}
+html[data-piel] .c17-pildora{position:absolute;z-index:0;top:3px;bottom:3px;left:0;border-radius:8px;background:var(--c-sup);box-shadow:0 0 0 .5px var(--c-linea),0 3px 8px rgba(20,20,40,.12);transition:transform .45s var(--c-mov),width .45s var(--c-mov);pointer-events:none}
+html[data-piel][data-modo="oscuro"] .c17-pildora{background:var(--c-relleno2)}
+
+/* al resolver: una franja de luz cruza el tablero */
+html[data-piel] .c17-barrido{position:absolute;inset:-25%;z-index:6;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.6) 50%,transparent 62%);transform:translateX(-85%);animation:c17Luz 1.15s var(--c-mov) forwards}
+@keyframes c17Luz{to{transform:translateX(85%)}}
+@media (prefers-reduced-motion:reduce){html[data-piel] .c17-barrido{display:none}}
+
+/* Aprende Ajedrez: lo que sigue el tema del tablero conserva su color dentro de la piel */
+html[data-piel][data-seccion="aa"] .aa-app{--aa-tema-txt:color-mix(in srgb,var(--acento-tema,#53707F) 45%,var(--c-tinta))}
+html[data-piel] .aa-fila-nav .btn.aa-nav-lec.aa-listo{
+  background:linear-gradient(140deg,color-mix(in srgb,var(--aa-luz) 82%,#fff) 0%,var(--aa-luz) 45%,color-mix(in srgb,var(--aa-luz) 70%,#000) 100%) padding-box,
+    conic-gradient(from var(--aa-giro),var(--aa-oro2),var(--aa-oro),color-mix(in srgb,var(--aa-luz) 40%,var(--aa-oro)),#fff,var(--aa-oro),var(--aa-oro2)) border-box!important;
+  color:#fff!important;border:2.5px solid transparent!important}
+html[data-piel] .aa-app .aa-etapa.activa i{color:var(--aa-tema-txt)!important}
+html[data-piel] .aa-app .aa-eyebrow{color:var(--aa-tema-txt)!important}
+html[data-piel] .aa-app .engine-banner-toggle[aria-pressed="true"]{background:color-mix(in srgb,var(--acento-tema,#53707F) 16%,transparent)!important;color:var(--aa-tema-txt)!important}
+
+/* =================== Ronda 3 del árbitro =================== */
+/* etapa activa que ya está hecha: número claro sobre el color del tema */
+html[data-piel] .aa-app .aa-etapa.activa.hecha i{color:var(--aa-tema-ink,#fff)!important}
+/* tamaños mínimos legibles (11–12 px) */
+html[data-piel] .boardhead-left .toplay,html[data-piel] .toplay{font-size:.74rem!important}
+html[data-piel] .boardhead-left .chip,html[data-piel] .chip{font-size:.7rem!important;padding:.16rem .5rem!important}
+html[data-piel] .engine-banner-toggle,html[data-piel] .boardhead-center .engine-banner-toggle{font-size:.72rem!important;padding:.3rem .62rem!important}
+/* chevrones en lugar de triángulos tipográficos */
+html[data-piel] .c17-chev{width:.95em;height:.95em;display:inline-block;vertical-align:-.12em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+html[data-piel] details.expl summary{list-style:none;display:inline-flex;align-items:center;gap:.35rem;cursor:pointer}
+html[data-piel] details.expl summary::-webkit-details-marker{display:none}
+html[data-piel] details.expl summary:before{content:"";width:.7em;height:.7em;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;transition:transform .3s var(--c-mov)}
+html[data-piel] details.expl[open] summary:before{transform:rotate(90deg)}
+html[data-piel] .chip.F{color:color-mix(in srgb,var(--c-bien) 78%,var(--c-tinta))!important}
+html[data-piel] .gift-btn::after{display:none!important}
+
+/* logo (caballo blanco sobre negro): las esquinas siguen las del logo; en modo oscuro, un filo de luz lo separa del fondo */
+html[data-piel][data-modo="oscuro"] .hdr-marca .home-icon{box-shadow:0 0 0 1px rgba(255,255,255,.16),var(--c-s1)!important}

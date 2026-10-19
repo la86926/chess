@@ -1,0 +1,62 @@
+/* ==================================================================
+   Chess de L · tokens del sistema visual «Luz»
+   Elegancia sobria: materiales translúcidos, sombras suaves y
+   los pasteles como tintes delicados. Compartidos por el contenedor
+   (index.html) y las tres secciones.
+   ================================================================== */
+:root{
+  --c-ft:'Instrument',-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --c-fd:var(--c-ft);
+
+  /* pasteles de marca */
+  --c-lila:#D9D0FF;  --c-menta:#CBF1DF; --c-cielo:#CFE3FF; --c-mant:#FFF1BF; --c-rosa:#FFD9E6; --c-melon:#FFDCC7;
+  /* tintas de cada sección (texto y anillos) */
+  --c-aa:#2E9E74; --c-pc1:#3B78E0; --c-pc2:#7458E8; --c-id:#C99A12;
+
+  --c-r-s:10px; --c-r-m:14px; --c-r-l:22px; --c-r-xl:28px;
+  --c-mov:cubic-bezier(.22,1,.36,1);
+  --c-suave:cubic-bezier(.4,0,.2,1);
+}
+html[data-modo="claro"]{
+  color-scheme:light;
+  --c-papel:#F5F5F8; --c-sup:#FFFFFF; --c-sup2:#FAFAFC;
+  --c-relleno:rgba(118,118,138,.12); --c-relleno2:rgba(118,118,138,.18);
+  --c-tinta:#1C1B22; --c-tinta2:#55545F; --c-tinta3:#62616E;
+  --c-linea:rgba(28,27,34,.08); --c-linea2:rgba(28,27,34,.14);
+  --c-vidrio:rgba(250,250,252,.72);
+  --c-acento:#5B47D6;
+  --c-bien:#16704C; --c-mal:#B02A50; --c-aviso:#7E5D00;
+  --c-aa-t:#1E7D59; --c-pc1-t:#2A62C9; --c-pc2-t:#5B3FD0; --c-id-t:#7E5D00; --c-acento-t:#4B38C4;
+  --c-velo:rgba(28,27,34,.22);
+  --c-s1:0 1px 1px rgba(30,25,70,.04),0 1px 3px rgba(30,25,70,.06);
+  --c-s2:0 1px 2px rgba(30,25,70,.05),0 8px 24px -10px rgba(40,30,100,.16);
+  --c-s3:0 2px 6px rgba(30,25,70,.05),0 30px 70px -28px rgba(40,30,100,.30);
+}
+html[data-modo="oscuro"]{
+  color-scheme:dark;
+  --c-papel:#0E0D13; --c-sup:#19181F; --c-sup2:#212029;
+  --c-relleno:rgba(150,148,175,.16); --c-relleno2:rgba(150,148,175,.24);
+  --c-tinta:#F4F3F8; --c-tinta2:#B3B1C2; --c-tinta3:#9391A6;
+  --c-linea:rgba(255,255,255,.08); --c-linea2:rgba(255,255,255,.14);
+  --c-vidrio:rgba(25,24,31,.72);
+  --c-acento:#B4A6FF;
+  --c-aa:#7FDDB6; --c-pc1:#8DB8FF; --c-pc2:#B9A8FF; --c-id:#F2D27A;
+  --c-bien:#7FDDB6; --c-mal:#FF8EAE; --c-aviso:#F2D27A;
+  --c-aa-t:#7FDDB6; --c-pc1-t:#8DB8FF; --c-pc2-t:#B9A8FF; --c-id-t:#F2D27A; --c-acento-t:#B4A6FF;
+  --c-velo:rgba(0,0,0,.5);
+  --c-s1:0 1px 2px rgba(0,0,0,.4);
+  --c-s2:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.7);
+  --c-s3:0 2px 8px rgba(0,0,0,.4),0 34px 80px -30px rgba(0,0,0,.85);
+}
+
+/* ---------- fondo desenfocado (lo pinta c17/fondos.js) ---------- */
+html[data-fondo]{background:var(--c-papel)}
+html[data-fondo] body{background:transparent!important}
+html[data-fondo] body:before,html[data-fondo] body:after{content:"";position:fixed;inset:0;pointer-events:none}
+html[data-fondo] body:before{z-index:-2;background:var(--c-fondo) center/cover no-repeat;transform:scale(1.04)}
+html[data-fondo] body:after{z-index:-1;background:color-mix(in srgb,var(--c-papel) var(--c-fondo-velo,55%),transparent)}
+
+/* Sobre un fondo, el texto secundario va con más tinta para no perder contraste */
+html[data-fondo][data-modo="claro"]{--c-tinta2:#3E3D47;--c-tinta3:#4A4955}
+html[data-fondo][data-modo="oscuro"]{--c-tinta2:#D4D2E0;--c-tinta3:#BDBBCC}
+html[data-fondo][data-modo="oscuro"] body:before{filter:brightness(.55) saturate(1.2)}

@@ -262,7 +262,9 @@ def construir():
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0F1411">
 <title>Aprende Ajedrez</title>
-<link rel="icon" type="image/png" href="torre.png">
+<link rel="icon" type="image/svg+xml" href="c17/logo.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="c17/logo-32.png?v=2">
+<link rel="apple-touch-icon" href="c17/logo-180.png?v=2">
 <!-- Generado por tools/aprende/construir.py a partir de index1.html. No editar a mano:
      los cambios propios de Aprende Ajedrez van en aa-*.js / aa-app.css / tools/aprende/cuerpo.html. -->
 {diseno}

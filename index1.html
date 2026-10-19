@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-piel data-seccion="pc1">
 <head>
+<!-- la piel se pide desde el principio, en paralelo con la página -->
+<link rel="preload" href="c17/tokens.css?v=5" as="style">
+<link rel="preload" href="c17/piel.css?v=9" as="style">
+<link rel="preload" href="c17/piel.js?v=6" as="script">
+<link rel="preload" href="c17/fondos.js?v=4" as="script">
 <!-- los ejercicios se piden desde el principio, junto con la página -->
 <link rel="preload" href="pc1-ejercicios.js?v=2" as="script">
 <script id="pc-backup-preload">
@@ -107,7 +112,9 @@ try{
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0F1411">
 <title>Método PC1</title>
-<link rel="icon" type="image/png" href="torre.png">
+<link rel="icon" type="image/svg+xml" href="c17/logo.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="c17/logo-32.png?v=2">
+<link rel="apple-touch-icon" href="c17/logo-180.png?v=2">
 <style id="pc-diseno">
 *{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html,body{touch-action:pan-x pan-y}
@@ -1984,12 +1991,17 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
 header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
 .boardhead{transition:padding-left .34s cubic-bezier(.32,.72,0,1)}
 </style>
+<link rel="stylesheet" href="c17/fuentes.css?v=3">
+<link rel="stylesheet" href="c17/tokens.css?v=5">
+<link rel="stylesheet" href="c17/piel.css?v=9">
+<script src="c17/piel.js?v=6" defer></script>
+<script src="c17/fondos.js?v=4"></script>
 </head>
 <body>
 
 <header class="topbar">
   <div class="hdr-marca">
-    <button class="home-icon" id="b-home" type="button" aria-label="Ir al inicio"> <img class="crest" src="torre.png" alt="Pieza de ajedrez" > </button>
+    <button class="home-icon" id="b-home" type="button" aria-label="Ir al inicio"> <img class="crest" src="c17/logo.svg?v=2" alt="Chess de L"> </button>
     <span class="titulo"><b>El Método PC1</b><small>1128 ejercicios tácticos</small></span>
   </div>
   <div class="hdr-centro">

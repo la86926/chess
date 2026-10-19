@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-modo="oscuro">
+<html lang="es" data-modo="oscuro" data-web="https://la86926.github.io/chess/">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -34,11 +34,15 @@
   }catch(e){}
 })();
 </script>
-<meta name="theme-color" content="#0F1411">
-<title>Chess</title>
-<meta name="apple-mobile-web-app-title" content="Chess">
-<meta name="application-name" content="Chess">
-<link rel="icon" type="image/png" href="torre.png">
+<meta name="theme-color" content="#F5F5F8">
+<title>Chess de L</title>
+<meta name="description" content="Aprende ajedrez desde cero y entrena con dos métodos de repetición: 1128 ejercicios tácticos y 1000 posicionales.">
+<meta name="apple-mobile-web-app-title" content="Chess de L">
+<meta name="application-name" content="Chess de L">
+<link rel="icon" type="image/svg+xml" href="c17/logo.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="c17/logo-32.png?v=2">
+<link rel="apple-touch-icon" href="c17/logo-180.png?v=2">
+<link rel="manifest" href="manifest.webmanifest">
 <script>
 /* Fija la apariencia antes del primer pintado. Lee localStorage y, si no hay, cookie. */
 (function(){
@@ -54,248 +58,99 @@
   }catch(e){document.documentElement.setAttribute('data-modo','oscuro');}
 })();
 </script>
-<style>
+<script id="c17-fondos">
+/* Copia incrustada de c17/fondos.js (el contenedor la necesita antes del primer pintado y así no
+   frena la lectura de la página; las secciones usan el archivo). Si cambia uno, cambiar el otro. */
 /* ==================================================================
-   Método PC1 y PC2 · selector de método
-   Mismo sistema de diseño que index1 e index2: mismos tokens,
-   mismas formas, mismo interruptor de apariencia.
+   Chess de L · fondos desenfocados
+   Lo usan el contenedor y las tres secciones. El fondo elegido se
+   guarda en este dispositivo (clave c17_fondo) y se aplica en vivo.
    ================================================================== */
-:root{
-  --r-cap:999px; --r-ico:14px; --r-card:20px; --r-box:26px;
-  --serif:Charter,"Bitstream Charter","Sitka Text",Cambria,"Iowan Old Style",Georgia,serif;
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Roboto Mono",monospace;
-}
-html,html[data-modo="oscuro"]{
-  color-scheme:dark;
-  --bg:#0F1411; --hondo:#0A0E0C; --panel:#171E1A; --panel2:#212B25;
-  --line:rgba(233,238,231,.13); --line-viva:rgba(233,238,231,.26);
-  --ink:#E9EEE7; --muted:#A4AFA6; --muted2:#7E887F;
-  --crest:#E96A45; --gold:#E2B65F;
-  --tinte-oro:rgba(226,182,95,.14); --tinte-neutro:rgba(233,238,231,.05);
-  --velo:rgba(6,9,7,.66);
-  --s1:0 1px 2px rgba(0,0,0,.3);
-  --s2:0 6px 18px -8px rgba(0,0,0,.6);
-  --s4:0 34px 80px -30px rgba(0,0,0,.9);
-  --luz-interna:inset 0 1px 0 rgba(233,238,231,.06);
-}
-html[data-modo="claro"]{
-  color-scheme:light;
-  --bg:#EEF1EB; --hondo:#E6EAE3; --panel:#FDFEFB; --panel2:#FFFFFF;
-  --line:rgba(21,28,24,.11); --line-viva:rgba(21,28,24,.24);
-  --ink:#151C18; --muted:#556055; --muted2:#737D73;
-  --crest:#B24019; --gold:#87621A;
-  --tinte-oro:rgba(135,98,26,.09); --tinte-neutro:rgba(21,28,24,.035);
-  --velo:rgba(26,32,28,.4);
-  --s1:0 1px 2px rgba(24,31,26,.07);
-  --s2:0 10px 24px -12px rgba(24,31,26,.18);
-  --s4:0 36px 84px -34px rgba(24,31,26,.36);
-  --luz-interna:inset 0 1px 0 rgba(255,255,255,.9);
-}
-
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans)}
-.app-frame{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;border:0;background:var(--bg);display:none}
-.app-frame.active{display:block}
-
-/* botón de menú: cuadrado redondeado, igual que los botones de icono de la app */
-.menu-button{
-  position:fixed;left:calc(11px + env(safe-area-inset-left));top:calc(11px + env(safe-area-inset-top));
-  z-index:10020;width:44px;height:44px;padding:0;cursor:pointer;
-  border:1px solid var(--line);border-radius:var(--r-ico);
-  background:var(--panel);color:var(--ink);
-  box-shadow:var(--s2),var(--luz-interna);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .14s,border-color .2s,color .2s,background .2s
-}
-.menu-button:active{transform:scale(.94)}
-.menu-button span,.menu-button:before,.menu-button:after{
-  content:"";display:block;position:absolute;width:18px;height:1.7px;border-radius:2px;
-  background:currentColor;transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .16s
-}
-.menu-button span{transform:translateY(0)}
-.menu-button:before{transform:translateY(-6px)}
-.menu-button:after{transform:translateY(6px)}
-.menu-button.open{border-color:var(--crest);color:var(--crest)}
-.menu-button.open span{opacity:0}
-.menu-button.open:before{transform:rotate(45deg)}
-.menu-button.open:after{transform:rotate(-45deg)}
-
-.drawer-backdrop{
-  position:fixed;top:0;right:0;bottom:0;left:0;z-index:10000;background:var(--velo);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s
-}
-.drawer-backdrop.open{opacity:1;visibility:visible}
-.drawer{
-  position:absolute;left:0;top:0;bottom:0;width:min(86vw,352px);
-  display:flex;flex-direction:column;
-  background:var(--panel);border-right:1px solid var(--line);
-  box-shadow:var(--s4);
-  transform:translateX(-102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);
-  padding:calc(72px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom))
-}
-.drawer-backdrop.open .drawer{transform:translateX(0)}
-
-.drawer-brand{
-  display:flex;align-items:center;gap:12px;padding:0 2px 16px;margin-bottom:14px;
-  border-bottom:1px solid var(--line);
-  opacity:0;transform:translateX(-8px);transition:opacity .3s cubic-bezier(.2,.8,.2,1),transform .3s cubic-bezier(.2,.8,.2,1)
-}
-.drawer-backdrop.open .drawer-brand{opacity:1;transform:none}
-.drawer-brand img{
-  width:42px;height:42px;object-fit:contain;padding:6px;border-radius:var(--r-ico);
-  background:var(--tinte-neutro);box-shadow:inset 0 0 0 1px var(--line)
-}
-.drawer-brand strong{display:block;font-family:var(--serif);font-size:1.3rem;font-weight:600;letter-spacing:-.01em;line-height:1.05}
-.drawer-brand small{
-  display:block;margin-top:5px;font-family:var(--mono);font-size:.58rem;font-weight:400;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)
-}
-
-/* interruptor de apariencia: idéntico al de los métodos */
-.tema{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:var(--r-cap);background:var(--tinte-neutro);margin-bottom:16px;align-self:flex-start}
-.tema button{
-  width:34px;height:28px;padding:0;border:0;border-radius:var(--r-cap);background:transparent;
-  color:var(--muted2);display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s
-}
-.tema button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.tema button:hover{color:var(--ink)}
-.tema button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);box-shadow:var(--s1)}
-
-/* los dos métodos, como tarjetas */
-.app-choice{
-  position:relative;width:100%;margin:0 0 10px;cursor:pointer;text-align:left;touch-action:manipulation;
-  display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
-  padding:16px 16px;
-  border:1px solid var(--line);border-radius:var(--r-card);
-  background:var(--tinte-neutro);color:var(--ink);
-  font-family:var(--sans);font-size:1rem;font-weight:600;
-  box-shadow:var(--s1);
-  opacity:0;transform:translateX(-10px);
-  transition:opacity .3s cubic-bezier(.2,.8,.2,1) .05s,transform .3s cubic-bezier(.2,.8,.2,1) .05s,
-             background .18s,border-color .18s,box-shadow .18s
-}
-.drawer-backdrop.open .app-choice{opacity:1;transform:none}
-.drawer-backdrop.open .app-choice[data-app="3"]{transition-delay:.11s}
-.drawer-backdrop.open .app-choice[data-app="1"]{transition-delay:.17s}
-.drawer-backdrop.open .app-choice[data-app="2"]{transition-delay:.23s}
-.app-choice > span{display:block;min-width:0;font-family:var(--serif);font-size:1.16rem;font-weight:600;letter-spacing:-.01em;line-height:1.15}
-.app-choice br{display:none}
-.app-choice small{
-  display:block;margin-top:6px;font-family:var(--mono);font-size:.6rem;font-weight:400;
-  letter-spacing:.1em;text-transform:uppercase;line-height:1.4;color:var(--muted2)
-}
-.app-choice:not(.active):hover{border-color:var(--line-viva);background:var(--panel2);box-shadow:var(--s2)}
-.app-choice:not(.active):active{transform:scale(.995)}
-.app-choice.active{
-  border-color:var(--gold);background:var(--tinte-oro);box-shadow:var(--s1),0 0 0 1px var(--gold)
-}
-.app-choice.active > span{color:var(--gold)}
-.app-choice.active:after{
-  content:"activo";
-  font-family:var(--mono);font-size:.56rem;font-weight:400;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--gold);border:1px solid var(--gold);border-radius:var(--r-cap);padding:.3em .6em;white-space:nowrap
-}
-.drawer-note{
-  margin:auto 2px 0;padding-top:18px;border-top:1px solid var(--line);
-  color:var(--muted2);font-family:var(--mono);font-size:.61rem;line-height:1.8;letter-spacing:.05em;
-  opacity:0;transform:translateX(-8px);
-  transition:opacity .3s cubic-bezier(.2,.8,.2,1) .16s,transform .3s cubic-bezier(.2,.8,.2,1) .16s
-}
-.drawer-backdrop.open .drawer-note{opacity:1;transform:none}
-.drawer-note:before{
-  content:"";display:block;width:88px;height:10px;margin:0 0 14px;border-radius:1px;
-  background-image:
-    linear-gradient(90deg,transparent 55px,var(--crest) 55px 66px,transparent 66px),
-    repeating-linear-gradient(90deg,var(--line-viva) 0 11px,transparent 11px 22px)
-}
-.menu-button:focus-visible,.app-choice:focus-visible,.tema button:focus-visible{outline:2px solid var(--crest);outline-offset:2px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-
-@media(max-width:480px){
-  .menu-button{left:calc(8px + env(safe-area-inset-left));top:calc(8px + env(safe-area-inset-top));width:41px;height:41px}
-  .drawer{padding-left:15px;padding-right:15px;padding-top:calc(64px + env(safe-area-inset-top))}
-  .drawer-brand strong{font-size:1.2rem}
-}
-@media(prefers-reduced-motion:reduce){
-  .drawer,.drawer-backdrop,.drawer-brand,.drawer-note,.app-choice,
-  .menu-button,.menu-button span,.menu-button:before,.menu-button:after{transition-duration:.01ms}
-  .menu-button:active,.app-choice:active{transform:none}
-}
-
-/* ---- Tutorial de bienvenida (solo usuarios nuevos) ---- */
-.tuto{position:fixed;inset:0;z-index:10990;pointer-events:none;display:none}
-.tuto.open{display:block}
-.tuto-velo{position:absolute;inset:0;background:rgba(6,9,7,.62);transition:opacity .25s}
-.tuto.con-foco .tuto-velo{opacity:0}
-.tuto-foco{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(6,9,7,.62),0 0 0 3px var(--tuto-acento,var(--gold));transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1),width .35s cubic-bezier(.2,.8,.2,1),height .35s cubic-bezier(.2,.8,.2,1),opacity .2s;opacity:0}
-.tuto.con-foco .tuto-foco{opacity:1}
-.tuto-foco:after{content:"";position:absolute;inset:-7px;border-radius:20px;border:2px solid var(--tuto-acento,var(--gold));animation:tutoPulso 1.6s ease-out infinite}
-@keyframes tutoPulso{0%{opacity:.9;transform:scale(.97)}100%{opacity:0;transform:scale(1.08)}}
-.tuto-mano{position:absolute;left:0;top:0;width:54px;height:54px;margin:-4px 0 0 -18px;font-size:46px;line-height:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));opacity:0;transition:opacity .2s;will-change:transform}
-.tuto-mano.ver{opacity:1}
-.tuto-mano.toque{animation:tutoToque 1.25s ease-in-out infinite}
-.tuto-mano.saludo{animation:tutoSaludo 1.6s ease-in-out infinite;transform-origin:60% 90%}
-.tuto-mano.arrastre{animation:tutoArrastre 2.4s cubic-bezier(.45,.05,.3,1) infinite}
-@keyframes tutoToque{0%,100%{transform:translate(var(--x),var(--y)) scale(1)}45%{transform:translate(var(--x),calc(var(--y) + 10px)) scale(.86)}60%{transform:translate(var(--x),calc(var(--y) + 10px)) scale(.86)}}
-@keyframes tutoSaludo{0%,100%{transform:translate(var(--x),var(--y)) rotate(0)}25%{transform:translate(var(--x),var(--y)) rotate(-16deg)}75%{transform:translate(var(--x),var(--y)) rotate(16deg)}}
-@keyframes tutoArrastre{0%{transform:translate(var(--x),var(--y)) scale(1);opacity:0}10%{opacity:1}22%{transform:translate(var(--x),calc(var(--y) + 8px)) scale(.86)}70%{transform:translate(var(--x2),calc(var(--y2) + 8px)) scale(.86);opacity:1}85%{transform:translate(var(--x2),var(--y2)) scale(1);opacity:1}100%{transform:translate(var(--x2),var(--y2)) scale(1);opacity:0}}
-.tuto-ficha{position:absolute;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#d9d4c6);box-shadow:0 6px 14px rgba(0,0,0,.4);display:grid;place-items:center;font-size:26px;color:#1b1b1b;opacity:0}
-.tuto-ficha.ver{animation:tutoFicha 2.4s cubic-bezier(.45,.05,.3,1) infinite}
-@keyframes tutoFicha{0%,20%{transform:translate(var(--x),var(--y));opacity:0}24%{opacity:.95}70%{transform:translate(var(--x2),var(--y2));opacity:.95}85%,100%{transform:translate(var(--x2),var(--y2));opacity:0}}
-.tuto-card{position:absolute;left:50%;width:min(92vw,400px);transform:translateX(-50%);pointer-events:auto;background:var(--panel);color:var(--ink);border:1px solid var(--line-viva);border-radius:var(--r-box);box-shadow:var(--s4);padding:18px 18px 14px;transition:top .3s cubic-bezier(.2,.8,.2,1),bottom .3s cubic-bezier(.2,.8,.2,1)}
-.tuto-card.abajo{bottom:calc(18px + env(safe-area-inset-bottom));top:auto}
-.tuto-card.arriba{top:calc(66px + env(safe-area-inset-top));bottom:auto}
-.tuto-card.centro{top:50%;bottom:auto;transform:translate(-50%,-50%)}
-.tuto-paso{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tuto-etiqueta,var(--gold))}
-.tuto-card h3{font-family:var(--serif);font-size:1.28rem;font-weight:600;letter-spacing:-.01em;margin:.35rem 0 .45rem}
-.tuto-card p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5}
-.tuto-puntos{display:flex;gap:6px;margin:14px 0 12px}
-.tuto-puntos i{width:7px;height:7px;border-radius:50%;background:var(--line-viva);transition:background .2s,width .2s}
-.tuto-puntos i.on{background:var(--tuto-acento,var(--gold));width:20px;border-radius:4px}
-.tuto-acciones{display:flex;gap:8px;align-items:center}
-.tuto-acciones button{min-height:40px;border-radius:12px;border:1px solid var(--line);background:var(--tinte-neutro);color:var(--ink);font:600 .85rem var(--sans);padding:0 14px;cursor:pointer;touch-action:manipulation}
-/* El botón principal del tutorial toma el color del tablero elegido en la sección abierta (por defecto, Cielo) */
-.tuto-acciones .tuto-sig{background:var(--tuto-acento,#7AA4BB);border-color:var(--tuto-acento,#7AA4BB);color:var(--tuto-acento-txt,#fff);margin-left:auto}
-.tuto-acciones .tuto-cerrar{background:transparent;color:var(--muted)}
-.tuto-acciones button:disabled{opacity:.35}
-.drawer-tuto{margin:4px 2px 0;align-self:flex-start;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--r-cap);padding:.45rem .9rem;font:600 .78rem var(--sans);cursor:pointer}
-.drawer-tuto:hover{color:var(--ink);border-color:var(--line-viva)}
-@media(prefers-reduced-motion:reduce){.tuto-mano,.tuto-ficha,.tuto-foco:after{animation-duration:3s}}
-</style>
+(function(){
+  'use strict';
+  var LISTA=[
+    {id:'f12',n:'Nácar',l:.80},
+    {id:'f05',n:'Niebla',l:.83},
+    {id:'f06',n:'Duna',l:.76},
+    {id:'f07',n:'Glaciar',l:.64},
+    {id:'f08',n:'Atardecer',l:.60},
+    {id:'f03',n:'Laguna',l:.63},
+    {id:'f09',n:'Aurora',l:.54},
+    {id:'f01',n:'Crepúsculo',l:.42},
+    {id:'f11',n:'Orquídea',l:.35},
+    {id:'f04',n:'Coral',l:.57},
+    {id:'f02',n:'Abismo',l:.28},
+    {id:'f10',n:'Cordillera',l:.09}
+  ];
+  var CLAVE='c17_fondo',PREDETERMINADO='f12',pedido='';
+  function leer(){var v=null;try{v=localStorage.getItem(CLAVE);}catch(e){}return v||PREDETERMINADO;}
+  function datos(id){for(var i=0;i<LISTA.length;i++)if(LISTA[i].id===id)return LISTA[i];return null;}
+  function aplicar(){
+    var r=document.documentElement,id=leer(),f=datos(id);
+    if(!f){r.removeAttribute('data-fondo');r.removeAttribute('data-fondo-tono');r.style.removeProperty('--c-fondo');return;}
+    var oscuro=r.getAttribute('data-modo')==='oscuro';
+    /* el velo se ajusta a la luz del fondo para que el texto siempre se lea */
+    /* claro: más velo cuanto más oscuro es el fondo; oscuro: el fondo se oscurece por filtro (conserva su color) y el velo es moderado */
+    var velo=oscuro?Math.min(.72,Math.max(.46,.42+f.l*.3)):Math.min(.82,Math.max(.5,.5+(.85-f.l)*.5));
+    r.setAttribute('data-fondo',id);
+    r.setAttribute('data-fondo-tono',f.l<.5?'oscuro':'claro');
+    var abs;try{abs=new URL('c17/fondos/'+id+'.webp',document.baseURI).href;}catch(e){abs='c17/fondos/'+id+'.webp';}
+    /* se pide ya, antes de que el estilo lo descubra, para que el fondo llegue con el primer pintado */
+    if(pedido!==abs){pedido=abs;try{var im=new Image();im.decoding='async';im.src=abs;}catch(e){}}
+    r.style.setProperty('--c-fondo','url("'+abs+'")');
+    r.style.setProperty('--c-fondo-velo',(velo*100).toFixed(0)+'%');
+  }
+  function guardar(id){try{localStorage.setItem(CLAVE,id);}catch(e){}aplicar();}
+  aplicar();
+  new MutationObserver(aplicar).observe(document.documentElement,{attributes:true,attributeFilter:['data-modo']});
+  window.addEventListener('storage',function(e){if(!e||!e.key||e.key===CLAVE)aplicar();});
+  window.C17Fondos={lista:LISTA,leer:leer,datos:datos,guardar:guardar,aplicar:aplicar};
+})();
+</script>
 <link rel="stylesheet" href="pc-cloud-sync.css?v=3">
+<link rel="stylesheet" href="c17/fuentes.css?v=3">
+<link rel="stylesheet" href="c17/tokens.css?v=5">
+<link rel="stylesheet" href="c17/shell.css?v=7">
 </head>
 <body>
-<button class="menu-button" id="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false"><span></span></button>
+<button class="menu-button c-vidrio" id="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false"><svg class="mb-lado" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3.5"/><path d="M9.5 4.5v15M5.6 8.2h1.6M5.6 11h1.6"/></svg><svg class="mb-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
 <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true">
-  <aside class="drawer" role="dialog" aria-modal="true" aria-label="Elegir aplicación">
-    <div class="drawer-brand">
-      <img src="torre.png" alt="Ajedrez">
-      <div><strong>Método PC1 y PC2</strong><small>Aprende Ajedrez y dos métodos</small></div>
+  <aside class="drawer c-vidrio" role="dialog" aria-modal="true" aria-label="Menú">
+    <div class="marca"><svg aria-hidden="true" viewBox="0 0 704 704"><rect width="704" height="704" rx="128" fill="#111"/><path transform="translate(0 2.5)" fill="#fff" d="M179.4 592.6C179.1 591.8 179.0 585.2 179.2 577.8C179.4 567.1 179.9 563.7 181.4 560.6C184.1 555.3 189.4 550.2 194.9 547.6L199.5 545.5L353.0 545.5L506.5 545.5L511.6 548.2C518.2 551.7 523.6 558.0 525.5 564.4C527.7 571.6 527.6 592.6 525.4 593.4C524.5 593.7 446.5 594.0 351.9 594.0C203.9 594.0 179.9 593.8 179.4 592.6ZM215.0 528.5C214.1 527.5 213.9 524.5 214.2 519.1C214.8 508.2 217.7 502.6 225.0 498.2L230.4 495.0L354.2 495.0C489.9 495.0 481.8 494.7 488.4 500.8C493.2 505.3 495.0 510.4 495.0 520.1C495.0 527.1 494.7 528.9 493.4 529.4C492.5 529.7 429.8 530.0 354.0 530.0C232.5 530.0 216.1 529.8 215.0 528.5ZM248.2 477.2C247.8 476.3 247.5 470.8 247.6 465.0C247.6 455.8 248.0 453.5 250.7 446.3C256.3 431.6 260.8 425.1 310.5 359.5C343.6 315.8 354.1 296.3 354.3 278.1C354.3 270.7 353.2 263.0 352.0 263.0C351.6 263.0 350.5 265.1 349.5 267.8C346.9 274.8 342.6 281.1 336.7 286.8C327.9 295.0 319.8 298.2 301.5 300.6C272.2 304.4 261.9 309.5 249.7 326.6C237.4 343.8 207.8 342.1 195.0 323.6C189.8 316.0 187.7 307.8 188.3 297.2C188.6 289.4 189.2 287.0 191.6 282.5C193.7 278.6 208.1 263.1 244.5 225.4C289.0 179.3 294.5 173.3 294.4 170.6C294.4 168.9 293.8 162.6 293.2 156.6C291.9 144.9 291.6 128.2 292.6 125.6C293.6 123.0 295.2 123.7 302.6 129.8C316.1 141.2 331.4 152.0 332.4 150.9C332.6 150.7 332.4 145.1 332.0 138.5C330.6 118.4 330.8 105.0 332.4 104.4C333.3 104.1 340.5 108.8 350.2 116.0C363.4 125.8 368.2 128.8 375.0 131.4C429.5 151.9 471.7 207.1 483.0 272.5C489.5 310.1 487.0 344.3 474.0 395.6C470.7 408.7 467.3 424.5 466.4 430.5C464.5 443.4 464.9 458.9 467.5 469.2C468.5 472.9 469.0 476.6 468.6 477.5C468.1 478.8 455.7 479.0 358.5 479.0C255.1 479.0 248.9 478.9 248.2 477.2Z"/></svg><div><strong>Chess de L</strong><small>Ajedrez, golpe a golpe</small></div></div>
+    <div class="anillos"><svg viewBox="0 0 84 84" aria-hidden="true"><circle class="pista" cx="42.0" cy="42.0" r="36"/><circle class="arco a-pc2" cx="42.0" cy="42.0" r="36" style="--l:226.19"/><circle class="pista" cx="42.0" cy="42.0" r="26.5"/><circle class="arco a-pc1" cx="42.0" cy="42.0" r="26.5" style="--l:166.50"/><circle class="pista" cx="42.0" cy="42.0" r="17"/><circle class="arco a-aa" cx="42.0" cy="42.0" r="17" style="--l:106.81"/></svg>
+      <div class="anillos-txt"><b>Tu avance</b><ul><li><i style="background:var(--c-aa)"></i>Aprende<span id="c-p-aa">0 %</span></li><li><i style="background:var(--c-pc1)"></i>Método PC1<span id="c-p-pc1">0 %</span></li><li><i style="background:var(--c-pc2)"></i>Método PC2<span id="c-p-pc2">0 %</span></li></ul></div></div>
+    <nav class="grupo" aria-label="Secciones">
+      <button class="app-choice" data-app="3" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Aprende Ajedrez<span class="ac-nivel">Desde cero</span></span><span class="ac-sub">218 lecciones en seis niveles</span></span><span class="ac-cifra">0</span></button>
+      <button class="app-choice active" data-app="1" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Método PC1<span class="ac-nivel">Avanzado</span></span><span class="ac-sub">1128 ejercicios tácticos</span></span><span class="ac-cifra">0</span></button>
+      <button class="app-choice" data-app="2" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Método PC2<span class="ac-nivel">Muy avanzado</span></span><span class="ac-sub">1000 ejercicios posicionales</span></span><span class="ac-cifra">0</span></button>
+    </nav>
+    <div class="grupo">
+      <button class="app-choice app-choice-id" data-app="id" type="button"><span class="ac-icono" aria-hidden="true"><span><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.2"/><path d="M11 12l8.5-8.5M16.5 6.5l2.5 2.5M14 9l2 2"/></svg></span></span><span class="ac-txt"><span class="ac-nombre">Mi ID</span><small id="mi-id-sub">Crea tu ID y sincroniza tus dispositivos</small></span><span></span></button>
     </div>
-    <div class="tema" id="tema" role="group" aria-label="Apariencia">
-      <button type="button" data-modo="claro" aria-pressed="false" title="Claro" aria-label="Apariencia: Claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v2.1M12 18.7v2.1M3.2 12h2.1M18.7 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5"/></svg><span class="sr">Claro</span></button>
-      <button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg><span class="sr">Oscuro</span></button>
-      <button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg><span class="sr">Sistema</span></button>
+    <div class="grupo fondos-grupo">
+      <div class="fondos-cab"><b>Fondo</b><span id="c-fondo-nombre"></span></div>
+      <div class="fondos-fila" id="c-fondos" role="radiogroup" aria-label="Fondo"></div>
     </div>
-    <button class="app-choice app-choice-id" data-app="id" type="button"><span>Mi ID<br><small id="mi-id-sub">Crea tu ID y sincroniza tus dispositivos</small></span></button>
-    <button class="app-choice" data-app="3" type="button"><span>Aprende Ajedrez<br><small>Temario</small></span></button>
-    <button class="app-choice active" data-app="1" type="button"><span>Método PC1 (Avanzado)<br><small>Ejercicios tácticos</small></span></button>
-    <button class="app-choice" data-app="2" type="button"><span>Método PC2 (Muy avanzado)<br><small>Ejercicios posicionales</small></span></button>
-    <button class="drawer-tuto" id="drawer-tuto" type="button">Ver tutorial</button>
-    <p class="drawer-note">El progreso de cada sección se conserva de forma independiente.</p>
+    <div class="drawer-pie">
+      <div class="tema" id="tema" role="group" aria-label="Apariencia">
+        <button type="button" data-modo="claro" aria-pressed="false" title="Claro" aria-label="Apariencia: Claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v2.1M12 18.7v2.1M3.2 12h2.1M18.7 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5"/></svg><span class="sr">Claro</span></button>
+        <button type="button" data-modo="oscuro" aria-pressed="false" title="Oscuro" aria-label="Apariencia: Oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A8.3 8.3 0 1 1 11 3.2a6.6 6.6 0 0 0 9.8 9.9z"/></svg><span class="sr">Oscuro</span></button>
+        <button type="button" data-modo="sistema" aria-pressed="false" title="Como el sistema" aria-label="Apariencia: Como el sistema"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.8" width="17.6" height="11.6" rx="1.7"/><path d="M8.6 19.6h6.8"/></svg><span class="sr">Sistema</span></button>
+      </div>
+      <button class="drawer-tuto" id="drawer-tuto" type="button">Ver tutorial</button>
+    </div>
   </aside>
 </div>
-<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=20261019-ligero3" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
-<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=20261019-ligero3" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-13" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-13" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
 <!-- Mi ID: crear, entrar, cambiar o salir del ID que sincroniza el avance de las tres secciones -->
 <section class="app-frame mi-id" id="app-frame-id" aria-label="Mi ID"><div class="mi-id-in" id="mi-id">
   <h1>Mi ID</h1>
+  <p class="mi-id-intro">Tu llave para llevar el avance de un dispositivo a otro.</p>
   <div class="mi-id-cuenta" id="mi-id-cuenta"></div>
 </div></section>
 <!-- Cada sección se carga la primera vez que se abre: al entrar solo se descarga y prepara la que se va a usar. -->
-<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=20261019-aa61" title="Aprende Ajedrez" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-13" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -386,7 +241,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     var bs=document.querySelectorAll('#tema button');
     for(var i=0;i<bs.length;i++) bs[i].setAttribute('aria-pressed', String(bs[i].getAttribute('data-modo')===modo));
     var m=document.querySelector('meta[name="theme-color"]');
-    if(m) m.setAttribute('content', oscuro?'#0F1411':'#ECEFE9');
+    if(m) m.setAttribute('content', oscuro?'#0E0D13':'#F5F5F8');
   }
   var bt=document.querySelectorAll('#tema button');
   for(var t=0;t<bt.length;t++){
@@ -612,15 +467,15 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 <div class="tuto" id="tuto" aria-hidden="true">
   <div class="tuto-velo"></div>
   <div class="tuto-foco" id="tuto-foco"></div>
-  <span class="tuto-ficha" id="tuto-ficha" aria-hidden="true">♞</span>
-  <span class="tuto-mano" id="tuto-mano" aria-hidden="true">👆</span>
+  <span class="tuto-ficha" id="tuto-ficha" aria-hidden="true"><svg viewBox="0 0 45 45"><path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="#fff" stroke="#1C1B22" stroke-width="1.5" stroke-linejoin="round"/><path d="M24 18c.4 2.9-5.5 7.4-8 9-3 2-2.8 4.3-5 4-1-.9 1.4-3 0-3-1 0 .2 1.2-1 2-1 0-4 1-4-4 0-2 6-12 6-12s1.9-1.9 2-3.5c-.7-1-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.8-2 2.5-3c1 0 1 3 1 3" fill="#fff" stroke="#1C1B22" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+  <span class="tuto-mano" id="tuto-mano" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M25 6.5c2.6 0 4.5 2 4.5 4.6V29l1.2-.4V24c0-2.4 1.9-4.2 4.2-4.2s4.2 1.8 4.2 4.2v4.3l.9-.2v-1.6c0-2.3 1.9-4.1 4.2-4.1s4.1 1.8 4.1 4.1v3.2l.6-.1c2.2-.2 4.1 1.6 4.1 3.8v10.4c0 9.2-7 15.7-16.4 15.7h-2.7c-6.2 0-10.6-2.8-13.9-7.7L12.8 38c-1.3-2-.8-4.6 1.2-5.9 1.9-1.3 4.4-.9 5.8.9l1.1 1.4V11.1c0-2.6 1.6-4.6 4.1-4.6z" fill="#FFFFFF" stroke="#1C1B22" stroke-width="2" stroke-linejoin="round"/><path d="M30.7 29v8M39.1 28.3v8.4M47.4 30.7v6.9" stroke="#1C1B22" stroke-width="1.8" stroke-linecap="round"/></svg></span>
   <section class="tuto-card abajo" id="tuto-card" role="dialog" aria-modal="false" aria-labelledby="tuto-titulo">
     <span class="tuto-paso" id="tuto-paso">Paso 1</span>
     <h3 id="tuto-titulo">Bienvenido</h3>
     <p id="tuto-texto"></p>
     <div class="tuto-puntos" id="tuto-puntos"></div>
     <div class="tuto-acciones">
-      <button class="tuto-cerrar" id="tuto-cerrar" type="button">Cerrar tutorial</button>
+      <button class="tuto-cerrar" id="tuto-cerrar" type="button">Saltar</button>
       <button class="tuto-atras" id="tuto-atras" type="button">Atrás</button>
       <button class="tuto-sig" id="tuto-sig" type="button">Siguiente</button>
     </div>
@@ -652,8 +507,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   var abierto=false,paso=0,reloj=null,vigia=null,estable=0;
 
   var PASOS_PC=[
-    {titulo:'Bienvenido al Método PC1 y PC2',texto:'Una escuela con lecciones y dos métodos de ajedrez en una sola app. En menos de un minuto te muestro qué tocar.',modo:'saludo'},
-    {titulo:'Elige tu método',texto:'Con este botón abres el menú y cambias entre Aprende Ajedrez (lecciones por niveles), el Método PC1 (Avanzado: ejercicios tácticos) y el Método PC2 (Muy avanzado: ejercicios posicionales).',padre:'menu-button',modo:'toque'},
+    {titulo:'Chess de L',texto:'Lecciones para empezar y dos métodos para entrenar, en una sola app. En menos de un minuto te enseño qué tocar.',modo:'saludo'},
+    {titulo:'Elige tu método',texto:'Este botón abre el menú. Ahí cambias entre Aprende Ajedrez (lecciones por niveles), el Método PC1 (Avanzado: ejercicios tácticos) y el Método PC2 (Muy avanzado: ejercicios posicionales), y ves cuánto llevas de cada uno.',padre:'menu-button',modo:'toque'},
     {titulo:'¿Quién juega?',texto:'Aquí ves el número del ejercicio, su dificultad y qué bando mueve: «Juegan: Blancas» o «Juegan: Negras».',app:'toplay',modo:'toque'},
     {titulo:'Juega sobre el tablero',texto:'Toca una de tus piezas y arrástrala, o toca la casilla de destino. Si es la jugada correcta, el rival responde solo.',app:'board',modo:'arrastre'},
     {titulo:'Más espacio',texto:'«Ocultar» esconde el encabezado de arriba para que el tablero tenga más espacio. «Mostrar» lo vuelve a poner.',app:'b-banner',modo:'toque'},
@@ -661,18 +516,18 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     {titulo:'Tus botones',texto:'💡 ilumina la pieza que debes mover, «Solución» reproduce la línea completa, «Girar» voltea el tablero, el parlante activa o silencia el sonido, el libro abre la explicación y el último botón comparte la imagen del ejercicio con su enlace, para que quien lo toque llegue directo a ese ejercicio.',app:'pc-fila-controles',modo:'toque'},
     {titulo:'Tu mascota',texto:'Te acompaña sobre el tablero y baila con su guitarra cuando resuelves un ejercicio. Con el botón de su carita, junto al regalo, eliges entre 11 mascotas o la quitas; también con doble toque sobre ella.',app:'pc-mascota',mascota:true,modo:'toque'},
     {titulo:'Tu entrenamiento',texto:'Aquí ves tu meta diaria, tu racha y el cuaderno de errores para repasar los ejercicios que te costaron.',app:'b-gift',modo:'toque'},
-    {titulo:'Mi ID',texto:'En el menú, «Mi ID» guarda tu avance en la nube. En otro dispositivo, entra con el mismo ID y recuperas todo.',padre:'menu-button',modo:'toque'},
-    {titulo:'¡Listo para entrenar!',texto:'Resuelve, repite y acelera. Puedes volver a ver esta guía desde el menú, en «Ver tutorial».',modo:'saludo',final:true}
+    {titulo:'Mi ID',texto:'En el menú, «Mi ID» guarda tu avance en la nube. En otro dispositivo entras con el mismo ID, o escaneas su código QR, y recuperas todo.',padre:'menu-button',modo:'toque'},
+    {titulo:'A entrenar',texto:'Resuelve, repite y gana velocidad. Esta guía queda en el menú, en «Ver tutorial».',modo:'saludo',final:true}
   ];
   /* Recorrido de Aprende Ajedrez (la primera sección): se usa cuando es la sección abierta. */
   var PASOS_AA=[
-    {titulo:'Bienvenido a Aprende Ajedrez',texto:'Aquí aprendes ajedrez desde cero. Cuando estés listo, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado) te esperan en el menú.',modo:'saludo'},
+    {titulo:'Aprende Ajedrez',texto:'Ajedrez desde la primera jugada. Cuando estés listo, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado) te esperan en el menú.',modo:'saludo'},
     {titulo:'El menú',texto:'Con este botón abres el menú y cambias entre Aprende Ajedrez, el Método PC1 (Avanzado) y el Método PC2 (Muy avanzado).',padre:'menu-button',modo:'toque'},
-    {titulo:'Tus pestañas',texto:'«Temario» reúne todas las lecciones, «Mis favoritos» guarda lo que marques con el corazón, «Repaso» te propone posiciones de lo que ya estudiaste para encontrar la jugada, y el botón de la carita, a la derecha, cambia tu mascota. Siempre quedan arriba, aunque bajes por la página.',app:'tabs',modo:'toque'},
+    {titulo:'Tus pestañas',texto:'«Temario» reúne las lecciones, «Mis favoritos» guarda lo que marques con el corazón y «Repaso» te propone posiciones de lo ya estudiado. La carita de la derecha cambia tu mascota.',app:'tabs',modo:'toque'},
     {titulo:'El temario',texto:'Toca un nivel para desplegar sus lecciones y toca una lección para abrirla. Cada lección avanza por pasos numerados: exploras, ves la demostración y resuelves en el tablero.',app:'aa-niveles',modo:'toque'},
     {titulo:'Continuar donde me quedé',texto:'Este botón te lleva directo a la lección y a la etapa donde te quedaste.',app:'aa-continuar-aprendiendo',modo:'toque'},
-    {titulo:'Mi ID',texto:'En el menú, «Mi ID» guarda tu avance en la nube. En otro dispositivo, entra con el mismo ID y recuperas todo.',padre:'menu-button',modo:'toque'},
-    {titulo:'¡A aprender!',texto:'Empieza por el Nivel I. Al abrir tu primera lección te mostraré sus botones. Puedes volver a ver esta guía desde el menú, en «Ver tutorial».',modo:'saludo',final:true}
+    {titulo:'Mi ID',texto:'En el menú, «Mi ID» guarda tu avance en la nube. En otro dispositivo entras con el mismo ID, o escaneas su código QR, y recuperas todo.',padre:'menu-button',modo:'toque'},
+    {titulo:'A aprender',texto:'Empieza por el Nivel I. Cuando abras tu primera lección te enseño sus botones. Esta guía queda en el menú, en «Ver tutorial».',modo:'saludo',final:true}
   ];
   var PASOS=PASOS_PC;
 
@@ -776,9 +631,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
     try{var f=frameActivo(),d=f&&f.contentDocument;if(d&&d.documentElement)col=getComputedStyle(d.documentElement).getPropertyValue('--dark').trim();}catch(e){}
     if(luz(col)==null)col=CIELO;
     var L=luz(col);
-    raiz.style.setProperty('--tuto-acento',col);
-    raiz.style.setProperty('--tuto-acento-txt',L>.4?'#16181b':'#fff');
-    raiz.style.setProperty('--tuto-etiqueta',L>.45?'var(--muted)':col);
+    var fa=frameActivo(),tono={'app-frame-3':'var(--c-aa-t)','app-frame-1':'var(--c-pc1-t)','app-frame-2':'var(--c-pc2-t)'}[fa&&fa.id]||'var(--c-acento-t)';
+    raiz.style.setProperty('--tuto-acento',tono);
+    raiz.style.setProperty('--tuto-acento-txt',tono);
   }
 
   function pintar(){
@@ -894,5 +749,6 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
   })();
 })();
 </script>
+<script src="c17/shell.js?v=8"></script>
 </body>
 </html>
