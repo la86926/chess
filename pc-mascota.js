@@ -164,7 +164,13 @@
   estilo.textContent = CSS;
   (document.head || document.documentElement).appendChild(estilo);
   precargar(actual());
-  MASCOTAS.forEach(function(m){ var i = new Image(); i.src = m.cara; });
+  /* las caras de la galería se piden cuando la página ya está quieta, no compiten con el tablero */
+  (function(){
+    function caras(){ MASCOTAS.forEach(function(m){ var i = new Image(); i.src = m.cara; }); }
+    function luego(){ if (window.requestIdleCallback) requestIdleCallback(caras, { timeout: 4000 }); else setTimeout(caras, 1500); }
+    if (document.readyState === 'complete') setTimeout(luego, 1200);
+    else window.addEventListener('load', function(){ setTimeout(luego, 1200); }, { once: true });
+  })();
 
   /* ---------- estado guardado ---------- */
   function leer(){

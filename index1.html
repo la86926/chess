@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- los ejercicios se piden desde el principio, junto con la página -->
+<link rel="preload" href="pc1-ejercicios.js?v=2" as="script">
 <script id="pc-backup-preload">
 (function(){
 'use strict';
@@ -115,7 +117,8 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 ::selection{background:var(--crest)}
 .texto-amigo{font-size: var(--txt-amigo-size);color: var(--muted);display: block;margin-top: 2px;font-weight: 400}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem clamp(.8rem,3vw,1.6rem);border-bottom:1px solid var(--line);position:static;top:0;backdrop-filter:blur(8px);z-index:30;max-width:1180px;margin-left:auto;margin-right:auto}
-.gift-btn{border:1px solid var(--gold);width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;font-size:1.25rem;line-height:1;flex:0 0 auto;transition:.2s;animation:giftPulse 2.4s ease-in-out infinite}
+.gift-btn{border:1px solid var(--gold);width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;font-size:1.25rem;line-height:1;flex:0 0 auto;transition:.2s;position:relative}
+.gift-btn::after{content:"";position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 0 0 2px rgba(226,182,95,.38);opacity:0;pointer-events:none;animation:giftPulse 2.4s ease-out infinite}
 .gift-btn:hover{transform:scale(1.1) rotate(-6deg)}
 .gift-box{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--gold);width:100%;max-width:400px;padding:2rem 1.6rem;text-align:center;transform:scale(.85);opacity:0;transition:transform .35s cubic-bezier(.2,1.2,.4,1), opacity .35s ease}
 .gift-bg.open .gift-box{transform:scale(1);opacity:1}
@@ -921,9 +924,10 @@ h1,h2,h3,h4{font-family:var(--serif)}
   transition:transform .2s,border-color .2s,background .2s
 }
 .gift-btn:hover{transform:translateY(-1px);border-color:var(--gold);background:var(--panel2)}
+/* onda del regalo: solo transform y opacity, así no recalcula estilos en cada fotograma */
 @keyframes giftPulse{
-  0%,100%{box-shadow:var(--luz-interna),0 0 0 0 rgba(226,182,95,.32)}
-  50%{box-shadow:var(--luz-interna),0 0 0 8px rgba(226,182,95,0)}
+  0%{opacity:.9;transform:scale(1)}
+  70%,100%{opacity:0;transform:scale(1.32)}
 }
 
 .exno{font-family:var(--serif);font-weight:600;letter-spacing:-.015em}
@@ -1827,7 +1831,7 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
   .workspace-shell{border-radius:0;border:0}
 }
 @media(prefers-reduced-motion:reduce){
-  .gift-btn,.gift-box .emoji{animation:none}
+  .gift-btn,.gift-btn::after,.gift-box .emoji{animation:none}
   .btn:hover,.pc-tema:hover,.error-item:hover{transform:none}
 }
 
@@ -4154,7 +4158,7 @@ const Chess = function (fen) {
 if (typeof window !== 'undefined') { window.Chess = Chess; }
 
 </script>
-<script src="pc1-ejercicios.js?v=1"></script>
+<script src="pc1-ejercicios.js?v=2"></script>
 <script>
 const PUZZLES = window.PC_EJERCICIOS;
 const LV={F:'Fácil',I:'Intermedio',A:'Avanzado'};
@@ -7846,6 +7850,22 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="pc-mascota.js?v=15"></script>
+<script src="pc-mascota.js?v=16"></script>
+<script id="pc-comentarios">
+/* Los comentarios del libro llegan después del tablero: no hacen falta para empezar a resolver. */
+window.pcComentariosListos=function(){
+  try{
+    var p=curr();
+    if(p&&$('ref-vs').textContent===p.w+' vs '+p.b)$('ref-full').textContent=traducirExplicacionLibro((p.full||'').trim());
+    var m=$('explain-modal');if(m&&m.classList.contains('open'))exRender();
+  }catch(e){}
+};
+(function(){
+  var ya=false;
+  function cargar(){if(ya)return;ya=true;var s=document.createElement('script');s.src='pc1-comentarios.js?v=1';s.async=true;document.body.appendChild(s);}
+  if(document.readyState==='complete')setTimeout(cargar,0);
+  else{addEventListener('load',function(){setTimeout(cargar,0);},{once:true});setTimeout(cargar,2500);}
+})();
+</script>
 </body>
 </html>

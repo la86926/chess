@@ -729,6 +729,9 @@ function installChangeWatchers(){
     if(t.closest('.app-choice[data-app="id"]'))return;
     if(t.closest('.app-choice')||t.closest('#tema button'))setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);
   },true);
+  // Cambio de sección que la propia página termina con su transición (chess17: el velo vuelve a
+  // lanzar el clic, que ya no es «de la persona»). Se sube igual, en cuanto la nube termina de aplicarse.
+  window.pcSyncSeccionElegida=()=>{if(currentRef)setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);};
   window.addEventListener('pagehide',()=>{
     if(currentRef&&!applyingRemote&&pendingScopes.size){clearTimeout(uploadTimer);pushPending();}
   });

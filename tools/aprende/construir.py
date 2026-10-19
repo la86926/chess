@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261019-aa56'
+VERSION = '20261019-aa57'
 
 
 class ErrorParche(Exception):
@@ -137,6 +137,26 @@ def parchear_copias(ruta):
 
 
 # ---------------------------------------------------------------------------
+def piel_c17(html):
+    """Solo en chess17 (tiene la carpeta c17/): Aprende Ajedrez lleva la misma piel que PC1.
+    Copia de index1.html las líneas de la piel para que las versiones nunca se desincronicen."""
+    if not (RAIZ / 'c17').is_dir():
+        return html
+    i1 = (RAIZ / 'index1.html').read_text(encoding='utf-8')
+    cab = i1[:i1.index('</head>')]
+    lineas = [l for l in cab.splitlines() if ('href="c17/' in l or 'src="c17/' in l) and 'rel="preload"' not in l]
+    precargas = [l for l in cab.splitlines() if 'rel="preload"' in l and 'c17/' in l]
+    if not lineas:
+        raise ErrorParche('index1.html no trae la piel c17')
+    html = parche(html, '<html lang="es">', '<html lang="es" data-piel data-seccion="aa">', nombre='piel: html')
+    if precargas:
+        html = parche(html, '<head>\n', '<head>\n' + '\n'.join(precargas) + '\n', nombre='piel: precargas')
+    m = re.search(r'<link rel="stylesheet" href="aa-app\.css\?v=[^"]*">\n', html)
+    if not m:
+        raise ErrorParche('No está la hoja aa-app.css')
+    return html[:m.end()] + '\n'.join(lineas) + '\n' + html[m.end():]
+
+
 def construir():
     i1 = (RAIZ / 'index1.html').read_text(encoding='utf-8')
     cuerpo = (AQUI / 'cuerpo.html').read_text(encoding='utf-8')
@@ -223,7 +243,19 @@ def construir():
     v = VERSION
     html = f'''<!DOCTYPE html>
 <html lang="es">
-<head><script id="pc-backup-preload">{preload}</script>
+<head>
+<!-- las lecciones y la app se piden desde el principio, junto con la página -->
+<link rel="preload" href="aa-app.css?v={v}" as="style">
+<link rel="preload" href="aa-catalogo.js?v={v}" as="script">
+<link rel="preload" href="aa-datos.js?v={v}" as="script">
+<link rel="preload" href="aa-lecciones-n1.js?v={v}" as="script">
+<link rel="preload" href="aa-lecciones-n2.js?v={v}" as="script">
+<link rel="preload" href="aa-lecciones-n3.js?v={v}" as="script">
+<link rel="preload" href="aa-lecciones-n4.js?v={v}" as="script">
+<link rel="preload" href="aa-lecciones-n5.js?v={v}" as="script">
+<link rel="preload" href="aa-lecciones-n6.js?v={v}" as="script">
+<link rel="preload" href="aa-app.js?v={v}" as="script">
+<script id="pc-backup-preload">{preload}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0F1411">
@@ -255,10 +287,11 @@ def construir():
 <script src="aa-lecciones-n5.js?v={v}"></script>
 <script src="aa-lecciones-n6.js?v={v}"></script>
 <script src="aa-app.js?v={v}"></script>
-<script src="pc-mascota.js?v=15"></script>
+<script src="pc-mascota.js?v=16"></script>
 </body>
 </html>
 '''
+    html = piel_c17(html)
     (RAIZ / 'index3.html').write_text(html, encoding='utf-8')
     return len(html)
 
