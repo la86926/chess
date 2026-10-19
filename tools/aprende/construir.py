@@ -200,15 +200,15 @@ def construir():
     logica = parche(logica, "const AUDIOS={\n  move:    new Audio('Move.mp3'),\n  capture: new Audio('Capture.mp3'),\n  error:   new Audio('Error.mp3')\n};",
                     "const AUDIOS={}; /* Aprende: sin sonido, no se descargan los audios */", nombre='sin audios')
     logica = parche(logica, "'pc_tab_ultimo_l1'", "'aa_tab_ultimo'", veces=2, nombre='pestaña')
-    # «Ocultar/Mostrar» del encabezado: en la Sección 1 empieza OCULTO (para no abrumar a quien
-    # empieza); si la persona elige «Mostrar», se respeta y viaja con su ID (clave aa_banner).
-    logica = parche(logica, "let bannerOculto=localStorage.getItem('aa_banner')==='1';",
+    # «Ocultar/Mostrar» del encabezado: empieza OCULTO, como en los métodos; la elección es de cada
+    # dispositivo (aa_banner no viaja con el ID).
+    logica = parche(logica, "let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* oculta por defecto: «Mostrar» queda listo */",
                     "let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* Sección 1: oculto por defecto */",
                     nombre='encabezado oculto por defecto')
     logica = parche(logica,
                     "$('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};",
                     "$('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};\n"
-                    "/* la elección llega desde otro dispositivo con el mismo ID */\n"
+                    "/* si se cambia en otra pestaña de este mismo dispositivo, se sigue */\n"
                     "window.addEventListener('storage',e=>{if(e&&e.key==='aa_banner'){const o=e.newValue!=='0';if(o!==bannerOculto){bannerOculto=o;aplicarBanner(o,true);}}});",
                     nombre='encabezado: seguir al ID')
     if re.search(r"['\"]wp_", logica):

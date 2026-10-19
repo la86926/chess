@@ -7064,7 +7064,7 @@ function aplicarBanner(oculto,animar){
 let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* Sección 1: oculto por defecto */
 aplicarBanner(bannerOculto);
 $('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};
-/* la elección llega desde otro dispositivo con el mismo ID */
+/* si se cambia en otra pestaña de este mismo dispositivo, se sigue */
 window.addEventListener('storage',e=>{if(e&&e.key==='aa_banner'){const o=e.newValue!=='0';if(o!==bannerOculto){bannerOculto=o;aplicarBanner(o,true);}}});
 
 </script>

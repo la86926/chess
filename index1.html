@@ -6804,7 +6804,7 @@ function aplicarBanner(oculto,animar){
     limpiar();
   };
 }
-let bannerOculto=localStorage.getItem('wp_banner')==='1';
+let bannerOculto=localStorage.getItem('wp_banner')!=='0'; /* oculta por defecto: «Mostrar» queda listo */
 aplicarBanner(bannerOculto);
 $('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('wp_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};
 

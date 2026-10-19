@@ -185,7 +185,7 @@
     }
 
     try{
-      bannerOculto=localStorage.getItem('wp_banner')==='1';
+      bannerOculto=localStorage.getItem('wp_banner')!=='0'; /* oculta por defecto; solo de este dispositivo */
       if(typeof aplicarBanner==='function') aplicarBanner(bannerOculto);
     }catch(e){}
     corregirBotonFlechas();

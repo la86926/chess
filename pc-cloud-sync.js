@@ -70,8 +70,11 @@ function randomCode(){
 }
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 
+// Ocultar/Mostrar la barra superior es una comodidad de cada dispositivo (en el móvil se quiere
+// una cosa y en la computadora otra): no viaja con el ID.
+const LOCAL_KEYS = ['wp_banner','aa_banner'];
 function isExcludedKey(key){
-  return !key || key===SYNC_CODE_KEY || key===CLIENT_KEY || key===DEVICE_MODE_KEY || key.indexOf('pc_cloud_sync_')===0;
+  return !key || key===SYNC_CODE_KEY || key===CLIENT_KEY || key===DEVICE_MODE_KEY || key.indexOf('pc_cloud_sync_')===0 || LOCAL_KEYS.indexOf(key)>=0;
 }
 function isAaKey(key){
   return !isExcludedKey(key) && key.indexOf('aa_')===0;
@@ -225,7 +228,7 @@ function injectBridge(frame){
     if(!/index[12]\.html$/i.test(ruta))return;
     const script=docu.createElement('script');
     script.id='pc-cloud-frame-bridge';
-    script.src=new URL('pc-frame-cloud-bridge.js',location.href).href+'?v=5';
+    script.src=new URL('pc-frame-cloud-bridge.js',location.href).href+'?v=6';
     docu.head.appendChild(script);
   }catch(e){}
 }
