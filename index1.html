@@ -3,7 +3,7 @@
 <head>
 <!-- la piel se pide desde el principio, en paralelo con la página -->
 <link rel="preload" href="c17/tokens.css?v=7" as="style">
-<link rel="preload" href="c17/piel.css?v=13" as="style">
+<link rel="preload" href="c17/piel.css?v=14" as="style">
 <link rel="preload" href="c17/piel.js?v=8" as="script">
 <link rel="preload" href="c17/fondos.js?v=5" as="script">
 <!-- los ejercicios se piden desde el principio, junto con la página -->
@@ -2003,7 +2003,7 @@ html[data-barra-anim="abre"] .boardhead{transition-delay:.2s}
 </style>
 <link rel="stylesheet" href="c17/fuentes.css?v=3">
 <link rel="stylesheet" href="c17/tokens.css?v=7">
-<link rel="stylesheet" href="c17/piel.css?v=13">
+<link rel="stylesheet" href="c17/piel.css?v=14">
 <script src="c17/piel.js?v=8" defer></script>
 <script src="c17/fondos.js?v=5"></script>
 </head>
@@ -6789,9 +6789,12 @@ function aplicarBanner(oculto,animar){
   const dy=ancla?yIni-ancla.getBoundingClientRect().top:0;
   // cuánto del encabezado tapaba ya el contenido al empezar (0 = nada; 1 = todo, como cuando estaba oculto)
   const fracIni=rEnc&&rEnc.height?Math.max(0,Math.min(1,(rEnc.bottom-yIni)/rEnc.height)):1;
-  const D=oculto?640:720,curva='cubic-bezier(.45,0,.2,1)',anims=[];
+  // tras interrumpir, si falta poco recorrido, la vuelta dura en proporción (nunca menos de 260 ms)
+  const Hcompleto=rEnc&&rEnc.height?rEnc.height:(ancla?Math.abs(dy):0);
+  const fraccion=habiaAnim&&Hcompleto?Math.min(1,Math.abs(dy)/Hcompleto):1;
+  const D=Math.max(260,Math.round((oculto?640:720)*fraccion)),curva='cubic-bezier(.45,0,.2,1)',anims=[];
   if(reducir){
-    anims.push(encabezado.animate([{opacity:opIni},{opacity:oculto?0:1}],{duration:220,easing:'ease-out',fill:'both'}));
+    anims.push(encabezado.animate([{opacity:opIni},{opacity:oculto?0:1}],{duration:oculto?120:220,easing:'ease-out',fill:'both'}));
     mover.forEach(e=>anims.push(e.animate([{opacity:.55},{opacity:1}],{duration:260,easing:'ease-out',fill:'backwards'})));
   }else{
     // persiana de verdad: el borde del contenido «enrolla» el encabezado. Lo que queda debajo del borde

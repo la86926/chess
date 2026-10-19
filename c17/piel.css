@@ -363,3 +363,5 @@ html[data-piel] .engine-banner-toggle::after{content:"";position:absolute;inset:
 /* iPhone/iPad: el texto nunca se reescala solo al cambiar el diseño (sin «zoom» al mostrar la barra)
    y un doble toque no acerca la página */
 html[data-piel]{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
+/* Aprende en móvil: la zona táctil de «Ocultar / Mostrar» llega a 44 px de alto */
+@media(max-width:480px){html[data-piel] .aa-app .engine-banner-toggle::after{top:-13px;bottom:-13px}}
