@@ -96,11 +96,17 @@
     if(!tabs||tabs.dataset.c17Desliza)return;
     tabs.dataset.c17Desliza='1';tabs.classList.add('c17-desliza');
     var p=document.createElement('span');p.className='c17-pildora';p.setAttribute('aria-hidden','true');tabs.insertBefore(p,tabs.firstChild);
+    /* si las pestañas estaban ocultas (barra plegada), la píldora se coloca de golpe al aparecer:
+       sin crecer desde cero, que se veía como un acercamiento */
+    var colocada=false;
     function mover(){
-      var a=tabs.querySelector('.tab.active');if(!a||!a.offsetWidth){p.style.opacity='0';return;}
+      var a=tabs.querySelector('.tab.active');if(!a||!a.offsetWidth){p.style.opacity='0';colocada=false;return;}
+      if(!colocada)p.style.transition='none';
       p.style.opacity='1';p.style.width=a.offsetWidth+'px';p.style.transform='translateX('+a.offsetLeft+'px)';
+      if(!colocada){void p.offsetWidth;p.style.transition='';colocada=true;}
     }
     new MutationObserver(mover).observe(tabs,{subtree:true,attributes:true,attributeFilter:['class']});
+    if(window.ResizeObserver)new ResizeObserver(mover).observe(tabs);
     window.addEventListener('resize',mover);
     requestAnimationFrame(mover);setTimeout(mover,400);
   }
