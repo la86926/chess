@@ -19,7 +19,7 @@
     {id:'f02',n:'Abismo',l:.28},
     {id:'f10',n:'Cordillera',l:.09}
   ];
-  var CLAVE='c17_fondo',PREDETERMINADO='f12',pedido='';
+  var CLAVE='c17_fondo',PREDETERMINADO='ninguno',pedido=''; /* sin fondo hasta que la persona elija uno */
   function leer(){var v=null;try{v=localStorage.getItem(CLAVE);}catch(e){}return v||PREDETERMINADO;}
   function datos(id){for(var i=0;i<LISTA.length;i++)if(LISTA[i].id===id)return LISTA[i];return null;}
   function aplicar(){

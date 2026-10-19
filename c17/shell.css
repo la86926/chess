@@ -254,7 +254,7 @@ html[data-fondo] .mi-id{background:transparent}
 .fondos-cab{display:flex;align-items:baseline;justify-content:space-between;padding:0 3px 10px}
 .fondos-cab b{font-weight:620;font-size:1rem;letter-spacing:-.012em}
 .fondos-cab span{font-size:.8rem;color:var(--c-tinta3)}
-.fondos-fila{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 3px;margin:-4px -3px;scroll-snap-type:x proximity}
+.fondos-fila{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:5px;margin:-5px;scroll-padding-inline:5px;scroll-snap-type:x proximity}
 .fondos-fila::-webkit-scrollbar{display:none}
 .fondo-op{flex:0 0 44px;width:44px;height:44px;padding:0;border:0;border-radius:13px;cursor:pointer;scroll-snap-align:start;background:var(--c-papel) center/cover no-repeat;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12);transition:transform .3s var(--c-mov),box-shadow .25s}
 .fondo-op:active{transform:scale(.92)}
