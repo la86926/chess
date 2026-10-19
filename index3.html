@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="es" data-piel data-seccion="aa">
 <head>
-<link rel="preload" href="c17/tokens.css?v=6" as="style">
-<link rel="preload" href="c17/piel.css?v=10" as="style">
+<link rel="preload" href="c17/tokens.css?v=7" as="style">
+<link rel="preload" href="c17/piel.css?v=11" as="style">
 <link rel="preload" href="c17/piel.js?v=7" as="script">
 <link rel="preload" href="c17/fondos.js?v=5" as="script">
 <!-- las lecciones y la app se piden desde el principio, junto con la página -->
-<link rel="preload" href="aa-app.css?v=20261019-aa61" as="style">
-<link rel="preload" href="aa-catalogo.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-datos.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-lecciones-n1.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-lecciones-n2.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-lecciones-n3.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-lecciones-n4.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-lecciones-n5.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-lecciones-n6.js?v=20261019-aa61" as="script">
-<link rel="preload" href="aa-app.js?v=20261019-aa61" as="script">
+<link rel="preload" href="aa-app.css?v=20261019-aa62" as="style">
+<link rel="preload" href="aa-catalogo.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-datos.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-lecciones-n1.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-lecciones-n2.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-lecciones-n3.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-lecciones-n4.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-lecciones-n5.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-lecciones-n6.js?v=20261019-aa62" as="script">
+<link rel="preload" href="aa-app.js?v=20261019-aa62" as="script">
 <link rel="preload" href="pc-compartir.js?v=3" as="script">
-<link rel="preload" href="pc-mascota.js?v=17" as="script">
+<link rel="preload" href="pc-mascota.js?v=18" as="script">
 <script id="pc-backup-preload">
 (function(){
 'use strict';
@@ -1720,10 +1720,14 @@ html[data-modo="claro"]{--verde-ok:#2C8A4F;--verde-ok-tinte:rgba(44,138,79,.12);
 .pc-perso-colores.bloqueado .pc-velo-bloqueo{display:block}
 
 html[data-enmarcado="si"] .topbar{padding-left:62px}
-html[data-enmarcado="si"][data-barra="oculta"] .boardhead{padding-left:58px}
+/* con la barra plegada, la fila del ejercicio deja sitio al botón de menú (izquierda) y al de la mascota
+   (derecha), por igual a ambos lados para que «Ocultar/Mostrar» siga centrado; en escritorio no hace falta */
+@media(max-width:1023px){
+  html[data-enmarcado="si"][data-barra="oculta"] .boardhead{padding-left:58px;padding-right:58px}
+}
 @media(max-width:480px){
   html[data-enmarcado="si"] .topbar{padding-left:56px}
-  html[data-enmarcado="si"][data-barra="oculta"] .boardhead{padding-left:52px}
+  html[data-enmarcado="si"][data-barra="oculta"] .boardhead{padding-left:52px;padding-right:52px}
 }
 
 @media (pointer:coarse){
@@ -2000,12 +2004,15 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
 @media(max-width:600px){.boardhead-center{align-self:start}}
 .engine-banner-toggle,.engine-banner-toggle:hover,.engine-banner-toggle[aria-pressed]{color:var(--gold);border-color:var(--gold);background:var(--tinte-oro)}
 header.topbar.topbar-anim{overflow:hidden;will-change:height,opacity,transform}
-.boardhead{transition:padding-left .64s cubic-bezier(.45,0,.2,1)}
+/* el hueco del botón de menú solo se anima durante la persiana (al cargar o con movimiento reducido, sin animación):
+   al plegar se aparta pronto, antes de que el título suba; al desplegar espera a que la barra haya bajado */
+html[data-barra-anim] .boardhead{transition:padding-left .42s cubic-bezier(.3,0,.2,1),padding-right .42s cubic-bezier(.3,0,.2,1)}
+html[data-barra-anim="abre"] .boardhead{transition-delay:.2s}
 </style>
-<link rel="stylesheet" href="aa-app.css?v=20261019-aa61">
+<link rel="stylesheet" href="aa-app.css?v=20261019-aa62">
 <link rel="stylesheet" href="c17/fuentes.css?v=3">
-<link rel="stylesheet" href="c17/tokens.css?v=6">
-<link rel="stylesheet" href="c17/piel.css?v=10">
+<link rel="stylesheet" href="c17/tokens.css?v=7">
+<link rel="stylesheet" href="c17/piel.css?v=11">
 <script src="c17/piel.js?v=7" defer></script>
 <script src="c17/fondos.js?v=5"></script>
 </head>
@@ -7001,7 +7008,7 @@ function aplicarBanner(oculto,animar){
   // si estaba a medio animar, parte desde donde va (sin saltos)
   let desde=null;
   if(bannerAnim){const cs=getComputedStyle(encabezado);desde={};props.forEach(k=>desde[k]=cs[k]);bannerAnim.cancel();bannerAnim=null;}
-  if(!animar||reducir||!encabezado.animate){encabezado.classList.remove('topbar-anim');encabezado.style.display=oculto?'none':'';return;}
+  if(!animar||reducir||!encabezado.animate){encabezado.classList.remove('topbar-anim');document.documentElement.removeAttribute('data-barra-anim');encabezado.style.display=oculto?'none':'';return;}
   encabezado.style.display='';
   const cs=getComputedStyle(encabezado);
   const lleno={height:cs.height,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom,marginTop:cs.marginTop,marginBottom:cs.marginBottom,borderBottomWidth:cs.borderBottomWidth,opacity:'1',transform:'translateY(0px)'};
@@ -7013,9 +7020,10 @@ function aplicarBanner(oculto,animar){
   const cuadros=desde?[desde,oculto?vacio:lleno]:oculto?[lleno,Object.assign({offset:.42},medio),vacio]:[vacio,Object.assign({offset:.5},medio),lleno];
   bannerAnim=encabezado.animate(cuadros,{duration:oculto?640:720,easing:'cubic-bezier(.45,0,.2,1)'});
   // el encabezado de la app se acomoda al mismo tiempo que se pliega la barra
-  setTimeout(()=>document.documentElement.setAttribute('data-barra',oculto?'oculta':'visible'),0);
+  const raizB=document.documentElement;raizB.setAttribute('data-barra-anim',oculto?'cierra':'abre');
+  setTimeout(()=>raizB.setAttribute('data-barra',oculto?'oculta':'visible'),0);
   const esta=bannerAnim;
-  esta.onfinish=()=>{if(bannerAnim!==esta)return;bannerAnim=null;encabezado.classList.remove('topbar-anim');if(oculto)encabezado.style.display='none';};
+  esta.onfinish=()=>{if(bannerAnim!==esta)return;bannerAnim=null;encabezado.classList.remove('topbar-anim');if(oculto)encabezado.style.display='none';raizB.removeAttribute('data-barra-anim');};
 }
 let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* Sección 1: oculto por defecto */
 aplicarBanner(bannerOculto);
@@ -7991,15 +7999,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="aa-catalogo.js?v=20261019-aa61"></script>
-<script src="aa-datos.js?v=20261019-aa61"></script>
-<script src="aa-lecciones-n1.js?v=20261019-aa61"></script>
-<script src="aa-lecciones-n2.js?v=20261019-aa61"></script>
-<script src="aa-lecciones-n3.js?v=20261019-aa61"></script>
-<script src="aa-lecciones-n4.js?v=20261019-aa61"></script>
-<script src="aa-lecciones-n5.js?v=20261019-aa61"></script>
-<script src="aa-lecciones-n6.js?v=20261019-aa61"></script>
-<script src="aa-app.js?v=20261019-aa61"></script>
-<script src="pc-mascota.js?v=17"></script>
+<script src="aa-catalogo.js?v=20261019-aa62"></script>
+<script src="aa-datos.js?v=20261019-aa62"></script>
+<script src="aa-lecciones-n1.js?v=20261019-aa62"></script>
+<script src="aa-lecciones-n2.js?v=20261019-aa62"></script>
+<script src="aa-lecciones-n3.js?v=20261019-aa62"></script>
+<script src="aa-lecciones-n4.js?v=20261019-aa62"></script>
+<script src="aa-lecciones-n5.js?v=20261019-aa62"></script>
+<script src="aa-lecciones-n6.js?v=20261019-aa62"></script>
+<script src="aa-app.js?v=20261019-aa62"></script>
+<script src="pc-mascota.js?v=18"></script>
 </body>
 </html>

@@ -230,6 +230,11 @@
     var derecha = p.cab && visible(p.cab.querySelector('.boardhead-right'));
     var borde = derecha ? Math.min(derecha.left - 14, rm.right - 10) : rm.right - 12;
     var minimo = centro ? centro.right + 10 : rm.left + 8;
+    /* con la barra plegada, el botón de la mascota queda fijo arriba a la derecha: la mascota no se mete debajo */
+    if (boton && boton.style.position === 'fixed') {
+      var rbt = boton.getBoundingClientRect();
+      if (rbt.width && rm.top - alto < rbt.bottom + 4) borde = Math.min(borde, rbt.left - 8);
+    }
     var x = Math.max(minimo, borde - ancho);
     el.style.width = ancho + 'px';
     el.style.height = alto + 'px';
@@ -375,6 +380,12 @@
 
   /* ---------- botón arriba a la derecha ---------- */
   function regalo(){ return document.getElementById('b-gift'); }
+  /* al cambiar de sitio (barra plegada o desplegada) el botón entra con suavidad, no de golpe */
+  function aparecerBoton(){
+    if (!boton || !boton.animate) return;
+    try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+    try { boton.animate([{ opacity: 0, transform: 'scale(.86)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 340, easing: 'cubic-bezier(.2,.8,.2,1)' }); } catch (e) {}
+  }
   function colocarBoton(){
     if (!boton) return;
     var barra = MODO_TUTOR && document.getElementById('aa-barra-fija');
@@ -399,7 +410,7 @@
     var bar = document.querySelector('.topbar');
     if (g && bar) {
       if (getComputedStyle(bar).position === 'static') bar.style.position = 'relative';
-      if (boton.parentElement !== bar) bar.appendChild(boton);
+      if (boton.parentElement !== bar) { var vieneDeFuera = boton.parentElement === document.body; bar.appendChild(boton); if (vieneDeFuera) aparecerBoton(); }
       var rb = bar.getBoundingClientRect();
       boton.style.position = 'absolute';
       var gap = Math.max(8, Math.round(g.width * .25));
@@ -409,7 +420,7 @@
       boton.style.top = Math.round(g.top - rb.top) + 'px';
       boton.style.right = '';
     } else {
-      if (boton.parentElement !== document.body) document.body.appendChild(boton);
+      if (boton.parentElement !== document.body) { document.body.appendChild(boton); aparecerBoton(); }
       boton.style.position = 'fixed';
       boton.style.left = '';
       boton.style.right = '12px';

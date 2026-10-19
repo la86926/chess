@@ -159,6 +159,8 @@ html[data-modo="oscuro"] .mi-id-btn[data-modo="crear"]{background:color-mix(in s
 .mi-id-usuario>div{position:relative;z-index:1}
 .c-pase-cab{display:flex;align-items:center;gap:9px;font-weight:620;font-size:.9rem;letter-spacing:-.01em;margin-bottom:26px}
 .c-pase-cab .c17-logo{width:26px;height:26px;flex:0 0 26px}
+/* en la tarjeta del pase el fondo va sin oscurecer, como la tarjeta misma */
+.mi-id-usuario .c17-logo::before{filter:none!important}
 .mi-id-etq{margin:0!important;font-size:.78rem!important;font-weight:600;letter-spacing:0;text-transform:none;color:rgba(28,27,34,.62)!important;display:block!important}
 .mi-id-usuario strong{display:block;font-weight:650;font-size:clamp(1.9rem,9vw,2.5rem);letter-spacing:-.035em;line-height:1.05;word-break:break-all;margin:2px 0 6px}
 .mi-id-usuario small{display:block;color:rgba(28,27,34,.7);font-size:.86rem}
@@ -281,6 +283,7 @@ html[data-fondo] .mi-id-form,html[data-fondo] .c-copiar,html[data-fondo] .mi-id-
 .c-cambio.sin-titulo div{opacity:0!important;transform:translateY(-6px)!important;transition:opacity .16s,transform .3s var(--c-mov)!important}
 .c-cambio.cierra{transition:opacity .24s var(--c-suave)}
 @media(max-width:360px){
+  .app-choice-id .ac-icono span{width:30px;height:30px}.app-choice-id .ac-icono span svg{width:18px;height:18px}
   .app-choice{grid-template-columns:30px 1fr;column-gap:10px}
   .ac-icono,.ac-icono svg{width:30px;height:30px}
   .ac-nombre{flex-wrap:wrap;gap:0 6px}

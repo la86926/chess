@@ -335,7 +335,6 @@ html[data-piel] .aa-fila-nav .btn.aa-nav-lec.aa-listo{
   color:#fff!important;border:2.5px solid transparent!important}
 html[data-piel] .aa-app .aa-etapa.activa i{color:var(--aa-tema-txt)!important}
 html[data-piel] .aa-app .aa-eyebrow{color:var(--aa-tema-txt)!important}
-html[data-piel] .aa-app .engine-banner-toggle[aria-pressed="true"]{background:color-mix(in srgb,var(--acento-tema,#53707F) 16%,transparent)!important;color:var(--aa-tema-txt)!important}
 
 /* =================== Ronda 3 del árbitro =================== */
 /* etapa activa que ya está hecha: número claro sobre el color del tema */
@@ -355,3 +354,6 @@ html[data-piel] .gift-btn::after{display:none!important}
 
 /* logo (caballo blanco sobre negro): las esquinas siguen las del logo; en modo oscuro, un filo de luz lo separa del fondo */
 html[data-piel] .hdr-marca .home-icon .crest.c17-logo{filter:none!important;object-fit:initial}
+@media(max-width:360px){html[data-piel] .aa-app .aa-eyebrow{font-size:.74rem!important}}
+/* «Ocultar / Mostrar» en móvil: un punto más pequeño, igual en las tres secciones */
+@media(max-width:480px){html[data-piel] .engine-banner-toggle,html[data-piel] .boardhead-center .engine-banner-toggle{font-size:.66rem!important;padding:.22rem .52rem!important;letter-spacing:.005em}}

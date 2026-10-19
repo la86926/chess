@@ -675,7 +675,7 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
     grid-template-areas:"tab head" "tab ley" "tab tutor" "tab nav" "tab resto";grid-template-rows:auto auto auto auto 1fr;
     column-gap:clamp(18px,2.4vw,34px);align-items:start;justify-content:center}
   .aa-app .boardcol>*{grid-column:2}
-  .aa-app .aa-boardhead{grid-area:head;margin:0;padding-top:4px}
+  .aa-app .aa-boardhead{grid-area:head;margin:0;padding-top:4px;--aa-bh-pt:4px}
   .aa-app .aa-tablero-fila{grid-area:tab;grid-column:1;width:calc(100dvh - 104px + 50px);max-width:min(780px,58vw);min-width:380px;margin:0}
   .aa-app .aa-leyenda,.aa-app .aa-leyenda[hidden]{grid-area:ley;max-width:none;margin:.5rem 0 0}
   .aa-app .aa-leyenda .aa-ley:first-child{margin-left:0}
@@ -851,7 +851,6 @@ html:not([data-modo="claro"]) .aa-app .aa-fv-mini.peligro{color:#ff7a6e}
 .e-completada .aa-fl-est i,.aa-fl-est.e-completada i{background:var(--aa-tema);color:var(--aa-tema-ink);border-color:transparent}
 .e-iniciada .aa-fl-est i,.aa-fl-est.e-iniciada i{border-color:var(--aa-tema);color:var(--aa-tema-txt)}
 .aa-ruta li.hecha button{color:var(--aa-tema-txt)}
-.aa-app .engine-banner-toggle[aria-pressed="true"]{color:var(--aa-tema-txt);border-color:var(--aa-tema);background:color-mix(in srgb,var(--aa-tema) 13%,transparent)}
 .aa-accion.principal{background:var(--aa-tema);border-color:var(--aa-tema);color:var(--aa-tema-ink)}
 .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:color-mix(in srgb,var(--aa-tema) 55%,#fff);--aa-oro2:color-mix(in srgb,var(--aa-tema) 22%,#fff)}
 html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:color-mix(in srgb,var(--aa-tema) 60%,#fff)}
@@ -914,3 +913,14 @@ html[data-modo="oscuro"] .aa-app #board .sq.aa-latido{--aa-lt:242,190,50}
 @media (prefers-reduced-motion:reduce){.aa-app #board .sq.aa-latido::before{animation:none;background:rgba(var(--aa-lt),.22);box-shadow:inset 0 0 0 4px rgba(var(--aa-lt),1),0 0 12px 2px rgba(var(--aa-lt),.45)}}
 /* mientras una casilla late, las demás mencionadas se atenúan para que se note cuál tocaste */
 .aa-app #board.aa-con-latido .sq.aa-mencion:not(.aa-latido)::before{animation:none;background:rgba(138,84,250,.12);box-shadow:inset 0 0 0 2px rgba(112,56,230,.3)}
+
+/* «Ocultar / Mostrar» en Aprende Ajedrez: igual que en los métodos, centrado arriba, a la altura de
+   «Nivel · Lección»; el texto de la lección nunca pasa por debajo del botón */
+.aa-app .aa-boardhead{position:relative}
+.aa-app .aa-boardhead .boardhead-center{position:absolute;left:50%;top:calc(var(--aa-bh-pt,0px) + .6rem);transform:translate(-50%,-50%);padding:0;margin:0;z-index:2;line-height:0}
+/* la columna de la lección es el encabezado menos el corazón (≈52 px): su mitad menos 14 px deja 8 px antes del botón */
+.aa-app .aa-eyebrow{max-width:calc(50% - 14px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* con la barra plegada, las pestañas ya quedan a la derecha del botón de menú: la lección no necesita apartarse */
+html[data-enmarcado="si"][data-barra="oculta"] .aa-app .aa-boardhead{padding-left:0!important;padding-right:0!important}
+@media(max-width:360px){.aa-app .aa-eyebrow{font-size:.74rem}}
+@media(max-width:360px){.aa-app .aa-boardhead .boardhead-center{top:calc(var(--aa-bh-pt,0px) + .5rem)}}
