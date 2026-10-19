@@ -1993,7 +1993,12 @@ function arrancar(){
   try{
     if(u.modo==='leccion'&&u.leccion&&catalogoDe(u.leccion))abrirLeccion(u.leccion,{etapa:u.etapa||undefined,paso:u.paso,jugadas:u.jugadas,restaurando:true,auto:u.auto});
     else{A.vistaAuto=true;pestana('levels');}
-  }finally{A.sinGuardarUltimo=false;}
+  }finally{
+    A.sinGuardarUltimo=false;
+    /* listo (aunque algo fallara al restaurar): el contenedor espera esta señal antes de retirar su velo */
+    if(window.AAApp)window.AAApp.listo=true;
+    document.body.classList.add('aa-arrancada');
+  }
   var visto=false;try{visto=localStorage.getItem('aa_tour_visto_v1')==='1';}catch(e){}
   if(!visto){
     /* espera a que la sección esté visible (está dentro de un marco del menú) */
@@ -2005,9 +2010,6 @@ function arrancar(){
       if(document.visibilityState==='visible'&&boardEl.getBoundingClientRect().width>0&&!document.querySelector('.aa-fv-fondo.open')){clearInterval(vigia);setTimeout(abrirTour,500);}
     },600);
   }
-  /* listo: el contenedor espera esta señal antes de retirar su velo */
-  if(window.AAApp)window.AAApp.listo=true;
-  document.body.classList.add('aa-arrancada');
 }
 var bGuia=document.createElement('button');bGuia.type='button';bGuia.className='btn';bGuia.textContent='Ver el recorrido de nuevo';bGuia.onclick=abrirTour;
 var guia=el('v-guide').querySelector('.reading');if(guia)guia.appendChild(bGuia);
