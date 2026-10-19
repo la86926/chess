@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261018-aa54'
+VERSION = '20261019-aa55'
 
 
 class ErrorParche(Exception):
@@ -254,7 +254,6 @@ def construir():
 <script src="aa-lecciones-n5.js?v={v}"></script>
 <script src="aa-lecciones-n6.js?v={v}"></script>
 <script src="aa-app.js?v={v}"></script>
-<script src="aa-voz.js?v={v}"></script>
 <script src="pc-mascota.js?v=15"></script>
 </body>
 </html>

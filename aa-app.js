@@ -698,8 +698,6 @@ function programarAuto(ms,accion){
   A.autoT=setTimeout(function esperar(){
     if(!A.auto||A.id!==id||A.etapa!==etapa||A.paso!==paso){A.autoT=null;pintarCuenta(0);return;}
     if(!leccionALaVista()){A.autoT=setTimeout(esperar,700);return;}
-    /* si el tutor todavía está leyendo en voz alta, se espera a que termine */
-    if(window.aaVoz&&window.aaVoz.hablando()){A.autoT=setTimeout(esperar,400);return;}
     A.autoT=null;pintarCuenta(0);accion();
   },ms);
 }
@@ -1935,7 +1933,7 @@ var TOUR=[
   {t:'Mueve en el tablero',x:'Cuando tu tutor diga «Mueve en el tablero», arrastra la pieza o tócala y luego toca la casilla.',sel:'#board',arrastre:true},
   {t:'Tu tutor',x:'La mascota te explica cada paso y la lección avanza sola. Con el botón de su carita, arriba a la derecha, eliges otra mascota.',sel:'#aa-tutor'},
   {t:'Pausa y avanza',x:'«Pausar» detiene la lección, y las demás también, hasta que toques «Reproducir». Con ‹ y › pasas al número anterior o al siguiente. Al terminar la lección, el botón de la lección siguiente se ilumina.',sel:'#aa-controles'},
-  {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio. La bocina lee en voz alta lo que dice tu tutor; tócala para silenciarla.',sel:'#aa-fila-nav-izq'},
+  {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio.',sel:'#aa-fila-nav-izq'},
   {t:'Otras lecciones',x:'Aquí pasas a la lección anterior o a la siguiente.',sel:'.aa-fila-nav-der'},
   {t:'Guarda tus favoritos',x:'El corazón guarda el ítem que estás viendo (nivel, lección y número) en una o varias carpetas. Desde Mis favoritos vuelves justo a ese ítem.',sel:'#aa-corazon'},
   {t:'Siempre a mano',x:'Las pestañas quedan siempre arriba. «Mi lección» te devuelve a tu lección tal como la dejaste; «Temario», a la lista.',sel:'#tabs'},

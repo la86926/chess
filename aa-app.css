@@ -864,24 +864,6 @@ html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:color-mi
 }
 .aa-cuenta,#aa-cuenta{background:var(--aa-tema)}
 
-/* Bocina de la lectura en voz alta (entre «Solución» y «Compartir») */
-.aa-btn-voz svg{width:21px;height:21px}
-.aa-btn-voz[aria-pressed="true"]{color:var(--aa-tema-txt)}
-.aa-btn-voz.aa-voz-off{color:var(--muted)}
-/* con la bocina, la fila lleva un botón más: en teléfonos se compacta para que todo quepa */
-@media (max-width:430px){
-  .aa-app .aa-fila-nav,.aa-app .aa-fila-nav-der,.aa-app .aa-fila-nav-izq{gap:.25rem}
-  .aa-app .aa-fila-nav .btn.aa-btn-icono,.aa-app .aa-fila-nav .btn.aa-btn-historial,.aa-app .aa-fila-nav .btn.aa-btn-sol,.aa-app .aa-fila-nav .btn.aa-btn-compartir{width:38px;min-width:38px;height:38px;min-height:38px;padding:0}
-  .aa-app .aa-fila-nav .btn.aa-btn-sol .aa-sol-txt{display:none}
-  .aa-app .aa-fila-nav .btn.aa-nav-lec{height:38px;min-height:38px;min-width:0;padding:0 .42rem}
-  .aa-app .aa-nav-lec span{font-size:.72rem}
-  .aa-app .aa-btn-voz svg{width:19px;height:19px}
-}
-@media (max-width:350px){
-  .aa-app .aa-fila-nav .btn.aa-btn-icono,.aa-app .aa-fila-nav .btn.aa-btn-historial,.aa-app .aa-fila-nav .btn.aa-btn-sol,.aa-app .aa-fila-nav .btn.aa-btn-compartir{width:33px;min-width:33px;height:34px;min-height:34px}
-  .aa-app .aa-fila-nav .btn.aa-nav-lec{width:40px;padding:0}
-  .aa-app .aa-nav-lec span{display:none}
-}
 /* el anillo del ítem actual y su onda de luz también toman el color del tema */
 .aa-app .aa-etapa.activa::after{border-color:color-mix(in srgb,var(--aa-tema) 85%,#fff)}
 @keyframes aaLuciernaga2{
