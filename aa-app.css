@@ -872,3 +872,16 @@ html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:color-mi
 @media (prefers-reduced-motion:reduce){
   .aa-app .aa-etapa.activa i{box-shadow:0 0 0 2px var(--panel2,#fff),0 0 0 4px var(--aa-tema),0 0 10px 4px color-mix(in srgb,var(--aa-tema) 45%,transparent)}
 }
+
+/* Teléfonos de 320 px: la fila de botones de la lección cabe sin desbordar
+   (las lecciones siguiente y anterior muestran solo su flecha; el nombre queda en aria-label) */
+@media (max-width:359px){
+  .aa-app .aa-fila-nav,.aa-app .aa-fila-nav-der,.aa-app .aa-fila-nav-izq{gap:.25rem}
+  .aa-app .aa-fila-nav .btn.aa-btn-icono,.aa-app .aa-fila-nav .btn.aa-btn-historial,.aa-app .aa-fila-nav .btn.aa-btn-sol,.aa-app .aa-fila-nav .btn.aa-btn-compartir{width:36px;min-width:36px;height:36px;min-height:36px;padding:0}
+  .aa-app .aa-fila-nav .btn.aa-btn-sol .aa-sol-txt{display:none}
+  .aa-app .aa-fila-nav .btn.aa-nav-lec{width:44px;min-width:44px;height:36px;min-height:36px;padding:0}
+  .aa-app .aa-nav-lec span{display:none}
+  .aa-titulo{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+}
+/* «Reproducir» cabe completo en el botón de la lección */
+.aa-app .aa-ctrl-play{min-width:8.4em}

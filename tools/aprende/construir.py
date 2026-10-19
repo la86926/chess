@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261019-aa55'
+VERSION = '20261019-aa56'
 
 
 class ErrorParche(Exception):
@@ -147,7 +147,7 @@ def construir():
     _, tema = script_con(i1, "r.setAttribute('data-tablero', g('pc_tablero_1')||'cielo');")
     estilos_extra = ''.join(estilo_id(i1, x) for x in ('android7-compat', 'pc-fila-controles-css', 'pc-ajustes-cabecera-css'))
     _, chessjs = script_con(i1, 'const Chess = function (fen) {')
-    _, logica = script_con(i1, 'const PUZZLES = [')
+    _, logica = script_con(i1, 'const PUZZLES = ')
     _, compat = script_con(i1, 'function squareElements(){')
     _, atras = script_con(i1, 'function pcCloseOpenWindows(){')
     _, apariencia = script_con(i1, "var PC_ID='1';")
@@ -165,8 +165,9 @@ def construir():
 
     # El libro de ejercicios se reemplaza por una posición neutra: las lecciones
     # cargan sus propias posiciones (aa-lecciones-*.js).
-    ini = logica.find('const PUZZLES = [')
-    fin = logica.find('];', ini) + 2
+    ini = logica.find('const PUZZLES = ')
+    # index1 lee sus ejercicios de pc1-ejercicios.js («const PUZZLES = window.PC_EJERCICIOS;»)
+    fin = (logica.find('];', ini) + 2) if logica.startswith('const PUZZLES = [', ini) else (logica.find(';', ini) + 1)
     neutra = ('const PUZZLES = [{"n":0,"lv":"F","fen":"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",'
               '"o":"w","ln":[],"u":[],"w":"","b":"","ev":"","tg":[],"v":0,"full":""}];')
     logica = logica[:ini] + neutra + logica[fin:]

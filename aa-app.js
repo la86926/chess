@@ -156,20 +156,6 @@ function pintarCapa(animar){
       M.map(function(m){return svgMarca(m,animar);}).join('')+F.map(function(f,i){return svgFlecha(f,i,animar);}).join('');
     boardEl.appendChild(svg);
   }
-  pintarLeyenda();
-}
-function pintarLeyenda(){
-  var cont=el('aa-leyenda');if(!cont)return;
-  var tipos={},marcas={};
-  (A.capa.flechas||[]).forEach(function(f){tipos[SENAL[f[2]]?f[2]:'mov']=1;});
-  (A.capa.marcas||[]).forEach(function(m){marcas[MARCA[m[1]]?m[1]:'clave']=1;});
-  /* lo mínimo: sin las señales que se entienden solas (jugada, casilla clave, jaque) y como mucho tres */
-  delete tipos.mov;delete marcas.clave;delete marcas.jaque;
-  var h='',n=0;
-  Object.keys(tipos).forEach(function(t){if(++n>3)return;h+='<span class="aa-ley"><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="22" y2="5" stroke="'+SENAL[t].c+'" stroke-width="'+(SENAL[t].w*14)+'"'+(SENAL[t].d?' stroke-dasharray="'+SENAL[t].d.split(' ').map(function(x){return x*14;}).join(' ')+'" stroke-linecap="round"':'')+'/><polygon points="29,5 21,1 21,9" fill="'+SENAL[t].c+'"/></svg>'+SENAL[t].n+'</span>';});
-  Object.keys(marcas).forEach(function(t){if(++n>3)return;h+='<span class="aa-ley"><i class="aa-ley-marca t-'+t+'">'+esc(MARCA[t].g)+'</i>'+MARCA[t].n+'</span>';});
-  /* la fila de la leyenda siempre ocupa su lugar (vacía o no): así el globo del tutor no se mueve */
-  cont.innerHTML=h;cont.hidden=false;cont.classList.toggle('vacia',!h);
 }
 function fijarCapa(flechas,marcas,animar){A.capa={flechas:(flechas||[]).slice(),marcas:(marcas||[]).slice()};pintarCapa(animar);}
 function limpiarCapa(){A.capaPista=false;fijarCapa([],[]);}
