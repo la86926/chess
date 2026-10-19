@@ -438,14 +438,27 @@ function pintarRuta(){
 }
 el('aa-ruta').addEventListener('click',function(e){var b=e.target.closest('[data-etapa]');if(b)irAEtapa(b.dataset.etapa);});
 
+/* ---- Pausa permanente ----
+   «Pausar» deja detenidas TODAS las lecciones (también las que se abran después, en cualquier nivel)
+   hasta que la persona toque «Reproducir». Se guarda como clave «aa_», así viaja con su ID. */
+var CLAVE_PAUSA='aa_pausa_fija_v1';
+function pausaFija(){try{return localStorage.getItem(CLAVE_PAUSA)==='1';}catch(e){return false;}}
+function fijarPausa(si){try{localStorage.setItem(CLAVE_PAUSA,si?'1':'0');}catch(e){}}
+window.addEventListener('storage',function(e){
+  if(!e||e.key!==CLAVE_PAUSA)return;
+  var fija=pausaFija();if(fija===!A.auto)return;
+  A.auto=!fija;pintarPausa();if(A.auto)planificarAuto();else cancelarAuto();
+});
+
 /* ---- Abrir una lección ---- */
 function abrirLeccion(id,opc){
   opc=opc||{};
   if(!catalogoDe(id))id=CAT.lista[0].id;
   pararDemo();
   /* cada lección empieza reproduciéndose sola; si solo se sigue a otro dispositivo, queda en pausa
-     (así dos pantallas abiertas a la vez no avanzan cada una por su cuenta) */
-  A.auto=opc.auto!=null?!!opc.auto:!opc.seguir;pintarPausa();
+     (así dos pantallas abiertas a la vez no avanzan cada una por su cuenta). Con la pausa permanente,
+     todas empiezan detenidas. */
+  A.auto=!pausaFija()&&!opc.seguir;pintarPausa();
   quitarBotonIrLeccion();
   A.modo='leccion';A.id=id;A.lec=LEC[id]||null;A.descubreItem=null;A.tarea=null;
   A.volverA=opc.volverA||null;
@@ -685,6 +698,8 @@ function programarAuto(ms,accion){
   A.autoT=setTimeout(function esperar(){
     if(!A.auto||A.id!==id||A.etapa!==etapa||A.paso!==paso){A.autoT=null;pintarCuenta(0);return;}
     if(!leccionALaVista()){A.autoT=setTimeout(esperar,700);return;}
+    /* si el tutor todavía está leyendo en voz alta, se espera a que termine */
+    if(window.aaVoz&&window.aaVoz.hablando()){A.autoT=setTimeout(esperar,400);return;}
     A.autoT=null;pintarCuenta(0);accion();
   },ms);
 }
@@ -734,7 +749,7 @@ el('aa-adelante').onclick=function(){
   }
   navegarEtapa(1);
 };
-el('aa-pausa').onclick=function(){A.auto=!A.auto;pintarPausa();if(A.auto)planificarAuto();else cancelarAuto();if(A.modo==='leccion')guardarUltimo();};
+el('aa-pausa').onclick=function(){A.auto=!A.auto;fijarPausa(!A.auto);pintarPausa();if(A.auto)planificarAuto();else cancelarAuto();if(A.modo==='leccion')guardarUltimo();};
 /* En Teoría el tablero está libre: si el alumno mueve una pieza, la lección se pausa para que explore tranquilo */
 boardEl.addEventListener('pointerdown',function(){
   if(A.auto&&A.modo==='leccion'&&A.etapa==='descubre'&&A.autoT){A.auto=false;cancelarAuto();pintarPausa();}
@@ -1919,8 +1934,8 @@ var TOUR=[
   {t:'Los pasos',x:'Cada número a la derecha del tablero es un paso de la lección. Se pone verde cuando lo terminas. Toca cualquiera para ir a él.',sel:'#aa-etapas'},
   {t:'Mueve en el tablero',x:'Cuando tu tutor diga «Mueve en el tablero», arrastra la pieza o tócala y luego toca la casilla.',sel:'#board',arrastre:true},
   {t:'Tu tutor',x:'La mascota te explica cada paso y la lección avanza sola. Con el botón de su carita, arriba a la derecha, eliges otra mascota.',sel:'#aa-tutor'},
-  {t:'Pausa y avanza',x:'«Pausar» detiene la lección. Con ‹ y › pasas al número anterior o al siguiente. Al terminar la lección, el botón de la lección siguiente se ilumina.',sel:'#aa-controles'},
-  {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio.',sel:'#aa-fila-nav-izq'},
+  {t:'Pausa y avanza',x:'«Pausar» detiene la lección, y las demás también, hasta que toques «Reproducir». Con ‹ y › pasas al número anterior o al siguiente. Al terminar la lección, el botón de la lección siguiente se ilumina.',sel:'#aa-controles'},
+  {t:'Tus botones',x:'El reloj abre tu historial. La bombilla da pistas poco a poco y «Solución» muestra la respuesta: se encienden cuando hay un ejercicio. La bocina lee en voz alta lo que dice tu tutor; tócala para silenciarla.',sel:'#aa-fila-nav-izq'},
   {t:'Otras lecciones',x:'Aquí pasas a la lección anterior o a la siguiente.',sel:'.aa-fila-nav-der'},
   {t:'Guarda tus favoritos',x:'El corazón guarda el ítem que estás viendo (nivel, lección y número) en una o varias carpetas. Desde Mis favoritos vuelves justo a ese ítem.',sel:'#aa-corazon'},
   {t:'Siempre a mano',x:'Las pestañas quedan siempre arriba. «Mi lección» te devuelve a tu lección tal como la dejaste; «Temario», a la lista.',sel:'#tabs'},

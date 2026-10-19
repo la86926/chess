@@ -10,8 +10,8 @@ android {
         applicationId 'com.luis.chessdel'
         minSdk 21
         targetSdk 35
-        versionCode 3
-        versionName '3'
+        versionCode 4
+        versionName '4'
     }
 
     def ks = System.getenv('ANDROID_KEYSTORE_FILE')
