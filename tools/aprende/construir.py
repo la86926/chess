@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261019-aa57'
+VERSION = '20261019-aa58'
 
 
 class ErrorParche(Exception):
@@ -255,6 +255,8 @@ def construir():
 <link rel="preload" href="aa-lecciones-n5.js?v={v}" as="script">
 <link rel="preload" href="aa-lecciones-n6.js?v={v}" as="script">
 <link rel="preload" href="aa-app.js?v={v}" as="script">
+<link rel="preload" href="pc-compartir.js?v=3" as="script">
+<link rel="preload" href="pc-mascota.js?v=16" as="script">
 <script id="pc-backup-preload">{preload}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -300,6 +302,13 @@ if __name__ == '__main__':
     try:
         n = construir()
         print(f'index3.html generado ({n:,} bytes)')
+        # el contenedor (index.html) también carga aa-datos.js: misma versión, así no se descarga dos veces
+        ruta = RAIZ / 'index.html'
+        t = ruta.read_text(encoding='utf-8')
+        t2 = re.sub(r'aa-datos\.js\?v=[^"]*"', 'aa-datos.js?v=' + VERSION + '"', t)
+        if t2 != t:
+            ruta.write_text(t2, encoding='utf-8')
+            print('index.html: versión de aa-datos.js actualizada')
         for nombre in ('index1.html', 'index2.html'):
             cambio = parchear_copias(RAIZ / nombre)
             print(f'{nombre}: ' + ('copias actualizadas para incluir Aprende Ajedrez' if cambio else 'copias ya actualizadas'))

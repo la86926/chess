@@ -2005,6 +2005,9 @@ function arrancar(){
       if(document.visibilityState==='visible'&&boardEl.getBoundingClientRect().width>0&&!document.querySelector('.aa-fv-fondo.open')){clearInterval(vigia);setTimeout(abrirTour,500);}
     },600);
   }
+  /* listo: el contenedor espera esta señal antes de retirar su velo */
+  if(window.AAApp)window.AAApp.listo=true;
+  document.body.classList.add('aa-arrancada');
 }
 var bGuia=document.createElement('button');bGuia.type='button';bGuia.className='btn';bGuia.textContent='Ver el recorrido de nuevo';bGuia.onclick=abrirTour;
 var guia=el('v-guide').querySelector('.reading');if(guia)guia.appendChild(bGuia);

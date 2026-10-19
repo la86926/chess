@@ -885,3 +885,8 @@ html[data-modo="oscuro"] .aa-fila-nav .btn.aa-nav-lec.aa-listo{--aa-oro:color-mi
 }
 /* «Reproducir» cabe completo en el botón de la lección */
 .aa-app .aa-ctrl-play{min-width:8.4em}
+
+/* Mientras la app arranca, las vistas no se muestran: así nunca se ve una lección que todavía no responde.
+   Al arrancar vuelve su animación de entrada de siempre. Si algo fallara, aparecen solas a los 6 s. */
+.aa-app:not(.aa-arrancada) > .view{opacity:0;pointer-events:none;animation:aaMostrarIgual 0s 6s forwards}
+@keyframes aaMostrarIgual{to{opacity:1;pointer-events:auto}}
