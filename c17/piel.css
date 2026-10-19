@@ -356,7 +356,10 @@ html[data-piel] .gift-btn::after{display:none!important}
 html[data-piel] .hdr-marca .home-icon .crest.c17-logo{filter:none!important;object-fit:initial}
 @media(max-width:360px){html[data-piel] .aa-app .aa-eyebrow{font-size:.74rem!important}}
 /* «Ocultar / Mostrar» en móvil: un punto más pequeño, igual en las tres secciones */
-@media(max-width:480px){html[data-piel] .engine-banner-toggle,html[data-piel] .boardhead-center .engine-banner-toggle{font-size:.66rem!important;padding:.22rem .52rem!important;letter-spacing:.005em}}
+@media(max-width:480px){html[data-piel] .engine-banner-toggle,html[data-piel] .boardhead-center .engine-banner-toggle{font-size:.69rem!important;padding:.2rem .5rem!important;letter-spacing:.005em}}
+/* el botón se ve pequeño, pero se puede tocar con holgura: su zona táctil es más grande que su dibujo */
+html[data-piel] .engine-banner-toggle{position:relative}
+html[data-piel] .engine-banner-toggle::after{content:"";position:absolute;inset:-12px -8px}
 /* iPhone/iPad: el texto nunca se reescala solo al cambiar el diseño (sin «zoom» al mostrar la barra)
    y un doble toque no acerca la página */
 html[data-piel]{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}

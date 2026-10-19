@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261019-aa62'
+VERSION = '20261019-aa63'
 
 
 class ErrorParche(Exception):
@@ -205,12 +205,7 @@ def construir():
     logica = parche(logica, "let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* oculta por defecto: «Mostrar» queda listo */",
                     "let bannerOculto=localStorage.getItem('aa_banner')!=='0'; /* Sección 1: oculto por defecto */",
                     nombre='encabezado oculto por defecto')
-    logica = parche(logica,
-                    "$('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};",
-                    "$('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_banner',bannerOculto?'1':'0');aplicarBanner(bannerOculto,true);};\n"
-                    "/* si se cambia en otra pestaña de este mismo dispositivo, se sigue */\n"
-                    "window.addEventListener('storage',e=>{if(e&&e.key==='aa_banner'){const o=e.newValue!=='0';if(o!==bannerOculto){bannerOculto=o;aplicarBanner(o,true);}}});",
-                    nombre='encabezado: seguir al ID')
+    # (la escucha de «storage» para seguir la elección en otras secciones viene de index1, ya renombrada a aa_banner)
     if re.search(r"['\"]wp_", logica):
         raise ErrorParche('Quedó alguna clave wp_ sin renombrar en la lógica copiada.')
     # Título de la imagen para compartir.
@@ -256,7 +251,7 @@ def construir():
 <link rel="preload" href="aa-lecciones-n6.js?v={v}" as="script">
 <link rel="preload" href="aa-app.js?v={v}" as="script">
 <link rel="preload" href="pc-compartir.js?v=3" as="script">
-<link rel="preload" href="pc-mascota.js?v=18" as="script">
+<link rel="preload" href="pc-mascota.js?v=19" as="script">
 <script id="pc-backup-preload">{preload}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -294,7 +289,7 @@ def construir():
 <script src="aa-lecciones-n5.js?v={v}"></script>
 <script src="aa-lecciones-n6.js?v={v}"></script>
 <script src="aa-app.js?v={v}"></script>
-<script src="pc-mascota.js?v=18"></script>
+<script src="pc-mascota.js?v=19"></script>
 </body>
 </html>
 '''

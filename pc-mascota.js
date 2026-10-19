@@ -69,7 +69,7 @@
 
   var CSS = '' +
   /* ---------- la mascota ---------- */
-  '.pc-mascota{position:absolute;z-index:30;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;transform-origin:50% 100%}' +
+  '.pc-mascota{position:absolute;z-index:30;transition:left .45s cubic-bezier(.2,.8,.2,1);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;transform-origin:50% 100%}' +
   '.pc-mascota,.pc-mascota *{-webkit-tap-highlight-color:transparent;outline:none}' +
   '.pc-mascota .pcm-sombra{position:absolute;left:18%;right:18%;bottom:-3%;height:8%;border-radius:50%;background:rgba(0,0,0,.2);filter:blur(1.5px);transform-origin:50% 50%}' +
   '.pc-mascota .pcm-baile{position:absolute;inset:0;transform-origin:50% 100%;animation:pcmRespira 3.4s ease-in-out infinite}' +
@@ -380,11 +380,11 @@
 
   /* ---------- botón arriba a la derecha ---------- */
   function regalo(){ return document.getElementById('b-gift'); }
-  /* al cambiar de sitio (barra plegada o desplegada) el botón entra con suavidad, no de golpe */
+  /* al cambiar de sitio (barra plegada o desplegada) el botón aparece con un fundido, sin escalar */
   function aparecerBoton(){
     if (!boton || !boton.animate) return;
     try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
-    try { boton.animate([{ opacity: 0, transform: 'scale(.86)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 340, easing: 'cubic-bezier(.2,.8,.2,1)' }); } catch (e) {}
+    try { boton.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' }); } catch (e) {}
   }
   function colocarBoton(){
     if (!boton) return;
@@ -792,7 +792,8 @@
     if (e.key === CLAVE_ELEGIDA) refrescarCaras();
   });
 
-  function recolocar(){ colocar(); colocarBoton(); }
+  /* primero el botón (la mascota se aparta de él), después la mascota */
+  function recolocar(){ colocarBoton(); colocar(); }
   window.addEventListener('resize', recolocar);
   window.addEventListener('orientationchange', function(){ setTimeout(recolocar, 250); });
   try { new MutationObserver(function(){ requestAnimationFrame(recolocar); })

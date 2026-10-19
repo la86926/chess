@@ -3,7 +3,7 @@
 <head>
 <!-- la piel se pide desde el principio, en paralelo con la página -->
 <link rel="preload" href="c17/tokens.css?v=7" as="style">
-<link rel="preload" href="c17/piel.css?v=12" as="style">
+<link rel="preload" href="c17/piel.css?v=13" as="style">
 <link rel="preload" href="c17/piel.js?v=8" as="script">
 <link rel="preload" href="c17/fondos.js?v=5" as="script">
 <!-- los ejercicios se piden desde el principio, junto con la página -->
@@ -1979,7 +1979,7 @@ html[data-barra-anim="abre"] .boardhead{transition-delay:.2s}
 </style>
 <link rel="stylesheet" href="c17/fuentes.css?v=3">
 <link rel="stylesheet" href="c17/tokens.css?v=7">
-<link rel="stylesheet" href="c17/piel.css?v=12">
+<link rel="stylesheet" href="c17/piel.css?v=13">
 <script src="c17/piel.js?v=8" defer></script>
 <script src="c17/fondos.js?v=5"></script>
 </head>
@@ -6022,9 +6022,9 @@ document.addEventListener('keydown',e=>{
 
 let bannerAnim=null;
 /* Persiana del encabezado (Ocultar / Mostrar).
-   Se anima solo con transform y opacity (técnica FLIP): el diseño cambia una sola vez y lo que está
-   debajo se desliza desde donde estaba. Así va fluido a 60 fps en iPhone, iPad y computadora, sin
-   recalcular la página en cada fotograma (eso era lo que hacía «temblar» pestañas y tablero).
+   FLIP: el diseño cambia una sola vez y lo que está debajo se desliza, con transform, desde donde se
+   veía hasta su sitio nuevo. Así va fluido en iPhone, iPad y computadora sin recalcular la página en
+   cada fotograma. Si se pulsa a mitad de camino, parte desde donde va (sin saltos ni barras fantasma).
    Con «reducir movimiento» no hay desplazamiento: solo un fundido breve. */
 function aplicarBanner(oculto,animar){
   const encabezado=document.querySelector('header.topbar'),boton=$('b-banner');
@@ -6033,52 +6033,59 @@ function aplicarBanner(oculto,animar){
   boton.setAttribute('aria-pressed',oculto?'true':'false');
   boton.setAttribute('aria-label',oculto?'Mostrar encabezado superior':'Ocultar encabezado superior');
   const raizB=document.documentElement;
-  // si estaba a medio animar, se termina al instante y se parte del estado final
-  if(bannerAnim){const a=bannerAnim;bannerAnim=null;a.forEach(x=>{try{x.finish();}catch(e){}});}
-  const limpiar=()=>{encabezado.classList.remove('topbar-anim');['position','top','left','width','boxSizing','zIndex','pointerEvents'].forEach(k=>encabezado.style[k]='');raizB.removeAttribute('data-barra-anim');};
-  const yaVisible=getComputedStyle(encabezado).display!=='none';
-  if(!animar||!encabezado.animate||yaVisible===!oculto){limpiar();encabezado.style.display=oculto?'none':'';raizB.setAttribute('data-barra',oculto?'oculta':'visible');return;}
-  const reducir=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // lo que hay debajo del encabezado y ocupa sitio en la página
   const mover=[];
   for(let e=encabezado.nextElementSibling;e;e=e.nextElementSibling){
     if(e.tagName==='SCRIPT'||e.tagName==='STYLE')continue;
     const c=getComputedStyle(e);if(c.display==='none'||c.position==='fixed'||c.position==='absolute')continue;
     mover.push(e);
   }
-  const alto=()=>{const r=encabezado.getBoundingClientRect(),c=getComputedStyle(encabezado);return r.height+(parseFloat(c.marginTop)||0)+(parseFloat(c.marginBottom)||0);};
-  const D=oculto?640:720,curva='cubic-bezier(.45,0,.2,1)',anims=[];
-  raizB.setAttribute('data-barra-anim',oculto?'cierra':'abre');
+  const ancla=mover[0]||null;
+  // dónde se ve todo AHORA (con lo que esté animándose), antes de tocar nada
+  const encVisible=getComputedStyle(encabezado).display!=='none';
+  const rEnc=encVisible?encabezado.getBoundingClientRect():null;
+  const opIni=encVisible?(parseFloat(getComputedStyle(encabezado).opacity)||0):0;
+  const yIni=ancla?ancla.getBoundingClientRect().top:0;
+  const habiaAnim=!!bannerAnim;
+  if(bannerAnim){const a=bannerAnim;bannerAnim=null;a.forEach(x=>{try{x.cancel();}catch(e){}});}
+  const limpiar=()=>{encabezado.classList.remove('topbar-anim');['position','top','left','width','boxSizing','zIndex','pointerEvents'].forEach(k=>encabezado.style[k]='');raizB.removeAttribute('data-barra-anim');raizB.style.overflowAnchor='';};
+  limpiar();
+  const yaEsta=!habiaAnim&&encVisible===!oculto;
+  const reducir=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!animar||!encabezado.animate||yaEsta){encabezado.style.display=oculto?'none':'';raizB.setAttribute('data-barra',oculto?'oculta':'visible');return;}
+  // el navegador no debe mover el desplazamiento por su cuenta mientras cambia el diseño
+  raizB.style.overflowAnchor='none';
+  if(!reducir)raizB.setAttribute('data-barra-anim',oculto?'cierra':'abre');
   if(oculto){
-    const r=encabezado.getBoundingClientRect(),H=alto();
-    // el encabezado sale del flujo pero sigue dibujado donde estaba, mientras se desvanece y sube
+    // el encabezado sale del flujo, pero sigue dibujado justo donde se veía mientras se desvanece
+    encabezado.style.display='';
+    const r=rEnc||encabezado.getBoundingClientRect();
     Object.assign(encabezado.style,{position:'absolute',top:(r.top+window.scrollY)+'px',left:(r.left+window.scrollX)+'px',width:r.width+'px',boxSizing:'border-box',zIndex:'1',pointerEvents:'none'});
     {const r2=encabezado.getBoundingClientRect();encabezado.style.top=(parseFloat(encabezado.style.top)+r.top-r2.top)+'px';encabezado.style.left=(parseFloat(encabezado.style.left)+r.left-r2.left)+'px';}
-    encabezado.classList.add('topbar-anim');
     raizB.setAttribute('data-barra','oculta');
-    if(reducir){
-      anims.push(encabezado.animate([{opacity:1},{opacity:0}],{duration:200,easing:'ease-out',fill:'forwards'}));
-      mover.forEach(e=>anims.push(e.animate([{opacity:.55},{opacity:1}],{duration:260,easing:'ease-out'})));
-    }else{
-      anims.push(encabezado.animate([{opacity:1,transform:'translateY(0px)'},{offset:.42,opacity:0,transform:'translateY(-10px)'},{opacity:0,transform:'translateY(-10px)'}],{duration:D,easing:curva,fill:'forwards'}));
-      mover.forEach(e=>anims.push(e.animate([{transform:'translateY('+H+'px)'},{transform:'translateY(0px)'}],{duration:D,easing:curva})));
-    }
   }else{
     encabezado.style.display='';
-    const H=alto();
-    encabezado.classList.add('topbar-anim');
     raizB.setAttribute('data-barra','visible');
-    if(reducir){
-      anims.push(encabezado.animate([{opacity:0},{opacity:1}],{duration:260,easing:'ease-out'}));
-      mover.forEach(e=>anims.push(e.animate([{opacity:.55},{opacity:1}],{duration:260,easing:'ease-out'})));
-    }else{
-      anims.push(encabezado.animate([{opacity:0,transform:'translateY(-10px)'},{offset:.5,opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'translateY(0px)'}],{duration:D,easing:curva}));
-      mover.forEach(e=>anims.push(e.animate([{transform:'translateY('+(-H)+'px)'},{transform:'translateY(0px)'}],{duration:D,easing:curva})));
-    }
+  }
+  encabezado.classList.add('topbar-anim');
+  const dy=ancla?yIni-ancla.getBoundingClientRect().top:0;
+  // cuánto del encabezado tapaba ya el contenido al empezar (0 = nada; 1 = todo, como cuando estaba oculto)
+  const fracIni=rEnc&&rEnc.height?Math.max(0,Math.min(1,(rEnc.bottom-yIni)/rEnc.height)):1;
+  const D=oculto?640:720,curva='cubic-bezier(.45,0,.2,1)',anims=[];
+  if(reducir){
+    anims.push(encabezado.animate([{opacity:opIni},{opacity:oculto?0:1}],{duration:220,easing:'ease-out',fill:'both'}));
+    mover.forEach(e=>anims.push(e.animate([{opacity:.55},{opacity:1}],{duration:260,easing:'ease-out',fill:'backwards'})));
+  }else{
+    // persiana de verdad: el borde del contenido «enrolla» el encabezado. Lo que queda debajo del borde
+    // se recorta (clip-path con la misma curva), así el contenido nunca pasa sobre texto visible
+    const recorte=p=>'inset(0px 0px '+(Math.max(0,Math.min(1,p))*100).toFixed(2)+'% 0px)';
+    const cuadrosEnc=oculto
+      ?[{opacity:opIni,clipPath:recorte(fracIni)},{offset:.5,opacity:.25,clipPath:recorte(fracIni+(1-fracIni)*.5)},{opacity:0,clipPath:recorte(1)}]
+      :[{opacity:opIni,clipPath:recorte(fracIni)},{offset:.35,opacity:Math.max(opIni,.35),clipPath:recorte(fracIni*.65)},{opacity:1,clipPath:recorte(0)}];
+    anims.push(encabezado.animate(cuadrosEnc,{duration:D,easing:curva,fill:'both'}));
+    if(Math.abs(dy)>.5)mover.forEach(e=>anims.push(e.animate([{transform:'translateY('+dy+'px)'},{transform:'translateY(0px)'}],{duration:D,easing:curva,fill:'backwards'})));
   }
   bannerAnim=anims;
-  const principal=anims[0];
-  principal.onfinish=()=>{
+  anims[0].onfinish=()=>{
     if(bannerAnim!==anims)return;bannerAnim=null;
     if(oculto)encabezado.style.display='none';
     anims.forEach(x=>{try{x.cancel();}catch(e){}});
@@ -6087,6 +6094,8 @@ function aplicarBanner(oculto,animar){
 }
 let bannerOculto=localStorage.getItem('wp_banner')!=='0'; /* oculta por defecto: «Mostrar» queda listo */
 aplicarBanner(bannerOculto);
+/* misma elección en las otras secciones abiertas de este dispositivo (sin animar: no están a la vista) */
+window.addEventListener('storage',e=>{if(e&&e.key==='wp_banner'){const o=e.newValue!=='0';if(o!==bannerOculto){bannerOculto=o;aplicarBanner(o,false);}}});
 $('b-banner').onclick=()=>{
   bannerOculto=!bannerOculto;
   localStorage.setItem('wp_banner',bannerOculto?'1':'0');
@@ -7842,7 +7851,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="pc-mascota.js?v=18"></script>
+<script src="pc-mascota.js?v=19"></script>
 <script id="pc-comentarios">
 /* Los comentarios del libro llegan después del tablero: no hacen falta para empezar a resolver. */
 window.pcComentariosListos=function(){
