@@ -144,7 +144,7 @@ def piel_c17(html):
         return html
     i1 = (RAIZ / 'index1.html').read_text(encoding='utf-8')
     cab = i1[:i1.index('</head>')]
-    lineas = [l for l in cab.splitlines() if ('href="c17/' in l or 'src="c17/' in l) and 'rel="preload"' not in l]
+    lineas = [l for l in cab.splitlines() if ('rel="stylesheet" href="c17/' in l or '<script src="c17/' in l)]
     precargas = [l for l in cab.splitlines() if 'rel="preload"' in l and 'c17/' in l]
     if not lineas:
         raise ErrorParche('index1.html no trae la piel c17')
@@ -262,9 +262,12 @@ def construir():
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0F1411">
 <title>Aprende Ajedrez</title>
-<link rel="icon" type="image/svg+xml" href="c17/logo.svg?v=2">
-<link rel="icon" type="image/png" sizes="32x32" href="c17/logo-32.png?v=2">
-<link rel="apple-touch-icon" href="c17/logo-180.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="c17/fav-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="c17/fav-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="c17/fav-48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="c17/fav-96.png">
+<link rel="icon" type="image/svg+xml" sizes="any" href="c17/logo.svg?v=3">
+<link rel="apple-touch-icon" sizes="180x180" href="c17/apple-touch-icon.png">
 <!-- Generado por tools/aprende/construir.py a partir de index1.html. No editar a mano:
      los cambios propios de Aprende Ajedrez van en aa-*.js / aa-app.css / tools/aprende/cuerpo.html. -->
 {diseno}

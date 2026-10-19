@@ -15,7 +15,7 @@
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function ls(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function json(k){try{return JSON.parse(ls(k)||'null');}catch(e){return null;}}
-  var LOGO=(document.querySelector('.marca svg')||{}).outerHTML||'';
+  var LOGO=(document.querySelector('.marca .c17-logo')||{}).outerHTML||'';
 
   /* ---------- cambio de sección ---------- */
   var SEC={

@@ -60,3 +60,18 @@ html[data-fondo] body:after{z-index:-1;background:color-mix(in srgb,var(--c-pape
 html[data-fondo][data-modo="claro"]{--c-tinta2:#3E3D47;--c-tinta3:#4A4955}
 html[data-fondo][data-modo="oscuro"]{--c-tinta2:#D4D2E0;--c-tinta3:#BDBBCC}
 html[data-fondo][data-modo="oscuro"] body:before{filter:brightness(.55) saturate(1.2)}
+
+/* ---------- logo vivo ----------
+   El cuadro del logo toma el fondo de la página: el fondo elegido en el menú o, sin fondo, el color
+   del papel. El caballo es una silueta (máscara) que cambia de tinta para leerse siempre:
+   oscura sobre fondos claros y blanca sobre fondos oscuros o en modo oscuro.
+   La pestaña del navegador y el ícono de la app conservan el logo original (negro). */
+.c17-logo{position:relative;display:block;overflow:hidden;border-radius:18.2%;isolation:isolate;
+  background:var(--c-papel);box-shadow:0 0 0 .5px var(--c-linea2),inset 0 0 0 .5px rgba(255,255,255,.22),var(--c-s1)}
+.c17-logo::before{content:"";position:absolute;inset:0;background:var(--c-fondo) center/cover no-repeat;opacity:0;transition:opacity .45s var(--c-suave)}
+html[data-fondo] .c17-logo::before{opacity:1}
+html[data-fondo][data-modo="oscuro"] .c17-logo::before{filter:brightness(.6) saturate(1.15)}
+.c17-logo::after{content:"";position:absolute;inset:0;background:var(--c-tinta);
+  -webkit-mask:url(caballo.svg) center/100% 100% no-repeat;mask:url(caballo.svg) center/100% 100% no-repeat;transition:background-color .45s var(--c-suave)}
+html[data-fondo][data-fondo-tono="claro"][data-modo="claro"] .c17-logo::after{background:#1C1B22}
+html[data-fondo][data-fondo-tono="oscuro"] .c17-logo::after,html[data-fondo][data-modo="oscuro"] .c17-logo::after{background:#fff}

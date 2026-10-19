@@ -131,7 +131,7 @@
   }
   function iniciar(){
     var c=document.querySelectorAll('.home-icon .crest, img.crest');
-    for(var i=0;i<c.length;i++){if((c[i].getAttribute('src')||'').indexOf('c17/logo.svg')<0)c[i].setAttribute('src','c17/logo.svg?v=2');c[i].setAttribute('alt','Chess de L');}
+    for(var i=0;i<c.length;i++){if(c[i].tagName!=='IMG')continue;if((c[i].getAttribute('src')||'').indexOf('c17/logo.svg')<0)c[i].setAttribute('src','c17/logo.svg?v=2');c[i].setAttribute('alt','Chess de L');}
     regalo();guiaSinEmoji();todo();
     var tabs=document.getElementById('tabs');if(tabs)deslizar(tabs);
     var st=document.getElementById('status');
