@@ -25,7 +25,7 @@ import re, sys, pathlib
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 AQUI = pathlib.Path(__file__).resolve().parent
-VERSION = '20261019-aa64'
+VERSION = '20261019-aa65'
 
 
 class ErrorParche(Exception):
@@ -251,7 +251,7 @@ def construir():
 <link rel="preload" href="aa-lecciones-n6.js?v={v}" as="script">
 <link rel="preload" href="aa-app.js?v={v}" as="script">
 <link rel="preload" href="pc-compartir.js?v=3" as="script">
-<link rel="preload" href="pc-mascota.js?v=20" as="script">
+<link rel="preload" href="pc-mascota.js?v=22" as="script">
 <script id="pc-backup-preload">{preload}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -289,7 +289,7 @@ def construir():
 <script src="aa-lecciones-n5.js?v={v}"></script>
 <script src="aa-lecciones-n6.js?v={v}"></script>
 <script src="aa-app.js?v={v}"></script>
-<script src="pc-mascota.js?v=20"></script>
+<script src="pc-mascota.js?v=22"></script>
 </body>
 </html>
 '''

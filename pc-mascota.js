@@ -233,7 +233,8 @@
     /* con la barra plegada, el botón de la mascota queda fijo arriba a la derecha: la mascota no se mete debajo */
     if (boton && boton.style.position === 'fixed') {
       var rbt = boton.getBoundingClientRect();
-      if (rbt.width && rm.top - alto < rbt.bottom + 4) borde = Math.min(borde, rbt.left - 8);
+      /* sin mirar la altura: durante la persiana el tablero está desplazado y eso la retrasaba hasta el final */
+      if (rbt.width) borde = Math.min(borde, rbt.left - 8);
     }
     var x = Math.max(minimo, borde - ancho);
     el.style.width = ancho + 'px';
@@ -373,6 +374,17 @@
       clearTimeout(tUno);
       tUno = setTimeout(levantar, DOBLE_MS - 40);
     }
+    /* computadora (ratón): al pasar por encima, la mascota hace lo mismo que con un clic; no se repite
+       mientras dura su animación */
+    var ultimoPaso = 0;
+    nodo.addEventListener('pointerenter', function(e){
+      if (e.pointerType !== 'mouse') return;
+      if (!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches)) return;
+      var ahora = Date.now();
+      if (ahora - ultimoPaso < 1800) return;
+      ultimoPaso = ahora;
+      levantar();
+    });
     nodo.addEventListener('pointerdown', abajo);
     nodo.addEventListener('pointerup', arriba);
     nodo.addEventListener('pointercancel', function(){ nodo.classList.remove('presionada'); });
@@ -414,7 +426,9 @@
       boton.style.top = Math.round((rt && rt.height ? rt.top - rr.top + (rt.height - lado) / 2 : (rr.height - lado) / 2)) + 'px';
       return;
     }
-    var g = visible(regalo());
+    /* con la barra plegada (o plegándose) el botón pasa a su sitio fijo desde el primer instante, a la vez
+       que la persiana, y no al terminar: así nada se mueve después de la animación */
+    var g = document.documentElement.getAttribute('data-barra') === 'oculta' ? null : visible(regalo());
     var bar = document.querySelector('.topbar');
     if (g && bar) {
       if (getComputedStyle(bar).position === 'static') bar.style.position = 'relative';
