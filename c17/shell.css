@@ -242,6 +242,12 @@ html[data-modo="oscuro"] .mi-id-btn[data-modo="crear"]{background:color-mix(in s
   .menu-button{left:calc(8px + env(safe-area-inset-left));top:calc(8px + env(safe-area-inset-top));width:42px;height:42px}
   .drawer{padding-top:62px}
 }
+/* tableta o móvil en horizontal (poca altura): la marca va a la derecha del botón, en su misma fila,
+   así el botón nunca tapa el logo y el menú gana altura */
+@media (orientation:landscape) and (pointer:coarse) and (max-height:860px) and (min-width:600px){
+  .drawer{padding-top:2px}
+  .marca{min-height:44px;margin-left:44px}
+}
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
   .tuto-mano{animation-duration:3s!important;animation-iteration-count:infinite!important}

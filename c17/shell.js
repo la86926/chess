@@ -239,7 +239,7 @@
     /* las miniaturas se piden la primera vez que se abre el menú, no al cargar la página */
     var minis=false;
     function cargarMinis(){if(minis)return;minis=true;var b=fila.querySelectorAll('[data-mini]');for(var j=0;j<b.length;j++)b[j].style.backgroundImage='url('+b[j].getAttribute('data-mini')+')';}
-    new MutationObserver(function(){if(backdrop.classList.contains('open')){cargarMinis();var a=fila.querySelector('[aria-checked="true"]');if(a)try{a.scrollIntoView({inline:'center',block:'nearest'});}catch(e){}}}).observe(backdrop,{attributes:true,attributeFilter:['class']});
+    new MutationObserver(function(){if(backdrop.classList.contains('open')){cargarMinis();var a=fila.querySelector('[aria-checked="true"]');/* centra el fondo elegido solo de lado: scrollIntoView también movía el menú hacia abajo y el logo quedaba bajo el botón */if(a)try{var ra=a.getBoundingClientRect(),rf=fila.getBoundingClientRect();fila.scrollLeft+=(ra.left-rf.left)-(rf.width-ra.width)/2;}catch(e){}}}).observe(backdrop,{attributes:true,attributeFilter:['class']});
   })();
 
   /* ---------- teclado: Escape cierra el menú; al abrirlo, el foco va a la sección activa ---------- */
