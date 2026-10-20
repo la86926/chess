@@ -48,6 +48,8 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-f
 .marca{display:flex;align-items:center;gap:12px;padding:0 6px}
 .marca .c17-logo{width:40px;height:40px;flex:0 0 40px}
 .marca strong{display:block;font-weight:650;font-size:1.22rem;letter-spacing:-.022em;line-height:1.1}
+/* versión de la web: pequeña, gris y tenue, para saber de un vistazo si ya llegó lo último */
+.marca .marca-version{font-size:.66rem;font-weight:500;letter-spacing:.02em;color:var(--c-tinta3);opacity:.75;margin-left:4px;vertical-align:.12em;font-variant-numeric:tabular-nums}
 .marca small{display:block;margin-top:1px;font-size:.84rem;color:var(--c-tinta2)}
 
 /* anillos de avance */
