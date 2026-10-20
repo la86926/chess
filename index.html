@@ -122,7 +122,7 @@
 <button class="menu-button c-vidrio" id="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false"><svg class="mb-lado" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3.5"/><path d="M9.5 4.5v15M5.6 8.2h1.6M5.6 11h1.6"/></svg><svg class="mb-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
 <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true">
   <aside class="drawer c-vidrio" role="dialog" aria-modal="true" aria-label="Menú">
-    <div class="marca"><span class="c17-logo" aria-hidden="true"></span><div><strong>Chess de L <span class="marca-version" title="Versión de la web">v2.0.10</span></strong><small>Ajedrez, golpe a golpe</small></div></div>
+    <div class="marca"><span class="c17-logo" aria-hidden="true"></span><div><strong>Chess de L <span class="marca-version" title="Versión de la web">v2.0.11</span></strong><small>Ajedrez, golpe a golpe</small></div></div>
     <div class="anillos"><svg viewBox="0 0 84 84" aria-hidden="true"><circle class="pista" cx="42.0" cy="42.0" r="36"/><circle class="arco a-pc2" cx="42.0" cy="42.0" r="36" style="--l:226.19"/><circle class="pista" cx="42.0" cy="42.0" r="26.5"/><circle class="arco a-pc1" cx="42.0" cy="42.0" r="26.5" style="--l:166.50"/><circle class="pista" cx="42.0" cy="42.0" r="17"/><circle class="arco a-aa" cx="42.0" cy="42.0" r="17" style="--l:106.81"/></svg>
       <div class="anillos-txt"><b>Tu avance</b><ul><li><i style="background:var(--c-aa)"></i>Aprende<span id="c-p-aa">0 %</span></li><li><i style="background:var(--c-pc1)"></i>Método PC1<span id="c-p-pc1">0 %</span></li><li><i style="background:var(--c-pc2)"></i>Método PC2<span id="c-p-pc2">0 %</span></li></ul></div></div>
     <nav class="grupo" aria-label="Secciones">
@@ -147,8 +147,8 @@
     </div>
   </aside>
 </div>
-<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-32" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
-<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-32" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-33" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-33" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
 <!-- Mi ID: crear, entrar, cambiar o salir del ID que sincroniza el avance de las tres secciones -->
 <section class="app-frame mi-id" id="app-frame-id" aria-label="Mi ID"><div class="mi-id-in" id="mi-id">
   <h1>Mi ID</h1>
@@ -156,7 +156,7 @@
   <div class="mi-id-cuenta" id="mi-id-cuenta"></div>
 </div></section>
 <!-- Cada sección se carga la primera vez que se abre: al entrar solo se descarga y prepara la que se va a usar. -->
-<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-32" title="Aprende Ajedrez" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-33" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -167,7 +167,11 @@
   document.addEventListener('gesturestart',impedirZoom,{passive:false});
   document.addEventListener('gesturechange',impedirZoom,{passive:false});
   document.addEventListener('gestureend',impedirZoom,{passive:false});
-  document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
+  var ES_APPLE=/iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
+  var ES_TACTIL_NO_APPLE=(navigator.maxTouchPoints||0)>0&&!ES_APPLE;
+  /* el pellizco se bloquea con touchmove solo en Apple; en Android lo hace touch-action, y este escucha
+     (que obliga al navegador a esperar a la página en cada movimiento del dedo) frenaba el desplazamiento */
+  if(ES_APPLE) document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
 
   function setDrawer(open){
     backdrop.classList.toggle('open',open);
@@ -297,7 +301,7 @@
       doc.addEventListener('gesturestart',impedirZoom,{passive:false});
       doc.addEventListener('gesturechange',impedirZoom,{passive:false});
       doc.addEventListener('gestureend',impedirZoom,{passive:false});
-      doc.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
+      if(ES_APPLE) doc.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
       doc.documentElement.dataset.zoomBloqueado='1';
     }catch(e){}
   }
@@ -318,9 +322,82 @@
         doc.body.style.touchAction='pan-y';
       }
       if(win) win.addEventListener('scroll',function(){if(win.scrollX!==0)win.scrollTo(0,win.scrollY);},{passive:true});
+      if(win) fijarLadoDurantePersiana(doc,win);
+      if(win&&ES_TACTIL_NO_APPLE) desplazarConElDedo(doc,win);
       doc.documentElement.dataset.scrollHorizontalBloqueado='1';
     }catch(e){}
   }
+
+  /* Mientras sube o baja la persiana de Mostrar/Ocultar, la página (y el contenedor) no pueden correrse de lado
+     ni un solo cuadro: se fijan en x = 0 en cada cuadro, antes de pintarse, y no después con el evento scroll */
+  function fijarLadoDurantePersiana(doc,win){
+    var raiz=doc.documentElement,hasta=0,corriendo=false;
+    function fijar(){
+      try{if(win.scrollX!==0)win.scrollTo(0,win.scrollY);}catch(e){}
+      try{if(raiz.scrollLeft)raiz.scrollLeft=0;if(doc.body&&doc.body.scrollLeft)doc.body.scrollLeft=0;}catch(e){}
+      try{if(window.scrollX!==0||window.scrollY!==0)window.scrollTo(0,0);var r=document.documentElement;if(r.scrollLeft)r.scrollLeft=0;if(document.body.scrollLeft)document.body.scrollLeft=0;}catch(e){}
+    }
+    function bucle(){fijar();if(performance.now()<hasta)requestAnimationFrame(bucle);else corriendo=false;}
+    function empezar(){hasta=performance.now()+1400;if(!corriendo){corriendo=true;requestAnimationFrame(bucle);}fijar();}
+    try{new MutationObserver(empezar).observe(raiz,{attributes:true,attributeFilter:['data-barra','data-barra-anim']});}catch(e){}
+    try{var bt=doc.getElementById('b-banner');if(bt)bt.addEventListener('click',empezar,true);}catch(e){}
+  }
+  window.addEventListener('scroll',function(){if(window.scrollX!==0||window.scrollY!==0)window.scrollTo(0,0);},{passive:true});
+
+  /* Tabletas y celulares táctiles (no Apple): si el navegador no desplaza lo que está bajo el dedo
+     (la página, una lista, una ventana, el menú), se desplaza igual, siguiendo al dedo y con su inercia
+     al soltarlo. Si el navegador sí lo desplaza, esto no hace nada. Las piezas, las flechas y los
+     deslizadores siguen como siempre */
+  function desplazarConElDedo(doc,win){
+    var EXCLUIR='.pc,.board.modo-anot,.pc-slider,.pc-float-board,.pc-float-bubble,.aa-confirmado,input,textarea,select,[contenteditable]';
+    var g=null,inercia=0;
+    function lienzo(el){
+      for(var e=el;e&&e.nodeType===1&&e!==doc.documentElement&&e!==doc.body;e=e.parentElement){
+        var cs=win.getComputedStyle(e);
+        if((cs.overflowY==='auto'||cs.overflowY==='scroll')&&e.scrollHeight>e.clientHeight+2)return e;
+      }
+      return null;
+    }
+    function leer(c){return c?c.scrollTop:win.scrollY;}
+    function poner(c,y){if(c)c.scrollTop=y;else win.scrollTo(win.scrollX,y);}
+    doc.addEventListener('touchstart',function(e){
+      cancelAnimationFrame(inercia);
+      if(!e.touches||e.touches.length!==1){g=null;return;}
+      var t=e.touches[0];
+      if(e.target&&e.target.closest&&e.target.closest(EXCLUIR)){g=null;return;}
+      var c=lienzo(e.target);
+      g={c:c,x0:t.clientX,y0:t.clientY,sy:leer(c),modo:null,movs:0,m:[{y:t.clientY,t:performance.now()}]};
+    },{passive:true,capture:true});
+    doc.addEventListener('touchmove',function(e){
+      if(!g||!e.touches||e.touches.length!==1){g=null;return;}
+      var t=e.touches[0],dx=t.clientX-g.x0,dy=t.clientY-g.y0;
+      g.m.push({y:t.clientY,t:performance.now()});if(g.m.length>6)g.m.shift();
+      if(!g.modo){
+        if(Math.abs(dy)<12||Math.abs(dy)<Math.abs(dx)){if(Math.abs(dx)>24)g=null;return;}
+        g.movs++;
+        if(Math.abs(leer(g.c)-g.sy)>1){g.modo='nativo';return;}
+        if(g.movs<3)return;
+        g.modo='dedo';
+      }
+      if(g.modo==='dedo')poner(g.c,g.sy-dy);
+    },{passive:true,capture:true});
+    function soltar(){
+      if(!g||g.modo!=='dedo'){g=null;return;}
+      var c=g.c,m=g.m,a=m[0],b=m[m.length-1],v=(b.t-a.t)>0?(b.y-a.y)/(b.t-a.t):0;g=null;
+      v=Math.max(-4,Math.min(4,v));var antes=performance.now();
+      (function paso(){
+        var ahora=performance.now(),dt=Math.min(32,ahora-antes);antes=ahora;
+        if(Math.abs(v)<0.03)return;
+        var y0=leer(c),pide=-v*dt;poner(c,y0+pide);v*=Math.pow(0.95,dt/16);
+        if(Math.abs(pide)>=1&&Math.abs(leer(c)-y0)<0.5)return; /* llegó al borde */
+        inercia=requestAnimationFrame(paso);
+      })();
+    }
+    doc.addEventListener('touchend',soltar,{passive:true,capture:true});
+    doc.addEventListener('touchcancel',function(){if(g&&g.modo==='dedo')soltar();else g=null;},{passive:true,capture:true});
+  }
+  /* también en el contenedor: menú lateral, «Mi ID» y ventanas */
+  if(ES_TACTIL_NO_APPLE) desplazarConElDedo(document,window);
 
   function mostrarControlesAnalisisSiempre(frame){
     try{
@@ -761,7 +838,7 @@
    una nueva. Al abrir la página y al volver a ella se consulta version.json sin caché; si hay una versión
    más nueva, se recarga una sola vez con la dirección cambiada para traer todo fresco. */
 (function(){
-  var VERSION='2.0.10';
+  var VERSION='2.0.11';
   function revisar(){
     if(!window.fetch)return;
     fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
