@@ -6047,31 +6047,30 @@ function aplicarBanner(oculto,animar){
   if(!encabezado||!boton)return;
   boton.textContent=oculto?'Mostrar':'Ocultar';
   boton.setAttribute('aria-pressed',oculto?'true':'false');
-  /* Android: persiana por altura. El encabezado se enrolla o desenrolla cambiando su alto, y lo de abajo
-     lo sigue solo, sin transform, sin recorte y sin desenfoque de fondo (en Android esa mezcla hacía
-     que la página pareciera acercarse y alejarse o moverse de lado) */
+  /* Android: persiana sin transform ni desenfoque de fondo. El encabezado conserva su tamaño y su diseño
+     (nada se reacomoda por dentro); solo su margen inferior se recoge, así el contenido sube o baja de verdad,
+     y la parte que el contenido ya cubrió se recorta: se enrolla como una persiana */
   if(animar&&encabezado.animate&&/Android/i.test(navigator.userAgent)&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
     const raizA=document.documentElement;
-    const P=['height','paddingTop','paddingBottom','borderBottomWidth','marginTop','marginBottom'];
     const visible=getComputedStyle(encabezado).display!=='none';
-    const cs0=getComputedStyle(encabezado),ini={};
-    P.forEach(k=>ini[k]=visible?cs0[k]:'0px');
-    if(visible)ini.height=encabezado.getBoundingClientRect().height+'px';
+    const mbAhora=visible?parseFloat(getComputedStyle(encabezado).marginBottom)||0:0;
+    const habia=!!bannerAnim;
     if(bannerAnim){const a=bannerAnim;bannerAnim=null;a.forEach(x=>{try{x.cancel();}catch(e){}});}
-    const limpiarA=()=>{['height','minHeight','overflow','boxSizing','backdropFilter','webkitBackdropFilter'].forEach(k=>encabezado.style[k]='');raizA.removeAttribute('data-barra-anim');raizA.style.overflowAnchor='';};
+    const limpiarA=()=>{['overflow','minHeight','height','boxSizing','backdropFilter','webkitBackdropFilter'].forEach(k=>encabezado.style[k]='');raizA.removeAttribute('data-barra-anim');raizA.style.overflowAnchor='';};
     limpiarA();
     encabezado.style.display='';
-    const cs1=getComputedStyle(encabezado),lleno={};
-    P.forEach(k=>lleno[k]=cs1[k]);
-    lleno.height=encabezado.getBoundingClientRect().height+'px';
-    const fin={};P.forEach(k=>fin[k]=oculto?'0px':lleno[k]);
+    const H=encabezado.getBoundingClientRect().height||1;
+    const mb0=parseFloat(getComputedStyle(encabezado).marginBottom)||0;
+    /* cuánto está enrollada ahora (0 = a la vista, 1 = oculta) */
+    const t0=!visible?1:(habia?Math.max(0,Math.min(1,(mb0-mbAhora)/H)):0);
+    const t1=oculto?1:0;
     raizA.style.overflowAnchor='none';
     raizA.setAttribute('data-barra-anim',oculto?'cierra':'abre');
     raizA.setAttribute('data-barra',oculto?'oculta':'visible');
-    Object.assign(encabezado.style,{overflow:'hidden',boxSizing:'border-box',minHeight:'0px',backdropFilter:'none',webkitBackdropFilter:'none'});
-    const recorrido=Math.abs(parseFloat(ini.height)-parseFloat(fin.height));
-    const D=Math.max(260,Math.round((oculto?640:720)*Math.min(1,recorrido/(parseFloat(lleno.height)||1))));
-    const an=encabezado.animate([ini,fin],{duration:D,easing:'cubic-bezier(.45,0,.2,1)',fill:'both'});
+    encabezado.style.backdropFilter='none';encabezado.style.webkitBackdropFilter='none';
+    const cuadro=t=>({marginBottom:(mb0-H*t).toFixed(2)+'px',clipPath:'inset(0px 0px '+(t*100).toFixed(2)+'% 0px)'});
+    const D=Math.max(260,Math.round((oculto?640:720)*Math.abs(t1-t0)));
+    const an=encabezado.animate([cuadro(t0),cuadro(t1)],{duration:D,easing:'cubic-bezier(.45,0,.2,1)',fill:'both'});
     bannerAnim=[an];
     an.onfinish=()=>{
       if(bannerAnim===null||bannerAnim[0]!==an)return;bannerAnim=null;
