@@ -6054,6 +6054,26 @@ function aplicarBanner(oculto,animar){
   const yaEsta=!habiaAnim&&encVisible===!oculto;
   const reducir=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!animar||!encabezado.animate||yaEsta){encabezado.style.display=oculto?'none':'';raizB.setAttribute('data-barra',oculto?'oculta':'visible');return;}
+  // Android: los navegadores de Android hacían «temblar» la persiana (pestañas, tablero y pasos), aunque en
+  // iPhone y computadora va fluida. Allí el cambio es un fundido: el contenido se atenúa, el diseño cambia
+  // mientras está atenuado y vuelve a aparecer. Nada se desplaza, así que nada puede temblar.
+  if(/Android/i.test(navigator.userAgent)&&!reducir){
+    const capaSale=(encVisible?[encabezado]:[]).concat(mover);
+    const sale=capaSale.map(e=>e.animate([{opacity:e===encabezado?opIni:1},{opacity:.12}],{duration:120,easing:'ease-in',fill:'forwards'}));
+    bannerAnim=sale;
+    sale[0].onfinish=()=>{
+      if(bannerAnim!==sale)return;
+      encabezado.style.display=oculto?'none':'';
+      raizB.setAttribute('data-barra',oculto?'oculta':'visible');
+      const capaEntra=(oculto?[]:[encabezado]).concat(mover);
+      const entra=capaEntra.map(e=>e.animate([{opacity:.12},{opacity:1}],{duration:260,easing:'ease-out',fill:'backwards'}));
+      sale.forEach(x=>{try{x.cancel();}catch(e){}});
+      bannerAnim=entra;
+      if(!entra.length){bannerAnim=null;return;}
+      entra[0].onfinish=()=>{if(bannerAnim!==entra)return;bannerAnim=null;entra.forEach(x=>{try{x.cancel();}catch(e){}});limpiar();};
+    };
+    return;
+  }
   // el navegador no debe mover el desplazamiento por su cuenta mientras cambia el diseño
   raizB.style.overflowAnchor='none';
   if(!reducir)raizB.setAttribute('data-barra-anim',oculto?'cierra':'abre');
