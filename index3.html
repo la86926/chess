@@ -1899,8 +1899,9 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
   .sq .pc{cursor:grab}
   .sq .pc.drag{cursor:grabbing}
 }
-/* tableta (táctil): deslizar sobre las casillas vacías desplaza la página; solo las piezas se arrastran */
-@media (pointer:coarse) and (min-width:769px){
+/* tableta (táctil): deslizar sobre las casillas vacías desplaza la página; solo las piezas se arrastran.
+   any-pointer: también vale si la tableta tiene lápiz, teclado con panel táctil o modo escritorio */
+@media (any-pointer:coarse) and (min-width:769px), (pointer:fine) and (any-pointer:coarse){
   .board,.sq{touch-action:pan-y}
   .sq .pc,.sq .pc svg{touch-action:none}
 }

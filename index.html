@@ -122,7 +122,7 @@
 <button class="menu-button c-vidrio" id="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false"><svg class="mb-lado" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3.5"/><path d="M9.5 4.5v15M5.6 8.2h1.6M5.6 11h1.6"/></svg><svg class="mb-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
 <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true">
   <aside class="drawer c-vidrio" role="dialog" aria-modal="true" aria-label="Menú">
-    <div class="marca"><span class="c17-logo" aria-hidden="true"></span><div><strong>Chess de L <span class="marca-version" title="Versión de la web">v2.0.9</span></strong><small>Ajedrez, golpe a golpe</small></div></div>
+    <div class="marca"><span class="c17-logo" aria-hidden="true"></span><div><strong>Chess de L <span class="marca-version" title="Versión de la web">v2.0.10</span></strong><small>Ajedrez, golpe a golpe</small></div></div>
     <div class="anillos"><svg viewBox="0 0 84 84" aria-hidden="true"><circle class="pista" cx="42.0" cy="42.0" r="36"/><circle class="arco a-pc2" cx="42.0" cy="42.0" r="36" style="--l:226.19"/><circle class="pista" cx="42.0" cy="42.0" r="26.5"/><circle class="arco a-pc1" cx="42.0" cy="42.0" r="26.5" style="--l:166.50"/><circle class="pista" cx="42.0" cy="42.0" r="17"/><circle class="arco a-aa" cx="42.0" cy="42.0" r="17" style="--l:106.81"/></svg>
       <div class="anillos-txt"><b>Tu avance</b><ul><li><i style="background:var(--c-aa)"></i>Aprende<span id="c-p-aa">0 %</span></li><li><i style="background:var(--c-pc1)"></i>Método PC1<span id="c-p-pc1">0 %</span></li><li><i style="background:var(--c-pc2)"></i>Método PC2<span id="c-p-pc2">0 %</span></li></ul></div></div>
     <nav class="grupo" aria-label="Secciones">
@@ -147,8 +147,8 @@
     </div>
   </aside>
 </div>
-<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-31" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
-<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-31" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-32" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-32" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
 <!-- Mi ID: crear, entrar, cambiar o salir del ID que sincroniza el avance de las tres secciones -->
 <section class="app-frame mi-id" id="app-frame-id" aria-label="Mi ID"><div class="mi-id-in" id="mi-id">
   <h1>Mi ID</h1>
@@ -156,7 +156,7 @@
   <div class="mi-id-cuenta" id="mi-id-cuenta"></div>
 </div></section>
 <!-- Cada sección se carga la primera vez que se abre: al entrar solo se descarga y prepara la que se va a usar. -->
-<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-31" title="Aprende Ajedrez" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-32" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -761,7 +761,7 @@
    una nueva. Al abrir la página y al volver a ella se consulta version.json sin caché; si hay una versión
    más nueva, se recarga una sola vez con la dirección cambiada para traer todo fresco. */
 (function(){
-  var VERSION='2.0.9';
+  var VERSION='2.0.10';
   function revisar(){
     if(!window.fetch)return;
     fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
@@ -776,6 +776,38 @@
   revisar();
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')revisar();});
   window.addEventListener('pageshow',function(e){if(e.persisted)revisar();});
+})();
+</script>
+<script>
+/* diagnóstico (solo con ?diag=1): muestra cómo se reporta el dispositivo y qué pasa al deslizar el dedo */
+(function(){
+  if(!/[?&]diag=1/.test(location.search))return;
+  var caja=document.createElement('pre');
+  caja.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:2147483647;margin:0;padding:10px 12px;max-height:46vh;overflow:hidden;pointer-events:none;background:rgba(20,20,22,.88);color:#e8e8ea;font:11px/1.45 ui-monospace,Menlo,monospace;border-radius:12px;white-space:pre-wrap';
+  document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(caja);});
+  function mq(q){try{return matchMedia(q).matches?'sí':'no';}catch(e){return '?';}}
+  var info='',log=[];
+  function base(){
+    var vv=window.visualViewport;
+    info=''+(document.querySelector('.marca-version')||{}).textContent+'  '+navigator.userAgent+
+      '\nplatform '+navigator.platform+' · toques '+(navigator.maxTouchPoints||0)+' · dpr '+devicePixelRatio+
+      '\npantalla '+innerWidth+'×'+innerHeight+' · zoom '+(vv?vv.scale.toFixed(2):'?')+
+      '\npointer coarse '+mq('(pointer:coarse)')+' · fine '+mq('(pointer:fine)')+' · any-coarse '+mq('(any-pointer:coarse)')+' · hover '+mq('(hover:hover)');
+  }
+  function pintar(){base();caja.textContent=info+'\n— últimos deslizamientos —\n'+log.join('\n');}
+  function cadena(el,win){var o=[];while(el&&o.length<3&&el.nodeType===1){var t=win.getComputedStyle(el).touchAction;if(t&&t!=='auto')o.push((el.id?'#'+el.id:(el.className&&typeof el.className==='string'?'.'+el.className.split(' ')[0]:el.tagName.toLowerCase()))+':'+t);el=el.parentElement;}return o.join(' ')||'auto';}
+  function vigilar(fr){
+    try{
+      var w=fr.contentWindow,d=w.document;if(!d||d.__diag)return;d.__diag=1;
+      var st=null;
+      d.addEventListener('touchstart',function(e){var t=e.touches[0];st={y0:w.scrollY,mov:0,prev:0,sec:fr.id.replace('app-frame-',''),dest:cadena(e.target,w),max:d.scrollingElement.scrollHeight-w.innerHeight,ty:t.clientY};},{capture:true,passive:true});
+      d.addEventListener('touchmove',function(e){if(!st)return;st.mov++;setTimeout(function(){if(e.defaultPrevented&&st)st.prev++;},0);st.dy=Math.round(e.touches[0].clientY-st.ty);},{capture:true,passive:true});
+      d.addEventListener('touchend',function(){if(!st)return;var s=st;st=null;setTimeout(function(){log.unshift('sec '+s.sec+' · dedo '+(s.dy||0)+'px · página '+Math.round(s.y0)+'→'+Math.round(w.scrollY)+' (máx '+Math.round(s.max)+') · movs '+s.mov+' bloqueados '+s.prev+' · '+s.dest);log=log.slice(0,6);pintar();},350);},{capture:true,passive:true});
+    }catch(e){log.unshift('sin acceso: '+e.message);}
+  }
+  var arriba=0;document.addEventListener('touchmove',function(){arriba++;},{capture:true,passive:true});
+  document.addEventListener('touchend',function(e){if(arriba){log.unshift('el contenedor recibió el deslizamiento ('+arriba+' movs), no la sección · '+cadena(e.target,window));log=log.slice(0,6);pintar();}arriba=0;},{capture:true,passive:true});
+  setInterval(function(){var f=document.querySelectorAll('iframe.app-frame');for(var i=0;i<f.length;i++)vigilar(f[i]);pintar();},1000);
 })();
 </script>
 </body>
