@@ -1667,6 +1667,14 @@ html[data-enmarcado="si"] .topbar{padding-left:62px}
   html[data-enmarcado="si"] .topbar{padding-left:56px}
   html[data-enmarcado="si"][data-barra="oculta"] .boardhead{padding-left:52px;padding-right:52px}
 }
+/* Android: el margen para los botones es fijo (con la barra visible u oculta), así nada se desplaza
+   de lado al pulsar «Mostrar/Ocultar»; solo baja o sube la persiana */
+@media(max-width:1023px){
+  html[data-android][data-enmarcado="si"] body:not(.aa-app) .boardhead{padding-left:58px;padding-right:58px}
+}
+@media(max-width:480px){
+  html[data-android][data-enmarcado="si"] body:not(.aa-app) .boardhead{padding-left:52px;padding-right:52px}
+}
 
 @media (pointer:coarse){
   .pc-perso-bg.escribiendo .pc-perso-colores{display:none}
@@ -1827,6 +1835,15 @@ html[data-modo="claro"],html[data-modo="oscuro"]{
   .sq,.sq .pc,.sq .pc svg{touch-action:none;-webkit-user-drag:none;user-drag:none}
   .sq .pc{cursor:grab}
   .sq .pc.drag{cursor:grabbing}
+}
+/* tableta (táctil): deslizar sobre las casillas vacías desplaza la página; solo las piezas se arrastran */
+@media (pointer:coarse) and (min-width:769px){
+  .board,.sq{touch-action:pan-y}
+  .sq .pc,.sq .pc svg{touch-action:none}
+}
+/* tableta en horizontal: el tablero cabe entero en la pantalla */
+@media (pointer:coarse) and (orientation:landscape) and (min-width:881px){
+  .frame{max-width:max(340px,min(620px,calc(100vh - 128px)));max-width:max(340px,min(620px,calc(100dvh - 128px)))}
 }
 .pc-nombre-acciones{
   margin-left:auto;display:flex;align-items:center;justify-content:flex-end;
@@ -7601,6 +7618,7 @@ function ejecutarPremove(){
   if(cajaAviso) cajaAviso.onclick=function(e){ if(e.target===cajaAviso) cerrar(cajaAviso); };
 
   try{ if(window.parent && window.parent!==window) raiz.setAttribute('data-enmarcado','si'); }catch(e){}
+  try{ if(/Android/i.test(navigator.userAgent)) raiz.setAttribute('data-android','si'); }catch(e){}
   var barraSup=document.querySelector('.topbar');
   if(barraSup){
     var mirarBarra=function(){
