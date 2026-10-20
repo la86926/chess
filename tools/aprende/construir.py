@@ -162,6 +162,9 @@ def construir():
     cuerpo = (AQUI / 'cuerpo.html').read_text(encoding='utf-8')
 
     # --- piezas de index1 ---
+    # detección de Android (también tabletas en modo escritorio), la misma de index1
+    _i = i1.index('<script>/* Android, también')
+    deteccion = i1[_i:i1.index('</script>\n', _i) + 10]
     _, preload = script_con(i1, "const PENDING='__pc_backup_pending_v3';")
     diseno = estilo_id(i1, 'pc-diseno')
     _, tema = script_con(i1, "r.setAttribute('data-tablero', g('pc_tablero_1')||'cielo');")
@@ -255,7 +258,7 @@ def construir():
 <script id="pc-backup-preload">{preload}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0F1411">
+{deteccion}<meta name="theme-color" content="#0F1411">
 <title>Aprende Ajedrez</title>
 <link rel="icon" type="image/png" sizes="16x16" href="c17/fav-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="c17/fav-32.png">

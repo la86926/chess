@@ -120,6 +120,7 @@ try{
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script>/* Android, también cuando el navegador de una tableta pide la versión de escritorio (entonces no dice «Android» y se presenta como Linux) */window.__esAndroid=(function(){try{var u=navigator.userAgent||"",d=navigator.userAgentData;if(/Android/i.test(u))return true;if(d&&/Android/i.test(d.platform||""))return true;return /Linux/i.test(navigator.platform||"")&&!/CrOS|iPhone|iPad|Macintosh/i.test(u)&&(navigator.maxTouchPoints||0)>0;}catch(e){return false}})();</script>
 <meta name="theme-color" content="#0F1411">
 <title>Aprende Ajedrez</title>
 <link rel="icon" type="image/png" sizes="16x16" href="c17/fav-16.png">
@@ -7026,7 +7027,7 @@ function aplicarBanner(oculto,animar){
   /* Android: persiana sin transform ni desenfoque de fondo. El encabezado conserva su tamaño y su diseño
      (nada se reacomoda por dentro); solo su margen inferior se recoge, así el contenido sube o baja de verdad,
      y la parte que el contenido ya cubrió se recorta: se enrolla como una persiana */
-  if(animar&&encabezado.animate&&/Android/i.test(navigator.userAgent)&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
+  if(animar&&encabezado.animate&&window.__esAndroid&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
     const raizA=document.documentElement;
     const visible=getComputedStyle(encabezado).display!=='none';
     const mbAhora=visible?parseFloat(getComputedStyle(encabezado).marginBottom)||0:0;
@@ -7844,7 +7845,7 @@ $('b-banner').onclick=()=>{bannerOculto=!bannerOculto;localStorage.setItem('aa_b
   if(cajaAviso) cajaAviso.onclick=function(e){ if(e.target===cajaAviso) cerrar(cajaAviso); };
 
   try{ if(window.parent && window.parent!==window) raiz.setAttribute('data-enmarcado','si'); }catch(e){}
-  try{ if(/Android/i.test(navigator.userAgent)) raiz.setAttribute('data-android','si'); }catch(e){}
+  try{ if(window.__esAndroid) raiz.setAttribute('data-android','si'); }catch(e){}
   var barraSup=document.querySelector('.topbar');
   if(barraSup){
     var mirarBarra=function(){
