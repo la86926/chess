@@ -110,7 +110,7 @@ try{
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script>/* Android, también cuando el navegador de una tableta pide la versión de escritorio (entonces no dice «Android» y se presenta como Linux) */window.__esAndroid=(function(){try{var u=navigator.userAgent||"",d=navigator.userAgentData;if(/Android/i.test(u))return true;if(d&&/Android/i.test(d.platform||""))return true;return /Linux/i.test(navigator.platform||"")&&!/CrOS|iPhone|iPad|Macintosh/i.test(u)&&(navigator.maxTouchPoints||0)>0;}catch(e){return false}})();</script>
+<script>/* Android, también cuando el navegador de una tableta pide la versión de escritorio (entonces no dice «Android» y se presenta como Linux) */window.__esAndroid=(function(){try{var u=navigator.userAgent||"",d=navigator.userAgentData;if(/Android/i.test(u))return true;if(d&&/Android/i.test(d.platform||""))return true;return /Linux/i.test(navigator.platform||"")&&!/CrOS|iPhone|iPad|Macintosh/i.test(u)&&(navigator.maxTouchPoints||0)>0;}catch(e){return false}})();try{if(window.__esAndroid)document.documentElement.setAttribute("data-android","si");}catch(e){}</script>
 <meta name="theme-color" content="#0F1411">
 <title>Método PC1</title>
 <link rel="icon" type="image/png" sizes="16x16" href="c17/fav-16.png">
@@ -6768,34 +6768,6 @@ function aplicarBanner(oculto,animar){
   if(!encabezado||!boton)return;
   boton.textContent=oculto?'Mostrar':'Ocultar';
   boton.setAttribute('aria-pressed',oculto?'true':'false');
-  /* Aprende Ajedrez en Android: sin persiana. La página se funde un instante, el encabezado aparece o
-     desaparece mientras no se ve y la página vuelve ya quieta: a la vista nada se desliza ni cambia de tamaño */
-  if(animar&&window.__esAndroid&&document.body&&document.body.classList.contains('aa-app')&&document.body.animate){
-    const raizF=document.documentElement,cuerpo=document.body;
-    if(bannerAnim){const a=bannerAnim;bannerAnim=null;a.forEach(x=>{try{x.cancel();}catch(e){}});}
-    ['overflow','minHeight','height','boxSizing','backdropFilter','webkitBackdropFilter','clipPath','marginBottom'].forEach(k=>encabezado.style[k]='');
-    raizF.setAttribute('data-barra-anim',oculto?'cierra':'abre');
-    const sale=cuerpo.animate([{opacity:1},{opacity:0}],{duration:140,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
-    bannerAnim=[sale];
-    sale.onfinish=()=>{
-      if(!bannerAnim||bannerAnim[0]!==sale)return;
-      encabezado.style.display=oculto?'none':'';
-      raizF.setAttribute('data-barra',oculto?'oculta':'visible');
-      /* dos cuadros para que todo se acomode (mascota, pestañas, pasos) antes de volver a verse */
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        if(!bannerAnim||bannerAnim[0]!==sale)return;
-        const entra=cuerpo.animate([{opacity:0},{opacity:1}],{duration:280,easing:'cubic-bezier(0,0,.2,1)',fill:'forwards'});
-        bannerAnim=[entra];
-        try{sale.cancel();}catch(e){}
-        entra.onfinish=()=>{
-          if(!bannerAnim||bannerAnim[0]!==entra)return;bannerAnim=null;
-          try{entra.cancel();}catch(e){}
-          raizF.removeAttribute('data-barra-anim');
-        };
-      }));
-    };
-    return;
-  }
   /* Android: persiana sin transform ni desenfoque de fondo. El encabezado conserva su tamaño y su diseño
      (nada se reacomoda por dentro); solo su margen inferior se recoge, así el contenido sube o baja de verdad,
      y la parte que el contenido ya cubrió se recorta: se enrolla como una persiana */

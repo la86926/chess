@@ -6,16 +6,16 @@
 <link rel="preload" href="c17/piel.js?v=8" as="script">
 <link rel="preload" href="c17/fondos.js?v=5" as="script">
 <!-- las lecciones y la app se piden desde el principio, junto con la página -->
-<link rel="preload" href="aa-app.css?v=20261021-aa66" as="style">
-<link rel="preload" href="aa-catalogo.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-datos.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-lecciones-n1.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-lecciones-n2.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-lecciones-n3.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-lecciones-n4.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-lecciones-n5.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-lecciones-n6.js?v=20261021-aa66" as="script">
-<link rel="preload" href="aa-app.js?v=20261021-aa66" as="script">
+<link rel="preload" href="aa-app.css?v=20261021-aa67" as="style">
+<link rel="preload" href="aa-catalogo.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-datos.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-lecciones-n1.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-lecciones-n2.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-lecciones-n3.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-lecciones-n4.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-lecciones-n5.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-lecciones-n6.js?v=20261021-aa67" as="script">
+<link rel="preload" href="aa-app.js?v=20261021-aa67" as="script">
 <link rel="preload" href="pc-compartir.js?v=3" as="script">
 <link rel="preload" href="pc-mascota.js?v=22" as="script">
 <script id="pc-backup-preload">
@@ -120,7 +120,7 @@ try{
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script>/* Android, también cuando el navegador de una tableta pide la versión de escritorio (entonces no dice «Android» y se presenta como Linux) */window.__esAndroid=(function(){try{var u=navigator.userAgent||"",d=navigator.userAgentData;if(/Android/i.test(u))return true;if(d&&/Android/i.test(d.platform||""))return true;return /Linux/i.test(navigator.platform||"")&&!/CrOS|iPhone|iPad|Macintosh/i.test(u)&&(navigator.maxTouchPoints||0)>0;}catch(e){return false}})();</script>
+<script>/* Android, también cuando el navegador de una tableta pide la versión de escritorio (entonces no dice «Android» y se presenta como Linux) */window.__esAndroid=(function(){try{var u=navigator.userAgent||"",d=navigator.userAgentData;if(/Android/i.test(u))return true;if(d&&/Android/i.test(d.platform||""))return true;return /Linux/i.test(navigator.platform||"")&&!/CrOS|iPhone|iPad|Macintosh/i.test(u)&&(navigator.maxTouchPoints||0)>0;}catch(e){return false}})();try{if(window.__esAndroid)document.documentElement.setAttribute("data-android","si");}catch(e){}</script>
 <meta name="theme-color" content="#0F1411">
 <title>Aprende Ajedrez</title>
 <link rel="icon" type="image/png" sizes="16x16" href="c17/fav-16.png">
@@ -2027,7 +2027,7 @@ header.topbar.topbar-anim{overflow:hidden}
    al plegar se aparta pronto, antes de que el título suba; al desplegar espera a que la barra haya bajado */
 /* (el hueco cambia de golpe y el título se desliza con transform desde aplicarBanner: nada se recalcula en cada fotograma) */
 </style>
-<link rel="stylesheet" href="aa-app.css?v=20261021-aa66">
+<link rel="stylesheet" href="aa-app.css?v=20261021-aa67">
 <link rel="stylesheet" href="c17/fuentes.css?v=3">
 <link rel="stylesheet" href="c17/tokens.css?v=7">
 <link rel="stylesheet" href="c17/piel.css?v=15">
@@ -7025,34 +7025,6 @@ function aplicarBanner(oculto,animar){
   if(!encabezado||!boton)return;
   boton.textContent=oculto?'Mostrar':'Ocultar';
   boton.setAttribute('aria-pressed',oculto?'true':'false');
-  /* Aprende Ajedrez en Android: sin persiana. La página se funde un instante, el encabezado aparece o
-     desaparece mientras no se ve y la página vuelve ya quieta: a la vista nada se desliza ni cambia de tamaño */
-  if(animar&&window.__esAndroid&&document.body&&document.body.classList.contains('aa-app')&&document.body.animate){
-    const raizF=document.documentElement,cuerpo=document.body;
-    if(bannerAnim){const a=bannerAnim;bannerAnim=null;a.forEach(x=>{try{x.cancel();}catch(e){}});}
-    ['overflow','minHeight','height','boxSizing','backdropFilter','webkitBackdropFilter','clipPath','marginBottom'].forEach(k=>encabezado.style[k]='');
-    raizF.setAttribute('data-barra-anim',oculto?'cierra':'abre');
-    const sale=cuerpo.animate([{opacity:1},{opacity:0}],{duration:140,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
-    bannerAnim=[sale];
-    sale.onfinish=()=>{
-      if(!bannerAnim||bannerAnim[0]!==sale)return;
-      encabezado.style.display=oculto?'none':'';
-      raizF.setAttribute('data-barra',oculto?'oculta':'visible');
-      /* dos cuadros para que todo se acomode (mascota, pestañas, pasos) antes de volver a verse */
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        if(!bannerAnim||bannerAnim[0]!==sale)return;
-        const entra=cuerpo.animate([{opacity:0},{opacity:1}],{duration:280,easing:'cubic-bezier(0,0,.2,1)',fill:'forwards'});
-        bannerAnim=[entra];
-        try{sale.cancel();}catch(e){}
-        entra.onfinish=()=>{
-          if(!bannerAnim||bannerAnim[0]!==entra)return;bannerAnim=null;
-          try{entra.cancel();}catch(e){}
-          raizF.removeAttribute('data-barra-anim');
-        };
-      }));
-    };
-    return;
-  }
   /* Android: persiana sin transform ni desenfoque de fondo. El encabezado conserva su tamaño y su diseño
      (nada se reacomoda por dentro); solo su margen inferior se recoge, así el contenido sube o baja de verdad,
      y la parte que el contenido ya cubrió se recorta: se enrolla como una persiana */
@@ -8134,15 +8106,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script src="pc-compartir.js?v=3"></script>
-<script src="aa-catalogo.js?v=20261021-aa66"></script>
-<script src="aa-datos.js?v=20261021-aa66"></script>
-<script src="aa-lecciones-n1.js?v=20261021-aa66"></script>
-<script src="aa-lecciones-n2.js?v=20261021-aa66"></script>
-<script src="aa-lecciones-n3.js?v=20261021-aa66"></script>
-<script src="aa-lecciones-n4.js?v=20261021-aa66"></script>
-<script src="aa-lecciones-n5.js?v=20261021-aa66"></script>
-<script src="aa-lecciones-n6.js?v=20261021-aa66"></script>
-<script src="aa-app.js?v=20261021-aa66"></script>
+<script src="aa-catalogo.js?v=20261021-aa67"></script>
+<script src="aa-datos.js?v=20261021-aa67"></script>
+<script src="aa-lecciones-n1.js?v=20261021-aa67"></script>
+<script src="aa-lecciones-n2.js?v=20261021-aa67"></script>
+<script src="aa-lecciones-n3.js?v=20261021-aa67"></script>
+<script src="aa-lecciones-n4.js?v=20261021-aa67"></script>
+<script src="aa-lecciones-n5.js?v=20261021-aa67"></script>
+<script src="aa-lecciones-n6.js?v=20261021-aa67"></script>
+<script src="aa-app.js?v=20261021-aa67"></script>
 <script src="pc-mascota.js?v=22"></script>
 </body>
 </html>
