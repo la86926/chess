@@ -534,18 +534,19 @@ function posarCara(p){if(cara)cara.dataset.pose=String(p);}
 (function(){
   var IDS=['gato','zorro','pinguino','conejita','panda','buho','dino','rana','koala','corgi'];
   var PAJARO=['mascota.png','mascota-sube1.png','mascota-sube2.png','mascota-rock.png'];
+  /* en el globo va solo el rostro de la mascota elegida, quieto (la que se mueve es la del tablero) */
   function poses(){
     var id='';try{id=localStorage.getItem('pc_mascota_elegida')||localStorage.getItem('mascotaPC_elegida')||'';}catch(e){}
-    if(IDS.indexOf(id)<0)return PAJARO;
-    return [0,1,2,3].map(function(k){return 'mascotas/'+id+'-'+k+'.webp';});
+    var r=IDS.indexOf(id)<0?'mascota-cara.png':'mascotas/'+id+'-cara.webp';
+    return [r,r,r,r];
   }
   function aplicar(animar){
     if(!cara)return;
     var imgs=cara.querySelectorAll('img.p0,img.p1,img.p2,img.p3'),ps=poses();
     if(!imgs.length||imgs[0].getAttribute('src')===ps[0])return;
     var cambiar=function(){for(var i=0;i<imgs.length;i++)imgs[i].setAttribute('src',ps[i]);};
+    cambiar();return;
     var caja=cara.querySelector('.aa-cara-baile')||cara;
-    if(!animar||!caja.animate){cambiar();return;}
     var sale=caja.animate([{transform:'scale(1) rotate(0)',opacity:1},{transform:'scale(.2) rotate(-25deg)',opacity:0}],{duration:220,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'});
     sale.onfinish=function(){cambiar();sale.cancel();caja.animate([{transform:'scale(.2) rotate(25deg)',opacity:0},{transform:'scale(1.15) rotate(-4deg)',opacity:1,offset:.6},{transform:'scale(1) rotate(0)',opacity:1}],{duration:480,easing:'cubic-bezier(.2,.8,.3,1)'});};
   }
@@ -556,6 +557,9 @@ function posarCara(p){if(cara)cara.dataset.pose=String(p);}
   document.addEventListener('visibilitychange',function(){if(!document.hidden)aplicar(true);});
 })();
 function festejarTutor(){
+  /* festeja la mascota del tablero; el rostro del globo se queda quieto */
+  try{if(window.pcMascota&&pcMascota.festejar)pcMascota.festejar();}catch(e){}
+  return;
   if(!cara)return;
   calmarTutor();
   festejo.activo=true;tutorCaja.classList.add('festeja');

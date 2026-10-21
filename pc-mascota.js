@@ -41,7 +41,7 @@
   function tutorCaja(){ var c = tutorCara(); return c && (c.closest ? c.closest('.aa-tutor') : c.parentElement); }
   var MODO_TUTOR = !!tutorCara();
   function tutorOculto(){ var t = tutorCaja(); return !!(t && t.classList.contains('pcm-sin-cara')); }
-  function presente(){ return MODO_TUTOR ? !tutorOculto() : !!el; }
+  function presente(){ return !!el; }
   function guardarElegida(id){ try { localStorage.setItem(CLAVE_ELEGIDA, id); } catch (e) {} }
   function precargar(m){ return m.poses.map(function(src){ var i = new Image(); i.src = src; return i; }); }
   var PROPORCION = 949 / 1016;           // ancho / alto de la caja del personaje
@@ -212,7 +212,8 @@
     if (!col) return null;
     var rm = marco.getBoundingClientRect();
     if (!rm.width) return null;
-    return { marco: marco, col: col, rm: rm, cab: col.querySelector('.boardhead') };
+    var cab = col.querySelector('.boardhead') || ((b.closest && b.closest('.boardcol')) || document).querySelector('.boardhead');
+    return { marco: marco, col: col, rm: rm, cab: cab };
   }
   function visible(n){ if (!n) return null; var r = n.getBoundingClientRect(); return (r.width && r.height) ? r : null; }
 
@@ -225,9 +226,16 @@
     if (el.parentElement !== p.col) p.col.appendChild(el);
     var rc = p.col.getBoundingClientRect(), rm = p.rm;
     var alto = Math.round(Math.max(56, Math.min(78, rm.width * 0.15)));
+    /* Aprende Ajedrez: no más alta que el hueco entre las pestañas y el tablero (se mide con la página arriba) */
+    if (MODO_TUTOR) {
+      var bf = document.getElementById('aa-barra-fija');
+      if (bf && (window.scrollY || 0) < 1) { var rbf = bf.getBoundingClientRect(); if (rbf.height) el._hueco = rm.top - rbf.bottom - 4; }
+      if (el._hueco > 0) alto = Math.round(Math.max(44, Math.min(alto, el._hueco)));
+    }
     var ancho = Math.round(alto * PROPORCION);
     var centro = p.cab && visible(p.cab.querySelector('.boardhead-center'));
-    var derecha = p.cab && visible(p.cab.querySelector('.boardhead-right'));
+    /* a la derecha: las flechas de los métodos o el corazón de Aprende Ajedrez */
+    var derecha = p.cab && (visible(p.cab.querySelector('.boardhead-right')) || visible(p.cab.querySelector('.aa-corazon')));
     var borde = derecha ? Math.min(derecha.left - 14, rm.right - 10) : rm.right - 12;
     var minimo = centro ? centro.right + 10 : rm.left + 8;
     /* con la barra plegada, el botón de la mascota queda fijo arriba a la derecha: la mascota no se mete debajo */
@@ -237,6 +245,8 @@
       if (rbt.width) borde = Math.min(borde, rbt.left - 8);
     }
     var x = Math.max(minimo, borde - ancho);
+    /* si a la derecha del botón Mostrar/Ocultar no cabe sobre el tablero, se sienta a su izquierda */
+    if (centro && x + ancho > rm.right - 6) x = Math.max(rm.left + 8, centro.left - 12 - ancho);
     el.style.width = ancho + 'px';
     el.style.height = alto + 'px';
     /* si cambia de sitio (barra plegada o desplegada), se desliza con «translate»: sin recalcular la página
@@ -249,7 +259,15 @@
       } catch (e) {}
     }
     el.style.top = Math.round(rm.top - rc.top - alto + alto * 0.05) + 'px';
+    /* Aprende Ajedrez: el título de la lección termina antes de la mascota, nunca pasa por debajo */
+    var tit = p.cab && p.cab.querySelector('.aa-titulo');
+    if (tit) {
+      tit.style.maxWidth = '';
+      var rt = tit.getBoundingClientRect(), arriba = rm.top - alto + alto * 0.05;
+      if (rt.width && rt.bottom > arriba && rt.right > x - 8 && rt.left < x) tit.style.maxWidth = Math.max(120, Math.round(x - rt.left - 8)) + 'px';
+    }
   }
+  function liberarTitulo(){ var t = document.querySelector('.aa-titulo'); if (t) t.style.maxWidth = ''; }
 
   /* ---------- crear / quitar la mascota ---------- */
   var festejo = { activo: false, t: [] };
@@ -277,6 +295,7 @@
     if (gesto) gesto.limpiar();
     if (el && el.parentElement) el.parentElement.removeChild(el);
     el = null;
+    liberarTitulo();
   }
 
   function posar(p){ if (el) el.setAttribute('data-pose', String(p)); }
@@ -605,17 +624,11 @@
   function elegirMascota(id, p){
     var m = buscar(id);
     if (!m) return;
-    if (MODO_TUTOR) {
-      if (m.id !== actual().id) { guardarElegida(m.id); refrescarCaras(p); if (boton) onda(); }
-      precargar(m);
-      if (tutorOculto()) { guardar(''); mostrarTutor(true); }
-      else try { window.dispatchEvent(new CustomEvent('pcmascota-cambio', { detail: { id: m.id } })); } catch (e) {}
-      return;
-    }
     if (m.id === actual().id && el) { if (el) { impulso(); chispas(6, (el.offsetHeight || 60) * .7); } return; }
     guardarElegida(m.id);
     refrescarCaras(p);
     if (boton) onda();
+    if (MODO_TUTOR) try { window.dispatchEvent(new CustomEvent('pcmascota-cambio', { detail: { id: m.id } })); } catch (e) {}
     var imgs = precargar(m), listo = false;
     function cuando(fn){
       var n = 0, hecho = false;
@@ -665,14 +678,14 @@
     abrirPop(ancla || el, [
       { acc: 'sesion', icono: 'reloj', texto: 'Quitar por esta vez' },
       { acc: 'siempre', icono: 'basura', texto: 'Quitar para siempre', peligro: true }
-    ], function(acc){ guardar(acc); if (MODO_TUTOR) ocultarTutor(true); else irseVolando(); });
+    ], function(acc){ guardar(acc); irseVolando(); });
   }
   function abrirMenuBoton(){
     if (!boton) return;
     if (presente()) { abrirMenuQuitar(boton); return; }
     abrirPop(boton, [
       { acc: 'agregar', icono: 'mas', texto: 'Agregar a la escena', principal: true }
-    ], function(){ guardar(''); if (MODO_TUTOR) mostrarTutor(true); else volverVolando(); });
+    ], function(){ guardar(''); volverVolando(); });
   }
 
   /* ---------- tutor de Aprende Ajedrez: se va al botón y vuelve de él ---------- */
@@ -742,6 +755,7 @@
     m.style.transformOrigin = '50% 50%';
     m.style.pointerEvents = 'none';
     el = null;
+    liberarTitulo();
     var a = animar(m, [
       { transform: 'translate(0,0) scale(1,1) rotate(0)', opacity: 1, offset: 0 },
       { transform: 'translate(0,4px) scale(1.1,.86) rotate(0)', opacity: 1, offset: .14 },
@@ -786,7 +800,9 @@
   /* ---------- estado inicial y cambios desde la otra sección ---------- */
   function aplicarEstado(animado){
     var oculto = !!leer();
-    if (MODO_TUTOR) {
+    /* Aprende Ajedrez: la carita del tutor en el globo siempre está; el botón pone o quita la del tablero */
+    if (MODO_TUTOR) { var tc = tutorCaja(); if (tc && tc.classList.contains('pcm-sin-cara')) { tc.classList.remove('pcm-sin-cara'); try { window.dispatchEvent(new CustomEvent('pcmascota-cambio', { detail: { sinAnimar: true } })); } catch (e) {} } }
+    if (false) {
       activarDobleToqueTutor();
       crearBoton();
       if (oculto && !tutorOculto()) { if (pop && pop._ancla === tutorCara()) cerrarPop(); if (animado) ocultarTutor(true); else { var t = tutorCaja(); if (t) t.classList.add('pcm-sin-cara'); } }
@@ -796,7 +812,7 @@
     if (oculto) {
       if (pop && el && pop._ancla === el) cerrarPop();
       if (el) {
-        var m = el; el = null; calmar();
+        var m = el; el = null; calmar(); liberarTitulo();
         var a = animado ? animar(m, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.6)' }], { duration: 220, fill: 'forwards' }) : null;
         alTerminar(a, function(){ if (m.parentElement) m.parentElement.removeChild(m); }, 220);
       }

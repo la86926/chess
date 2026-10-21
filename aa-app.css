@@ -611,7 +611,7 @@ html[data-modo="oscuro"] .aa-app .aa-etapa.activa i{--panel2:#1b1f1c}
 /* =====================================================================
    Mascota: en la Sección 1 no aparece la grande sobre el tablero; la del tutor festeja
    ===================================================================== */
-.aa-app .pc-mascota{display:none!important}
+/* la mascota se sienta sobre el borde superior del tablero, como en PC1 y PC2 (el botón la pone o la quita) */
 .aa-tutor-cara{position:relative;display:block;object-fit:initial}
 .aa-tutor-cara .aa-cara-baile{position:absolute;inset:0;transform-origin:50% 100%}
 .aa-tutor-cara img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;-webkit-user-drag:none}
@@ -949,3 +949,8 @@ html[data-android][data-barra-anim] .aa-barra-fija{background:var(--bg)!importan
    en ese instante la forma de manejar la sección (la que mueve la barra del navegador), y se veía un zoom leve */
 html[data-android]{height:100%}
 html[data-android] body.aa-app{min-height:calc(100% + 2px)!important;box-sizing:border-box}
+
+/* El globo del tutor muestra solo el rostro de la mascota elegida, quieto: la que se mueve es la del tablero */
+.aa-app .aa-tutor-cara,.aa-app .aa-tutor.habla .aa-tutor-cara,.aa-app .aa-tutor.festeja .aa-cara-baile{animation:none!important}
+.aa-app .aa-cara-notas{display:none!important}
+.aa-app .aa-tutor-cara img{object-fit:contain;object-position:50% 100%}
