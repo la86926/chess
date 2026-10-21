@@ -934,3 +934,12 @@ html[data-enmarcado="si"][data-barra="oculta"] .aa-app .aa-boardhead{padding-lef
   /* las pestañas se corren 4 px por el hueco del menú (66 px) frente al de la mascota (58 px): el botón las sigue */
   html[data-enmarcado="si"] .aa-app .aa-boardhead .boardhead-center{left:calc(50% + 4px)}
 }
+
+/* Android: mientras sube o baja la persiana de Mostrar/Ocultar no hay desenfoque de fondo (vidrio) sobre
+   el contenido que se mueve, igual que en el encabezado de PC1 y PC2: en Android esa mezcla hace que la
+   página parezca acercarse, alejarse o correrse de lado. Al terminar, el vidrio vuelve */
+html[data-android][data-barra-anim] .aa-barra-fija,
+html[data-android][data-barra-anim] .aa-barra-fija *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html[data-android][data-barra-anim] .aa-barra-fija{background:var(--bg)!important}
+/* las ventanas solo llevan desenfoque cuando están abiertas (ocultas, no dejan una capa de vidrio sobre la página) */
+.aa-fv-fondo:not(.open){-webkit-backdrop-filter:none;backdrop-filter:none}
