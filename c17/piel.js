@@ -87,7 +87,7 @@
   }
   function regalo(){
     var b=document.getElementById('b-gift');if(!b||b.querySelector('svg'))return;
-    var pesa=raiz.getAttribute('data-seccion')==='pc2';
+    var sec=raiz.getAttribute('data-seccion'),pesa=sec==='pc1'||sec==='pc2';
     b.innerHTML=svg(pesa?I.pesa:I.regalo,'');
   }
 

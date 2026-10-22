@@ -1,5 +1,5 @@
 /* Aprende Ajedrez · Catálogo curricular
-   Seis niveles, 218 contenidos. Los identificadores (N1-001 …) son permanentes:
+   Seis niveles, 219 contenidos. Los identificadores (N1-001 …) son permanentes:
    el progreso, el historial y los favoritos se guardan con ellos. Si un título
    cambia o se reordena el catálogo, el identificador NO cambia: una lección
    reubicada se escribe «Título|N3-002» y conserva su identificador. */

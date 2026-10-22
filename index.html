@@ -122,11 +122,11 @@
 <button class="menu-button c-vidrio" id="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false"><svg class="mb-lado" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3.5"/><path d="M9.5 4.5v15M5.6 8.2h1.6M5.6 11h1.6"/></svg><svg class="mb-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
 <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true">
   <aside class="drawer c-vidrio" role="dialog" aria-modal="true" aria-label="Menú">
-    <div class="marca"><span class="c17-logo" aria-hidden="true"></span><div><strong>Chess de L <span class="marca-version" title="Versión de la web">v2.0.15</span></strong><small>Ajedrez, golpe a golpe</small></div></div>
+    <div class="marca"><span class="c17-logo" aria-hidden="true"></span><div><strong>Chess de L <span class="marca-version" title="Versión de la web">v2.0.16</span></strong><small>Ajedrez, golpe a golpe</small></div></div>
     <div class="anillos"><svg viewBox="0 0 84 84" aria-hidden="true"><circle class="pista" cx="42.0" cy="42.0" r="36"/><circle class="arco a-pc2" cx="42.0" cy="42.0" r="36" style="--l:226.19"/><circle class="pista" cx="42.0" cy="42.0" r="26.5"/><circle class="arco a-pc1" cx="42.0" cy="42.0" r="26.5" style="--l:166.50"/><circle class="pista" cx="42.0" cy="42.0" r="17"/><circle class="arco a-aa" cx="42.0" cy="42.0" r="17" style="--l:106.81"/></svg>
       <div class="anillos-txt"><b>Tu avance</b><ul><li><i style="background:var(--c-aa)"></i>Aprende<span id="c-p-aa">0 %</span></li><li><i style="background:var(--c-pc1)"></i>Método PC1<span id="c-p-pc1">0 %</span></li><li><i style="background:var(--c-pc2)"></i>Método PC2<span id="c-p-pc2">0 %</span></li></ul></div></div>
     <nav class="grupo" aria-label="Secciones">
-      <button class="app-choice" data-app="3" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Aprende Ajedrez<span class="ac-nivel">Desde cero</span></span><span class="ac-sub">218 lecciones en seis niveles</span></span><span class="ac-cifra">0</span></button>
+      <button class="app-choice" data-app="3" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Aprende Ajedrez<span class="ac-nivel">Desde cero</span></span><span class="ac-sub">219 lecciones en seis niveles</span></span><span class="ac-cifra">0</span></button>
       <button class="app-choice active" data-app="1" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Método PC1<span class="ac-nivel">Avanzado</span></span><span class="ac-sub">1128 ejercicios tácticos</span></span><span class="ac-cifra">0</span></button>
       <button class="app-choice" data-app="2" type="button"><span class="ac-icono" aria-hidden="true"><svg viewBox="0 0 34 34"><circle class="pista" cx="17.0" cy="17.0" r="14"/><circle class="arco " cx="17.0" cy="17.0" r="14" style="--l:87.96"/></svg></span><span class="ac-txt"><span class="ac-nombre">Método PC2<span class="ac-nivel">Muy avanzado</span></span><span class="ac-sub">1000 ejercicios posicionales</span></span><span class="ac-cifra">0</span></button>
     </nav>
@@ -147,8 +147,8 @@
     </div>
   </aside>
 </div>
-<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-37" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
-<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-37" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame active" id="app-frame-1" data-src="index1.html?v=c17-38" title="Método PC1 (Avanzado)" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-2" data-src="index2.html?v=c17-38" title="Método PC2 (Muy avanzado)" allow="autoplay"></iframe>
 <!-- Mi ID: crear, entrar, cambiar o salir del ID que sincroniza el avance de las tres secciones -->
 <section class="app-frame mi-id" id="app-frame-id" aria-label="Mi ID"><div class="mi-id-in" id="mi-id">
   <h1>Mi ID</h1>
@@ -156,7 +156,7 @@
   <div class="mi-id-cuenta" id="mi-id-cuenta"></div>
 </div></section>
 <!-- Cada sección se carga la primera vez que se abre: al entrar solo se descarga y prepara la que se va a usar. -->
-<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-37" title="Aprende Ajedrez" allow="autoplay"></iframe>
+<iframe class="app-frame" id="app-frame-3" data-src="index3.html?v=c17-38" title="Aprende Ajedrez" allow="autoplay"></iframe>
 <script>
 (function(){
   var menuButton=document.getElementById('menu-button');
@@ -399,6 +399,59 @@
   /* también en el contenedor: menú lateral, «Mi ID» y ventanas */
   if(ES_TACTIL_NO_APPLE) desplazarConElDedo(document,window);
 
+  /* PC1 y PC2 en computadora: la rueda del ratón y el panel táctil siempre desplazan la sección.
+     En cada gesto se mira primero si el navegador ya desplazó algo; solo si no lo hizo, se desplaza
+     aquí (la página, o la lista o ventana que esté bajo el puntero). Si el navegador sí lo hace, esto no toca nada. */
+  function normalizarRueda(e,win){var d=e.deltaY;if(e.deltaMode===1)d*=40;else if(e.deltaMode===2)d*=win.innerHeight*.9;return d;}
+  function lienzoRueda(el,win,doc,dy){
+    for(var e=el;e&&e.nodeType===1&&e!==doc.documentElement&&e!==doc.body;e=e.parentElement){
+      var cs=win.getComputedStyle(e);
+      if((cs.overflowY==='auto'||cs.overflowY==='scroll')&&e.scrollHeight>e.clientHeight+2){
+        if(dy>0?e.scrollTop+e.clientHeight<e.scrollHeight-1:e.scrollTop>0)return e;
+      }
+    }
+    return null;
+  }
+  function asegurarRuedaFrame(frame){
+    try{
+      if(!frame||(frame.id!=='app-frame-1'&&frame.id!=='app-frame-2'))return;
+      var doc=frame.contentDocument,win=frame.contentWindow;
+      if(!doc||!win||!doc.documentElement||doc.location.href==='about:blank'||doc.documentElement.dataset.ruedaSegura)return;
+      doc.documentElement.dataset.ruedaSegura='1';
+      var g=null,ultimoScroll=-1e9;
+      function pos(c){return c?c.scrollTop:(doc.scrollingElement||doc.documentElement).scrollTop;}
+      function mover(c,dy){if(c)c.scrollTop+=dy;else win.scrollBy(0,dy);}
+      /* cualquier desplazamiento (página, lista o ventana) cerca del inicio del gesto cuenta como «ya lo hizo el navegador» */
+      doc.addEventListener('scroll',function(){ultimoScroll=performance.now();},{passive:true,capture:true});
+      win.addEventListener('wheel',function(e){
+        if(e.ctrlKey||e.defaultPrevented)return;
+        var dy=normalizarRueda(e,win);
+        if(!dy||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+        var ahora=performance.now();
+        if(!g||ahora-g.ultimo>220){
+          var c=lienzoRueda(e.target,win,doc,dy);
+          g={c:c,y0:pos(c),pend:0,modo:null,ultimo:ahora,inicio:ahora};
+          var este=g;
+          setTimeout(function(){
+            if(g!==este||este.modo)return;
+            if(ultimoScroll>=este.inicio-60||Math.abs(pos(este.c)-este.y0)>0.5){este.modo='nativo';return;}
+            este.modo='propio';mover(este.c,este.pend);este.pend=0;
+          },100);
+        }
+        g.ultimo=ahora;
+        if(g.modo==='propio')mover(g.c,dy);
+        else if(!g.modo)g.pend+=dy;
+      },{passive:true});
+    }catch(e){}
+  }
+  /* si la rueda cae en el contenedor (fuera de la sección), también va a PC1 o PC2 */
+  document.addEventListener('wheel',function(e){
+    if(e.ctrlKey||e.defaultPrevented||(activeApp!=='1'&&activeApp!=='2'))return;
+    var t=e.target;if(t&&t.closest&&t.closest('.drawer-backdrop,.tuto,.mi-id'))return;
+    var fr=document.getElementById('app-frame-'+activeApp);
+    try{var w=fr&&fr.contentWindow;if(!w)return;var dy=normalizarRueda(e,w);if(dy&&Math.abs(e.deltaY)>=Math.abs(e.deltaX))w.scrollBy(0,dy);}catch(err){}
+  },{passive:true});
+
   function mostrarControlesAnalisisSiempre(frame){
     try{
       var doc=frame&&frame.contentDocument;
@@ -538,11 +591,12 @@
     });
   }
   var appFrames=document.querySelectorAll('.app-frame');
-  for(var f=0;f<appFrames.length;f++) appFrames[f].addEventListener('load',function(){bloquearZoomFrame(this);bloquearScrollHorizontalFrame(this);mostrarControlesAnalisisSiempre(this);fijarTamanoBotonDroidfish(this);});
+  for(var f=0;f<appFrames.length;f++) appFrames[f].addEventListener('load',function(){bloquearZoomFrame(this);bloquearScrollHorizontalFrame(this);asegurarRuedaFrame(this);mostrarControlesAnalisisSiempre(this);fijarTamanoBotonDroidfish(this);});
   var appChoices=document.querySelectorAll('.app-choice');
-  for(var c=0;c<appChoices.length;c++) appChoices[c].addEventListener('click',function(){var frame=document.getElementById('app-frame-'+this.getAttribute('data-app'));bloquearZoomFrame(frame);bloquearScrollHorizontalFrame(frame);mostrarControlesAnalisisSiempre(frame);fijarTamanoBotonDroidfish(frame);});
+  for(var c=0;c<appChoices.length;c++) appChoices[c].addEventListener('click',function(){var frame=document.getElementById('app-frame-'+this.getAttribute('data-app'));bloquearZoomFrame(frame);bloquearScrollHorizontalFrame(frame);asegurarRuedaFrame(frame);mostrarControlesAnalisisSiempre(frame);fijarTamanoBotonDroidfish(frame);});
   bloquearZoomFrame(document.getElementById('app-frame-1'));
   bloquearScrollHorizontalFrame(document.getElementById('app-frame-1'));
+  asegurarRuedaFrame(document.getElementById('app-frame-1'));
   mostrarControlesAnalisisSiempre(document.getElementById('app-frame-1'));
   fijarTamanoBotonDroidfish(document.getElementById('app-frame-1'));
 })();
@@ -564,6 +618,7 @@
     </div>
   </section>
 </div>
+<script src="aa-catalogo.js?v=20261021-aa69"></script>
 <script src="aa-datos.js?v=20261021-aa69"></script>
 <script type="module" src="pc-cloud-sync.js?v=11"></script>
 <script>
@@ -597,7 +652,7 @@
     {titulo:'Más espacio',texto:'«Ocultar» esconde el encabezado de arriba para que el tablero tenga más espacio. «Mostrar» lo vuelve a poner.',app:'b-banner',modo:'toque'},
     {titulo:'Analiza con Stockfish',texto:'El botón del chip enciende Stockfish, el motor de ajedrez: solo entonces aparecen la evaluación de la posición y la mejor línea. A su lado, «Flechas» te deja dibujar flechas sobre el tablero.',app:'b-edit',modo:'toque'},
     {titulo:'Tus botones',texto:'💡 ilumina la pieza que debes mover, «Solución» reproduce la línea completa, «Girar» voltea el tablero, el parlante activa o silencia el sonido, el libro abre la explicación y el último botón comparte la imagen del ejercicio con su enlace, para que quien lo toque llegue directo a ese ejercicio.',app:'pc-fila-controles',modo:'toque'},
-    {titulo:'Tu mascota',texto:'Te acompaña sobre el tablero y baila con su guitarra cuando resuelves un ejercicio. Con el botón de su carita, junto al regalo, eliges entre 11 mascotas o la quitas; también con doble toque sobre ella.',app:'pc-mascota',mascota:true,modo:'toque'},
+    {titulo:'Tu mascota',texto:'Te acompaña sobre el tablero y baila con su guitarra cuando resuelves un ejercicio. Con el botón de su carita, junto a la pesa, eliges entre 11 mascotas o la quitas; también con doble toque sobre ella.',app:'pc-mascota',mascota:true,modo:'toque'},
     {titulo:'Tu entrenamiento',texto:'Aquí ves tu meta diaria, tu racha y el cuaderno de errores para repasar los ejercicios que te costaron.',app:'b-gift',modo:'toque'},
     {titulo:'Mi ID',texto:'En el menú, «Mi ID» guarda tu avance en la nube. En otro dispositivo entras con el mismo ID, o escaneas su código QR, y recuperas todo.',padre:'menu-button',modo:'toque'},
     {titulo:'A entrenar',texto:'Resuelve, repite y gana velocidad. Esta guía queda en el menú, en «Ver tutorial».',modo:'saludo',final:true}
@@ -832,13 +887,13 @@
   })();
 })();
 </script>
-<script src="c17/shell.js?v=10"></script>
+<script src="c17/shell.js?v=11"></script>
 <script>
 /* Versión de la web. Algunos navegadores (sobre todo en Android) muestran la copia guardada aunque ya haya
    una nueva. Al abrir la página y al volver a ella se consulta version.json sin caché; si hay una versión
    más nueva, se recarga una sola vez con la dirección cambiada para traer todo fresco. */
 (function(){
-  var VERSION='2.0.15';
+  var VERSION='2.0.16';
   function revisar(){
     if(!window.fetch)return;
     fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
