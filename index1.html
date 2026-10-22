@@ -4224,12 +4224,27 @@ function saveHistLog(){
 
 let lastStreak=0;
 
+/* Resueltos: nunca se pierde uno. Se leen los guardados y, además, todo ejercicio que aparezca
+   en el historial (fechas, registro y sus copias), porque solo se anota ahí al resolverlo. */
+function leerResueltosGuardados(){
+  const out=new Set(),max=PUZZLES.length;
+  const poner=x=>{const n=Number(x);if(Number.isInteger(n)&&n>=1&&n<=max)out.add(n);};
+  const leer=k=>{try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}};
+  const lista=leer('wp_solved');
+  if(Array.isArray(lista))lista.forEach(poner);else if(lista&&typeof lista==='object')Object.keys(lista).forEach(poner);
+  ['wp_solved_at','wp_solved_at_backup'].forEach(k=>{const o=leer(k);if(o&&typeof o==='object'&&!Array.isArray(o))Object.keys(o).forEach(poner);});
+  ['wp_hist_log','wp_hist_log_backup'].forEach(k=>{const a=leer(k);if(Array.isArray(a))a.forEach(e=>{if(e&&typeof e==='object')poner(e.n);});});
+  return out;
+}
 function loadSolved(){
-  try{const r=localStorage.getItem('wp_solved');return r?new Set(JSON.parse(r)):new Set();}
-  catch(e){return new Set();}
+  const s=leerResueltosGuardados();
+  try{const r=localStorage.getItem('wp_solved'),a=r?JSON.parse(r):[];if(!Array.isArray(a)||a.length!==s.size)localStorage.setItem('wp_solved',JSON.stringify([...s]));}catch(e){}
+  return s;
 }
 
 function saveSolved(){
+  /* lo que ya estaba guardado (por ejemplo, lo que trajo la nube de otro dispositivo) se conserva */
+  try{leerResueltosGuardados().forEach(n=>solved.add(n));}catch(e){}
   try{localStorage.setItem('wp_solved',JSON.stringify([...solved]));}catch(e){}
 }
 function loadSolvedAt(){

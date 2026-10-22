@@ -83,15 +83,6 @@
     if(l)for(var k in l){if(l[k]&&l[k].estado==='completada'&&(!CAT_AA||CAT_AA.porId[k]))n++;}
     return n;
   }
-  /* PC1 y PC2: el número del ejercicio en el que está la persona, el mismo que dice «Ejercicio N» */
-  function ejercicioActual(app){
-    try{var f=document.getElementById('app-frame-'+app),w=f&&f.contentWindow;
-      if(w&&typeof w.curr==='function'){var p=w.curr();if(p&&Number(p.n)>0)return Number(p.n);}}catch(e){}
-    try{var s=parseInt(sessionStorage.getItem(app==='1'?'pc_tab_ultimo_l1':'pc_tab_ultimo_l2'),10);if(s>0)return s;}catch(e){}
-    var n=parseInt(ls(app==='1'?'wp_ultimo':'wp2_ultimo'),10);
-    return n>0?n:0;
-  }
-  function resuelto(k,n){var v=json(k);if(Array.isArray(v))return v.indexOf(n)>=0||v.indexOf(String(n))>=0;return !!(v&&typeof v==='object'&&v[n]);}
   function fijar(arco,frac){
     if(!arco)return;
     var l=parseFloat(arco.style.getPropertyValue('--l'))||0;
@@ -100,20 +91,14 @@
     arco.style.setProperty('--o',(l*(1-Math.min(1,f))).toFixed(2));
   }
   function pintarAvance(){
-    var e1=ejercicioActual('1'),e2=ejercicioActual('2');
-    /* [cifra que se muestra, total, anillo, lo ya hecho] — en PC1 y PC2 la cifra es el ejercicio actual
-       y el anillo cuenta los anteriores (y el actual, si ya se resolvió) */
-    var datos={'3':[contarAprende(),CAT_AA?CAT_AA.total:219,'aa'],
-      '1':[e1,1128,'pc1',e1&&!resuelto('wp_solved',e1)?e1-1:e1],
-      '2':[e2,1000,'pc2',e2&&!resuelto('wp2_solved',e2)?e2-1:e2]};
+    var datos={'3':[contarAprende(),CAT_AA?CAT_AA.total:219,'aa'],'1':[contarLista('wp_solved'),1128,'pc1'],'2':[contarLista('wp2_solved'),1000,'pc2']};
     for(var app in datos){
-      var cifra=Math.min(datos[app][0],datos[app][1]),total=datos[app][1],id=datos[app][2];
-      var hecho=datos[app].length>3?Math.min(datos[app][3],total):cifra,frac=hecho/total;
+      var hecho=Math.min(datos[app][0],datos[app][1]),total=datos[app][1],frac=hecho/total,id=datos[app][2];
       var el=document.querySelector('.app-choice[data-app="'+app+'"]');
       if(el){
         fijar(el.querySelector('.arco'),frac);
-        el.querySelector('.ac-cifra').textContent=cifra.toLocaleString('es')+' / '+total.toLocaleString('es');
-        el.setAttribute('aria-label',el.querySelector('.ac-nombre').firstChild.textContent+': '+(app==='3'?cifra+' de '+total+' completados':'ejercicio '+cifra+' de '+total));
+        el.querySelector('.ac-cifra').textContent=hecho.toLocaleString('es')+' / '+total.toLocaleString('es');
+        el.setAttribute('aria-label',el.querySelector('.ac-nombre').firstChild.textContent+': '+hecho+' de '+total+' completados');
       }
       fijar(document.querySelector('.anillos .a-'+id),frac);
       var pct=document.getElementById('c-p-'+id);

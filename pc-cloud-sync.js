@@ -257,6 +257,31 @@ function resetFrames(){
   try{const f3=document.getElementById('app-frame-3');if(f3&&f3.contentWindow&&f3.getAttribute('src'))f3.contentWindow.location.reload();}catch(e){}
 }
 
+/* Ejercicios resueltos de PC1 y PC2: se suman, nunca se restan. Aunque una sección se tome entera
+   de la nube (o se suba entera desde aquí), los resueltos de ambos lados se juntan. */
+const CLAVE_RESUELTOS={l1:'wp_solved',l2:'wp2_solved'};
+function listaResueltos(raw){
+  let v=null;try{v=typeof raw==='string'?JSON.parse(raw):raw;}catch(e){v=null;}
+  const out=[];
+  const poner=x=>{const n=Number(x);if(Number.isInteger(n)&&n>0)out.push(n);};
+  if(Array.isArray(v))v.forEach(poner);else if(v&&typeof v==='object')Object.keys(v).forEach(poner);
+  return out;
+}
+function unirResueltos(a,b){
+  const vistos=new Set(),out=[];
+  a.concat(b).forEach(n=>{if(!vistos.has(n)){vistos.add(n);out.push(n);}});
+  return out;
+}
+/* Escribe en este dispositivo la unión; devuelve true si aquí faltaba algo */
+function completarResueltosLocal(scope,lista){
+  const k=CLAVE_RESUELTOS[scope];
+  let actual=[];try{actual=listaResueltos(localStorage.getItem(k));}catch(e){}
+  const union=unirResueltos(actual,lista);
+  if(union.length===actual.length)return false;
+  try{localStorage.setItem(k,JSON.stringify(union));}catch(e){}
+  return true;
+}
+
 async function applyRemote(data,force){
   if(!data||typeof data!=='object')return;
   applyingRemote=true;
@@ -273,10 +298,20 @@ async function applyRemote(data,force){
   let subirAaDespues=false;
   const subirDespues=['l1','l2'].filter(scope=>!usar[scope]&&(keepPending.has(scope)||localStamp(scope)>remoteStamp(data[scope])));
   try{
+    const antes={};
+    ['l1','l2'].forEach(scope=>{try{antes[scope]=listaResueltos(localStorage.getItem(CLAVE_RESUELTOS[scope]));}catch(e){antes[scope]=[];}});
     const c1=usar.l1?applyStorage('l1',data.l1.storage):[];
     const c2=usar.l2?applyStorage('l2',data.l2.storage):[];
     if(usar.l1)setLocalStamp('l1',remoteStamp(data.l1)||Date.now());
     if(usar.l2)setLocalStamp('l2',remoteStamp(data.l2)||Date.now());
+    ['l1','l2'].forEach(scope=>{
+      if(!data[scope])return;
+      const remotos=listaResueltos(((data[scope].storage)||{})[CLAVE_RESUELTOS[scope]]);
+      const union=unirResueltos(antes[scope],remotos);
+      if(completarResueltosLocal(scope,union))(scope==='l1'?c1:c2).push(CLAVE_RESUELTOS[scope]);
+      // a la nube le faltan resueltos de este dispositivo: se suben
+      if(union.length>remotos.length&&subirDespues.indexOf(scope)<0){setLocalStamp(scope,Math.max(localStamp(scope),remoteStamp(data[scope])+1));subirDespues.push(scope);}
+    });
     const changed=[...new Set(c1.concat(c2))];
 
     // Aprende Ajedrez: siempre se fusiona (no hay «gana el más reciente» para todo el ámbito).
@@ -297,6 +332,8 @@ async function applyRemote(data,force){
 
     if(usar.l1)callBridge('app-frame-1',{page:(data.l1&&data.l1.page)||{},changedKeys:changed});
     if(usar.l2)callBridge('app-frame-2',{page:(data.l2&&data.l2.page)||{},changedKeys:changed});
+    if(!usar.l1&&c1.length)callBridge('app-frame-1',null,'refresh');
+    if(!usar.l2&&c2.length)callBridge('app-frame-2',null,'refresh');
     setStatus('Sincronizado','ok');
   }finally{
     setTimeout(()=>{
@@ -336,7 +373,27 @@ async function pushPending(){
   if(scopes.includes('l2'))patch.l2=captureScope('l2');
   try{
     lastUploadAt=Date.now();
-    if(patch.l1||patch.l2)await setDoc(currentRef,patch,{merge:true});
+    if(patch.l1||patch.l2){
+      // se lee la nube en la misma transacción: si otro dispositivo resolvió ejercicios, se suman
+      const ref=currentRef,faltaban={};
+      await runTransaction(db,async tx=>{
+        const snap=await tx.get(ref);
+        const nube=snap.exists()?(snap.data()||{}):{};
+        ['l1','l2'].forEach(scope=>{
+          if(!patch[scope])return;
+          const k=CLAVE_RESUELTOS[scope];
+          const locales=listaResueltos(patch[scope].storage[k]);
+          const remotos=listaResueltos(nube[scope]&&nube[scope].storage&&nube[scope].storage[k]);
+          const union=unirResueltos(locales,remotos);
+          faltaban[scope]=union.length>locales.length?union:null;
+          if(union.length)patch[scope].storage[k]=JSON.stringify(union);
+        });
+        tx.set(ref,patch,{merge:true});
+      });
+      ['l1','l2'].forEach(scope=>{
+        if(faltaban[scope]&&completarResueltosLocal(scope,faltaban[scope]))callBridge(scope==='l1'?'app-frame-1':'app-frame-2',null,'refresh');
+      });
+    }
     if(scopes.includes('aa'))await subirAa();
     setStatus('Sincronizado','ok');
   }catch(e){
