@@ -246,7 +246,7 @@ function injectBridge(frame){
     if(!/index[12]\.html$/i.test(ruta))return;
     const script=docu.createElement('script');
     script.id='pc-cloud-frame-bridge';
-    script.src=new URL('pc-frame-cloud-bridge.js',location.href).href+'?v=6';
+    script.src=new URL('pc-frame-cloud-bridge.js',location.href).href+'?v=7';
     docu.head.appendChild(script);
   }catch(e){}
 }
