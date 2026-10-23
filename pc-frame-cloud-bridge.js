@@ -146,12 +146,9 @@
       }
     }catch(e){}
 
-    // Solo la nube (cuando trae algo más nuevo) puede llevarte a otro ejercicio.
-    // Los cambios guardados por otras pestañas no te mueven del ejercicio en el que estás.
-    if(desdeNube){
-      try{ if(typeof applyPageState==='function') applyPageState(); }catch(e){}
-      refreshExercise(page);
-    }
+    // El ID actualiza progreso y preferencias, pero nunca cambia el ejercicio
+    // activo, la jugada analizada, la pestaña ni el filtro de este dispositivo.
+    // En particular, no ejecutar applyPageState() ni jumpToNumber() por la nube.
 
     try{ if(typeof renderProgress==='function') renderProgress(); }catch(e){}
     try{ if(typeof renderHistorial==='function') renderHistorial(); }catch(e){}
@@ -202,7 +199,7 @@
     payload=payload||{};
     lastApply=Date.now();
     dispatchStorage(payload.changedKeys||[]);
-    refreshRuntime(payload.page||pageState(),true);
+    refreshRuntime(null,false);
     try{window.dispatchEvent(new CustomEvent('pc-cloud-state-applied',{detail:{file:file}}));}catch(e){}
   }
 
@@ -223,7 +220,7 @@
     }catch(e){
       try{if(typeof jumpToNumber==='function')jumpToNumber(1);}catch(x){}
     }
-    refreshRuntime(pageState());
+    refreshRuntime(null,false);
   }
 
   function relevantKey(key){
@@ -236,14 +233,14 @@
   window.addEventListener('storage',function(e){
     if(!e||!relevantKey(e.key))return;
     if(Date.now()-lastApply<80)return;
-    setTimeout(function(){refreshRuntime(pageState());},20);
+    setTimeout(function(){refreshRuntime(null,false);},20);
   });
 
   window.PCCloudFrameBridge=Object.freeze({
     file:file,
     apply:apply,
     reset:reset,
-    refresh:function(){refreshRuntime(pageState());},
+    refresh:function(){refreshRuntime(null,false);},
     pageState:pageState
   });
 
