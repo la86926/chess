@@ -167,6 +167,17 @@
   FUSION[K.progreso]=fusionarProgreso;FUSION[K.historial]=fusionarHistorial;FUSION[K.ultimo]=fusionarSimple;
   FUSION[K.prefs]=fusionarSimple;FUSION[K.favoritos]=fusionarFavoritos;FUSION[K.descubre]=fusionarDescubre;
 
+  /* Finales de peones: mismos algoritmos de fusión, claves independientes. */
+  var AF={
+    progreso:'aa_finales_progreso_v1',historial:'aa_finales_historial_v1',
+    ultimo:'aa_finales_ultimo_v1',prefs:'aa_finales_prefs_v1',
+    favoritos:'aa_finales_favoritos_v1',descubre:'aa_finales_descubre_v1'
+  };
+  NORM[AF.progreso]=normProgreso;NORM[AF.historial]=normHistorial;NORM[AF.ultimo]=normSimple;
+  NORM[AF.prefs]=normSimple;NORM[AF.favoritos]=normFavoritos;NORM[AF.descubre]=normDescubre;
+  FUSION[AF.progreso]=fusionarProgreso;FUSION[AF.historial]=fusionarHistorial;FUSION[AF.ultimo]=fusionarSimple;
+  FUSION[AF.prefs]=fusionarSimple;FUSION[AF.favoritos]=fusionarFavoritos;FUSION[AF.descubre]=fusionarDescubre;
+
   /* Fusiona dos mapas {clave: texto} del ámbito aa.
      Las claves estructuradas usan su fusión propia. Las demás (sonido, tema
      de la explicación, encabezado oculto…) gana la que cambió por última vez,
