@@ -72,7 +72,17 @@ function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 
 // Ocultar/Mostrar la barra superior es una comodidad de cada dispositivo (en el móvil se quiere
 // una cosa y en la computadora otra): no viaja con el ID.
-const LOCAL_KEYS = ['wp_banner','aa_banner'];
+/* Cada dispositivo conserva la sección, ejercicio y paso que tiene abiertos.
+   No forman parte del perfil de Mi ID, aunque siguen guardados localmente.
+   Las instantáneas de las páginas pueden incluir movimientos/filtro: también
+   permanecen locales y no viajan en el campo page de Firestore. */
+const LOCAL_KEYS = [
+  'wp_banner','aa_banner',
+  'pc_l3_active_app','pc_tab_ultimo_l1','pc_tab_ultimo_l2',
+  'wp_ultimo','wp2_ultimo',
+  'aa_ultimo','aa_tab_ultimo','aa_ultimo_v1','aa_finales_ultimo_v1',
+  PAGE1_KEY,PAGE2_KEY
+];
 function isExcludedKey(key){
   return !key || key===SYNC_CODE_KEY || key===CLIENT_KEY || key===DEVICE_MODE_KEY || key.indexOf('pc_cloud_sync_')===0 || LOCAL_KEYS.indexOf(key)>=0;
 }
@@ -112,7 +122,7 @@ function readPage(scope){
   }catch(e){return {};}
 }
 function captureScope(scope){
-  return {storage:captureStorage(scope),page:readPage(scope),updatedAt:localStamp(scope)||Date.now()};
+  return {storage:captureStorage(scope),page:{},updatedAt:localStamp(scope)||Date.now()};
 }
 /* Cuándo cambió por última vez cada sección (L1 / L2) en ESTE dispositivo.
    Sirve para que al sincronizar gane siempre el cambio más reciente. */
@@ -142,10 +152,18 @@ function sellarAa(key){
 function captureAa(){
   return {storage:captureStorage('aa'),sellos:aaSellos(),updatedAt:Date.now()};
 }
+function soloAaCompartido(map){
+  const out={};
+  Object.keys(map||{}).forEach(k=>{if(isAaKey(k))out[k]=map[k];});
+  return out;
+}
 function fusionAa(local,remoto){
   const D=window.AADatos;
-  if(!D)return {mapa:local.storage,sellos:local.sellos};
-  return D.fusionarMapas(local.storage,(remoto&&remoto.storage)||{},local.sellos,(remoto&&remoto.sellos)||{});
+  const localMap=soloAaCompartido(local.storage);
+  const remotoMap=soloAaCompartido((remoto&&remoto.storage)||{});
+  if(!D)return {mapa:localMap,sellos:local.sellos};
+  const f=D.fusionarMapas(localMap,remotoMap,local.sellos,(remoto&&remoto.sellos)||{});
+  return {mapa:soloAaCompartido(f.mapa),sellos:f.sellos};
 }
 function mismoMapa(a,b){
   const ka=Object.keys(a||{}),kb=Object.keys(b||{});
@@ -317,18 +335,8 @@ async function applyRemote(data,force){
     // Aprende Ajedrez: siempre se fusiona (no hay «gana el más reciente» para todo el ámbito).
     if(aplicarAa(data.aa))subirAaDespues=true;
 
-    // Sección abierta: se sigue la que trae la nube para este código. Si la copia de la nube
-    // no guarda ninguna (avances de antes de que existiera Aprende Ajedrez), esa persona
-    // siempre estuvo en el Método PC1, así que se abre el PC1.
-    let active=localStorage.getItem('pc_l3_active_app');
-    if(!(active==='1'||active==='2'||active==='3')&&usar.l1)active='1';
-    // En «Mi ID» no se saca a la persona de la página, salvo justo al entrar con su ID (force):
-    // entonces se la lleva a la sección donde se quedó.
-    const enMiId=!force&&!!document.querySelector('.app-choice.active[data-app="id"]');
-    if(!enMiId&&(active==='1'||active==='2'||active==='3')){
-      const button=document.querySelector('.app-choice[data-app="'+active+'"]');
-      if(button&&!button.classList.contains('active'))button.click();
-    }
+    // La sección en pantalla y los ejercicios activos son exclusivos del dispositivo.
+    // Recibir o recuperar Mi ID nunca hace clic en otra sección.
 
     if(usar.l1)callBridge('app-frame-1',{page:(data.l1&&data.l1.page)||{},changedKeys:changed});
     if(usar.l2)callBridge('app-frame-2',{page:(data.l2&&data.l2.page)||{},changedKeys:changed});
@@ -774,24 +782,19 @@ function installChangeWatchers(){
     // (por ejemplo, abrir otra lección) se sella y se sube después; nunca se pierde.
     if(scope==='aa'){sellarAa(e.key);cuandoLibre(()=>queueUpload('aa'));return;}
     if(applyingRemote)return;
-    // la foto de página se guarda sola al cargar: se sube, pero no cuenta como cambio de la persona
-    if(scope)queueUpload(scope,e.key!==PAGE1_KEY&&e.key!==PAGE2_KEY);
+    // Solo guardar cambios de datos compartidos; navegación y página son locales.
+    if(scope)queueUpload(scope);
   });
   window.addEventListener('online',()=>{if(currentRef&&pendingScopes.size){clearTimeout(uploadTimer);uploadTimer=setTimeout(pushPending,300);}});
-  // Cambio de sección o de apariencia hecho por la persona. Si coincide con la llegada de datos de
-  // la nube (applyingRemote), no se pierde: se sube en cuanto termina de aplicarse.
-  // Los clics que hace el propio código al aplicar la nube (isTrusted=false) no se suben.
-  // «Mi ID» no es una sección de avance: abrirla no se sincroniza.
+  // El cambio de apariencia sí se sincroniza; cambiar entre secciones NO.
   document.addEventListener('click',e=>{
     if(!currentRef)return;
     if(applyingRemote&&!e.isTrusted)return;
-    const t=e.target.closest?e.target:null;if(!t)return;
-    if(t.closest('.app-choice[data-app="id"]'))return;
-    if(t.closest('.app-choice')||t.closest('#tema button'))setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);
+    const t=e.target.closest?e.target:null;
+    if(t&&t.closest('#tema button'))setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);
   },true);
-  // Cambio de sección que la propia página termina con su transición (chess17: el velo vuelve a
-  // lanzar el clic, que ya no es «de la persona»). Se sube igual, en cuanto la nube termina de aplicarse.
-  window.pcSyncSeccionElegida=()=>{if(currentRef)setTimeout(()=>cuandoLibre(()=>queueUpload('l1')),10);};
+  // Compatibilidad con el callback de la navegación; ya no sube su estado.
+  window.pcSyncSeccionElegida=()=>{};
   window.addEventListener('pagehide',()=>{
     if(currentRef&&!applyingRemote&&pendingScopes.size){clearTimeout(uploadTimer);pushPending();}
   });
